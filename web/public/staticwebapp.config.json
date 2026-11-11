@@ -2,8 +2,5 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": ["/assets/*", "/*.{svg,png,ico,json,webmanifest}"]
-  },
-  "platform": {
-    "apiRuntime": "dotnet-isolated:10.0"
   }
 }
