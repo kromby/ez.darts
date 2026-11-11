@@ -1,0 +1,22 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+
+# Azure Functions local settings (copy local.settings.example.json)
+local.settings.json
+
+# Azurite (local storage emulator)
+__azurite_db*.json
+__blobstorage__/
+__queuestorage__/
+.azurite/
+
+# SWA CLI
+.swa/
+
+# OS / editors
+.DS_Store
+.idea/
