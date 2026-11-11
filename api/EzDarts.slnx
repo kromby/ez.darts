@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="EzDarts.Api.Tests/EzDarts.Api.Tests.csproj" />
+  <Project Path="EzDarts.Api/EzDarts.Api.csproj" />
+</Solution>
