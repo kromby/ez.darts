@@ -40,6 +40,17 @@ export interface GameModule<TOptions, TState> {
   id: string
   /** Reads the module's options from the setup screen's values. */
   toOptions(values: OptionValues): TOptions
+  /**
+   * Settles anything left to chance before each new game (play again
+   * included), e.g. Killer's random numbers. The result is what the record
+   * stores, so `init` and `applyDart` stay pure. `random` works like
+   * `Math.random`.
+   */
+  prepare?(
+    options: TOptions,
+    slots: readonly PlayerSlot[],
+    random: () => number,
+  ): TOptions
   init(options: TOptions, slots: readonly PlayerSlot[]): TState
   applyDart(state: TState, dart: Dart): TState
   isOver(state: TState): boolean

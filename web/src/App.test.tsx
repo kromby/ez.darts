@@ -142,4 +142,39 @@ describe('App', () => {
       screen.getByRole('button', { name: '1–20 og miðja' }),
     ).toHaveAttribute('aria-pressed', 'true')
   })
+
+  it('picks Killer and has players choose their numbers', async () => {
+    mockHealth('ok')
+    const user = userEvent.setup()
+
+    render(<App />)
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Anna{Enter}')
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Óli{Enter}')
+    await user.click(screen.getByRole('button', { name: 'Áfram' }))
+    const games = within(screen.getByRole('group', { name: 'Leikur' }))
+    await user.click(games.getByRole('button', { name: 'Killer' }))
+    await user.click(screen.getByRole('radio', { name: 'Velja' }))
+    await user.click(screen.getByRole('button', { name: 'Byrja leik' }))
+
+    expect(
+      screen.getByRole('heading', {
+        name: '3 líf · 3 hitt í killer · Leikmenn velja tölur',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('region', { name: 'Anna velur tölu' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Einfalt 7' }))
+    await user.click(screen.getByRole('button', { name: 'Einfalt 12' }))
+
+    expect(
+      screen.getByRole('region', { name: 'Kastar: Anna' }),
+    ).toBeInTheDocument()
+    expect(screen.getByTestId('remaining')).toHaveTextContent('7')
+    const sides = within(
+      screen.getByRole('list', { name: 'Staðan' }),
+    ).getAllByRole('listitem')
+    expect(sides[1]).toHaveTextContent('Óli')
+    expect(sides[1]).toHaveTextContent('12')
+  })
 })

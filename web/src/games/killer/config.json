@@ -1,0 +1,79 @@
+{
+  "id": "killer",
+  "version": 1,
+  "name": { "is": "Killer", "en": "Killer" },
+  "teams": false,
+  "options": [
+    {
+      "key": "assign",
+      "type": "choice",
+      "label": { "is": "Tölur leikmanna", "en": "Player numbers" },
+      "values": [
+        {
+          "value": "random",
+          "label": { "is": "Af handahófi", "en": "Random" }
+        },
+        { "value": "choose", "label": { "is": "Velja", "en": "Choose" } },
+        { "value": "throw", "label": { "is": "Kasta", "en": "Throw" } }
+      ],
+      "default": "random"
+    },
+    {
+      "key": "mode",
+      "type": "choice",
+      "label": { "is": "Killer tekur", "en": "A killer takes" },
+      "values": [
+        { "value": "lives", "label": { "is": "Líf", "en": "Lives" } },
+        { "value": "hits", "label": { "is": "Hitt", "en": "Hits" } }
+      ],
+      "default": "lives"
+    },
+    {
+      "key": "hitsToKiller",
+      "type": "choice",
+      "label": {
+        "is": "Hitt til að verða killer",
+        "en": "Hits to become a killer"
+      },
+      "values": [1, 3, 5],
+      "allowCustom": true,
+      "min": 1,
+      "max": 9,
+      "default": 3
+    },
+    {
+      "key": "lives",
+      "type": "choice",
+      "label": { "is": "Líf", "en": "Lives" },
+      "values": [1, 3, 5],
+      "allowCustom": true,
+      "min": 1,
+      "max": 9,
+      "default": 3
+    },
+    {
+      "key": "selfHit",
+      "type": "bool",
+      "label": {
+        "is": "Killer tapar á eigin tölu",
+        "en": "A killer loses on their own number"
+      },
+      "default": false
+    }
+  ],
+  "playerOptions": [],
+  "presets": [
+    {
+      "name": { "is": "Klassískt", "en": "Classic" },
+      "options": { "mode": "lives", "hitsToKiller": 3, "lives": 3 }
+    },
+    {
+      "name": { "is": "Hitt tekin", "en": "Take hits" },
+      "options": { "mode": "hits", "hitsToKiller": 3 }
+    },
+    {
+      "name": { "is": "Stutt", "en": "Quick" },
+      "options": { "mode": "lives", "hitsToKiller": 1, "lives": 1 }
+    }
+  ]
+}
