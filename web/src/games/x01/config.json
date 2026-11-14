@@ -1,0 +1,67 @@
+{
+  "id": "x01",
+  "version": 1,
+  "name": { "is": "x01", "en": "x01" },
+  "teams": true,
+  "options": [
+    {
+      "key": "startScore",
+      "type": "choice",
+      "label": { "is": "Byrjunarstig", "en": "Start score" },
+      "values": [301, 501, 701],
+      "allowCustom": true,
+      "min": 2,
+      "max": 9999,
+      "default": 501
+    },
+    {
+      "key": "in",
+      "type": "choice",
+      "label": { "is": "Inn", "en": "In" },
+      "values": [
+        { "value": "single", "label": { "is": "Einfalt", "en": "Single" } },
+        { "value": "double", "label": { "is": "Tvöfalt", "en": "Double" } },
+        { "value": "master", "label": { "is": "Meistara", "en": "Master" } }
+      ],
+      "default": "single"
+    },
+    {
+      "key": "out",
+      "type": "choice",
+      "label": { "is": "Út", "en": "Out" },
+      "values": [
+        { "value": "single", "label": { "is": "Einfalt", "en": "Single" } },
+        { "value": "double", "label": { "is": "Tvöfalt", "en": "Double" } },
+        { "value": "master", "label": { "is": "Meistara", "en": "Master" } }
+      ],
+      "default": "double"
+    }
+  ],
+  "playerOptions": [
+    {
+      "key": "startScore",
+      "type": "int",
+      "label": {
+        "is": "Forgjöf (byrjunarstig)",
+        "en": "Handicap (start score)"
+      },
+      "min": 2,
+      "max": 9999,
+      "default": null
+    }
+  ],
+  "presets": [
+    {
+      "name": { "is": "301 einfalt út", "en": "301 single out" },
+      "options": { "startScore": 301, "in": "single", "out": "single" }
+    },
+    {
+      "name": { "is": "501 tvöfalt út", "en": "501 double out" },
+      "options": { "startScore": 501, "in": "single", "out": "double" }
+    },
+    {
+      "name": { "is": "701 tvöfalt út", "en": "701 double out" },
+      "options": { "startScore": 701, "in": "single", "out": "double" }
+    }
+  ]
+}

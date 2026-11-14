@@ -48,4 +48,25 @@ describe('App', () => {
     expect(localStorage.getItem(languageStorageKey)).toBe('en')
     expect(document.documentElement.lang).toBe('en')
   })
+
+  it('shows the x01 setup screen and starts a game', async () => {
+    mockHealth('ok')
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: 'x01' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: '501 tvöfalt út' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(
+      screen.getByRole('group', { name: 'Leikmaður 2' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Byrja leik' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Leikskjárinn kemur fljótlega.',
+    )
+  })
 })
