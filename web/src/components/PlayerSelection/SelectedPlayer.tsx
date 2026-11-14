@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from 'react-i18next'
 import type { TeamId } from '../../engine/game'
 import type { Player } from '../../players/player'
+import PlayerAvatar from '../PlayerAvatar/PlayerAvatar'
 import styles from './PlayerSelection.module.css'
 
 type Props = {
@@ -59,6 +60,7 @@ function SelectedPlayer({
         </svg>
       </button>
       <span className={styles.position}>{position}</span>
+      <PlayerAvatar player={player} size={32} />
       <span className={styles.name}>{player.name}</span>
       {teams && (
         <span

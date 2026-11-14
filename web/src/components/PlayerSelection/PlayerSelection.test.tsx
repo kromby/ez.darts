@@ -237,4 +237,40 @@ describe('PlayerSelection', () => {
       screen.getByRole('button', { name: 'Færa Anna' }),
     ).toBeInTheDocument()
   })
+
+  it('does not offer removed players, but keeps their names taken', async () => {
+    const { user } = setup({
+      players: [
+        ...household,
+        { id: 'gunna', name: 'Gunna', archivedAt: '2026-11-14T20:00:00Z' },
+      ],
+    })
+
+    expect(
+      screen.queryByRole('button', { name: 'Bæta Gunna í leikinn' }),
+    ).not.toBeInTheDocument()
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'gunna')
+    expect(screen.getByText(/Fjarlægður leikmaður heitir þetta/)).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Bæta við' })).toBeDisabled()
+  })
+
+  it('opens player management', async () => {
+    const onManage = vi.fn<(slots: PlayerSlot[]) => void>()
+    const user = userEvent.setup()
+    render(
+      <PlayerSelection
+        players={household}
+        teamsSupported={false}
+        onAddPlayer={(name) => createPlayer(name)}
+        onContinue={vi.fn<(slots: PlayerSlot[]) => void>()}
+        onManage={onManage}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Bæta Óli í leikinn' }))
+    await user.click(screen.getByRole('button', { name: 'Breyta leikmönnum' }))
+
+    // With the line-up so far, so it is kept.
+    expect(onManage).toHaveBeenCalledWith([{ playerId: 'oli' }])
+  })
 })

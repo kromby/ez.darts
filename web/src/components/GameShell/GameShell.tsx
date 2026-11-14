@@ -10,6 +10,7 @@ type Props<TOptions, TState> = {
   module: GameModule<TOptions, TState>
   record: GameRecord<TOptions>
   playerName(id: PlayerId): string
+  playerColor?(id: PlayerId): string | undefined
   /** Same players and options, a fresh game. */
   onPlayAgain(): void
   /**
@@ -30,6 +31,7 @@ function GameShell<TOptions, TState>({
   module,
   record: initial,
   playerName,
+  playerColor,
   onPlayAgain,
   onExit,
   onRecord,
@@ -77,6 +79,7 @@ function GameShell<TOptions, TState>({
         <Scoreboard
           state={state}
           playerName={playerName}
+          playerColor={playerColor}
           hint={module.hint ? module.hint(state) : undefined}
         />
       </div>

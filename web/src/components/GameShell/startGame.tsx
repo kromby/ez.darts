@@ -11,6 +11,8 @@ import GameShell from './GameShell'
 
 export type ShellCallbacks = {
   playerName(id: PlayerId): string
+  /** The player's avatar colour as a CSS value. */
+  playerColor?(id: PlayerId): string | undefined
   onPlayAgain(): void
   /** With the game's last record: unfinished when it was quit. */
   onExit(record: GameRecord<unknown>): void

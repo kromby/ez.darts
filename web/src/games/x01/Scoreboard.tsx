@@ -45,7 +45,12 @@ function sideStats(state: X01State, side: Side): X01Stats {
  * turn ends the dart slots show how it went (scored, bust or checkout)
  * until the next dart.
  */
-function Scoreboard({ state, playerName, hint }: ScoreboardProps<X01State>) {
+function Scoreboard({
+  state,
+  playerName,
+  playerColor,
+  hint,
+}: ScoreboardProps<X01State>) {
   const { t } = useTranslation()
   const decimal = useDecimal()
   const dartName = useDartName()
@@ -100,7 +105,7 @@ function Scoreboard({ state, playerName, hint }: ScoreboardProps<X01State>) {
       id: s.id,
       name: sideName(s, playerName),
       avatar: sideAvatar(s, playerName),
-      color: sideColor(s, index),
+      color: sideColor(s, index, playerColor),
       tags: (
         <>
           {sideScore.start !== options.startScore && (

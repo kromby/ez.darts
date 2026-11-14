@@ -18,6 +18,8 @@ export type ScoreboardProps<TState> = {
   state: TState
   /** Display name for a player id. */
   playerName(id: PlayerId): string
+  /** The player's avatar colour as a CSS value, when they have one. */
+  playerColor?(id: PlayerId): string | undefined
   /**
    * The module's hint for the thrower, such as a checkout. `null` when there
    * is none right now; left out when the module gives no hints at all.
