@@ -44,6 +44,17 @@ const is = {
       cancelled: 'Hætt við að færa {{name}}',
     },
   },
+  pad: {
+    modifier: 'Margfeldi',
+    single: 'Einfalt',
+    double: 'Tvöfalt',
+    triple: 'Þrefalt',
+    number: '{{modifier}} {{number}}',
+    bull: 'Miðja',
+    noTriple: 'ekki þreföld',
+    miss: 'Framhjá',
+    undo: 'Afturkalla',
+  },
   setup: {
     presets: 'Forstillingar',
     options: 'Stillingar',
@@ -54,6 +65,8 @@ const is = {
     wholeNumberRange: 'Heil tala frá {{min}} til {{max}}',
     // Placeholder until the game screen (#10).
     comingSoon: 'Leikskjárinn kemur fljótlega.',
+    padPreview: 'Á meðan má prófa pílutakkaborðið:',
+    padDarts: 'Síðustu pílur',
     back: 'Til baka',
   },
 }

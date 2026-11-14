@@ -9,6 +9,7 @@ import {
   isMiss,
   isTriple,
   isValidDart,
+  notation,
   points,
   type Dart,
 } from './dart'
@@ -140,5 +141,16 @@ describe('dart', () => {
   it('throws for a dart that cannot be thrown', () => {
     expect(() => dart(BULL, 3)).toThrow(RangeError)
     expect(() => dart(21, 1)).toThrow(RangeError)
+  })
+})
+
+describe('notation', () => {
+  it('writes darts in board notation', () => {
+    expect(notation(single20)).toBe('S20')
+    expect(notation(double20)).toBe('D20')
+    expect(notation(triple20)).toBe('T20')
+    expect(notation(outerBull)).toBe('S25')
+    expect(notation(bullseye)).toBe('D25')
+    expect(notation(MISS)).toBeNull()
   })
 })

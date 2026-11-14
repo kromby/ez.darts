@@ -28,13 +28,40 @@
 .placeholder {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 12px;
   max-width: 640px;
   margin: 0 auto;
 }
 
-.placeholder button {
+.placeholder p {
+  margin: 0;
+}
+
+.darts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  min-height: 54px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.darts li {
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--surface-3);
+  font-size: 22px;
+  font-weight: 850;
+}
+
+.pad {
+  width: 100%;
+}
+
+.placeholder > button {
   min-height: 48px;
   padding: 0 18px;
   border: 0;

@@ -42,6 +42,17 @@ const en: typeof is = {
       cancelled: 'Stopped moving {{name}}',
     },
   },
+  pad: {
+    modifier: 'Multiplier',
+    single: 'Single',
+    double: 'Double',
+    triple: 'Triple',
+    number: '{{modifier}} {{number}}',
+    bull: 'Bull',
+    noTriple: 'no triple',
+    miss: 'Miss',
+    undo: 'Undo',
+  },
   setup: {
     presets: 'Presets',
     options: 'Options',
@@ -51,6 +62,8 @@ const en: typeof is = {
     wholeNumber: 'Enter a whole number',
     wholeNumberRange: 'A whole number from {{min}} to {{max}}',
     comingSoon: 'The game screen is coming soon.',
+    padPreview: 'Meanwhile, try the dart pad:',
+    padDarts: 'Last darts',
     back: 'Back',
   },
 }
