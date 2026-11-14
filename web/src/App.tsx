@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchHealth, type HealthStatus } from './api/health'
 import GamePicker from './components/GameSetup/GamePicker'
@@ -31,9 +31,11 @@ function save(write: Promise<void>) {
 type Props = {
   /** Where players, games and settings are kept: on the device for guests. */
   store: DataStore
+  /** Shown above the current step, e.g. the offer to import guest data. */
+  notice?: ReactNode
 }
 
-function App({ store }: Props) {
+function App({ store, notice }: Props) {
   const { t } = useTranslation()
   const [health, setHealth] = useState<HealthStatus | 'checking'>('checking')
   const [step, setStep] = useState<Step>('loading')
@@ -143,6 +145,7 @@ function App({ store }: Props) {
         <LanguageSwitcher />
       </header>
       <main className={styles.main}>
+        {notice}
         {step === 'players' && (
           <PlayerSelection
             players={players}

@@ -16,6 +16,11 @@ export type Settings = {
   gameId: string
   /** The last setup used for each game, by game id. */
   setups: Record<string, SetupValues>
+  /**
+   * Households this device's guest data has been offered to (imported or
+   * skipped), so the offer comes once per household.
+   */
+  importOffered: string[]
 }
 
 export type SettingKey = keyof Settings
