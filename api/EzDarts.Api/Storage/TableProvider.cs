@@ -12,6 +12,9 @@ public class TableProvider(TableServiceClient service)
     public const string Players = "Players";
     public const string Games = "Games";
     public const string PlayerStats = "PlayerStats";
+    public const string Users = "Users";
+    public const string Sessions = "Sessions";
+    public const string LoginAttempts = "LoginAttempts";
 
     private readonly ConcurrentDictionary<string, TableClient> _ready = new();
 

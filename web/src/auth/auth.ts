@@ -7,9 +7,11 @@ export type AuthState =
   | {
       status: 'signedIn'
       householdId: string
+      /** The account's email; not known for a dev-header household. */
+      email?: string
       /**
-       * Development only: lets the API trust an `X-Household-Id` header
-       * under `func start` until real sessions exist (#19).
+       * Development only: signed in through the API's `X-Household-Id`
+       * header under `func start`, without an account.
        */
       devHeader?: boolean
     }
@@ -17,9 +19,10 @@ export type AuthState =
 export const guest: AuthState = Object.freeze({ status: 'guest' })
 
 /**
- * The seam sign-in plugs into. Today nothing signs in, so the app stays a
- * guest. Sign-in (#19) calls `set` after logging in or out (and on start-up
- * with the session it finds), and the app switches stores.
+ * Who is signed in, for the app to follow: the account menu sets it after
+ * signing in or out, `restoreSession` on start-up, and the API store on a
+ * 401 when the session has ended elsewhere. The app switches stores on every
+ * change.
  */
 export type AuthSource = {
   get(): AuthState
@@ -52,7 +55,7 @@ const householdId = /^[A-Za-z0-9-]{1,64}$/
 /**
  * Development builds only: `?household=test` (remembered on this device) or
  * `?household=` (back to guest) signs in as that household through the
- * API's dev header, to try the API store before sign-in exists.
+ * API's dev header, to try the API without an account.
  */
 export function devAuthState(
   search: string = location.search,
@@ -71,4 +74,25 @@ export function devAuthState(
   } catch {
     return guest
   }
+}
+
+/**
+ * On start-up: signed in when the session cookie still holds, otherwise a
+ * guest (or, in development, a `?household=` dev household).
+ */
+export async function restoreSession(
+  auth: AuthSource,
+  me: () => Promise<{ email: string; householdId: string } | null>,
+  fallback: AuthState = guest,
+): Promise<void> {
+  const account = await me()
+  auth.set(
+    account
+      ? {
+          status: 'signedIn',
+          householdId: account.householdId,
+          email: account.email,
+        }
+      : fallback,
+  )
 }

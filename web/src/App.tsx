@@ -33,9 +33,11 @@ type Props = {
   store: DataStore
   /** Shown above the current step, e.g. the offer to import guest data. */
   notice?: ReactNode
+  /** The header's sign-in and account button. */
+  account?: ReactNode
 }
 
-function App({ store, notice }: Props) {
+function App({ store, notice, account }: Props) {
   const { t } = useTranslation()
   const [health, setHealth] = useState<HealthStatus | 'checking'>('checking')
   const [step, setStep] = useState<Step>('loading')
@@ -142,6 +144,7 @@ function App({ store, notice }: Props) {
     <div className={styles.app}>
       <header className={styles.header}>
         <h1 className={styles.name}>{t('app.name')}</h1>
+        {account}
         <LanguageSwitcher />
       </header>
       <main className={styles.main}>

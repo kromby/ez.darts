@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createAuthSource, guest, type AuthSource } from './auth/auth'
 import Root from './Root'
 import { createMemoryStore } from './storage/memoryStore'
+import { fakeAccountApi } from './test/fakeAccountApi'
 import type { DataStore } from './storage/store'
 
 function mockHealth() {
@@ -33,7 +34,14 @@ async function setup({ guestPlayers = ['Anna'] } = {}) {
   }
   const auth = createAuthSource()
   const homes = households()
-  render(<Root local={local} auth={auth} createHouseholdStore={homes.create} />)
+  render(
+    <Root
+      local={local}
+      auth={auth}
+      accountApi={fakeAccountApi().api}
+      createHouseholdStore={homes.create}
+    />,
+  )
   await screen.findByRole('heading', { name: 'Leikmenn' })
   return { local, auth, homes, user: userEvent.setup() }
 }
@@ -159,5 +167,44 @@ describe('Root', () => {
     await screen.findByRole('heading', { name: 'Leikmenn' })
 
     expect(offer()).not.toBeInTheDocument()
+  })
+
+  it('signs up from the header, offers the import, and signs out again', async () => {
+    mockHealth()
+    const local = createMemoryStore()
+    await local.players.put({ id: 'guest-anna', name: 'Anna', color: 'sky' })
+    const auth = createAuthSource()
+    const homes = households()
+    const account = fakeAccountApi()
+    render(
+      <Root
+        local={local}
+        auth={auth}
+        accountApi={account.api}
+        createHouseholdStore={homes.create}
+      />,
+    )
+    const user = userEvent.setup()
+    await screen.findByRole('heading', { name: 'Leikmenn' })
+
+    await user.click(screen.getByRole('button', { name: 'Skrá inn' }))
+    await user.click(screen.getByRole('button', { name: 'Nýskráning' }))
+    await user.type(screen.getByLabelText('Netfang'), 'anna@example.com')
+    await user.type(screen.getByLabelText('Lykilorð'), 'correct horse')
+    await user.click(screen.getByRole('button', { name: 'Stofna aðgang' }))
+
+    expect(homes.create).toHaveBeenCalledWith('home-1', false)
+    await user.click(await screen.findByRole('button', { name: 'Flytja inn' }))
+    expect(
+      await screen.findByText('Flutt inn: 1 leikmaður og 0 leikir.'),
+    ).toBeVisible()
+    expect(await homes.stores.get('home-1')?.players.list()).toHaveLength(1)
+
+    await user.click(screen.getByRole('button', { name: 'Aðgangur' }))
+    await user.click(screen.getByRole('button', { name: 'Skrá út' }))
+    expect(auth.get()).toBe(guest)
+    expect(
+      await screen.findByRole('button', { name: 'Skrá inn' }),
+    ).toBeInTheDocument()
   })
 })

@@ -35,7 +35,8 @@ public static partial class ApiJson
     private static partial Regex Id();
 }
 
-public record ErrorResponse(string Error);
+/// <summary>An error for people, and a stable code for the app to show its own words.</summary>
+public record ErrorResponse(string Error, string? Code = null);
 
 public static class ApiResults
 {

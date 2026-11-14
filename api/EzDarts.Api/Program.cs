@@ -1,10 +1,12 @@
 using Azure.Data.Tables;
 using Azure.Monitor.OpenTelemetry.Exporter;
+using EzDarts.Api.Accounts;
 using EzDarts.Api.Games;
 using EzDarts.Api.Households;
 using EzDarts.Api.Players;
 using EzDarts.Api.Stats;
 using EzDarts.Api.Storage;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
@@ -33,19 +35,29 @@ builder.Services.AddSingleton<IPlayerStore, TablePlayerStore>();
 builder.Services.AddSingleton<IGameStore, TableGameStore>();
 builder.Services.AddSingleton<IStatsStore, TableStatsStore>();
 
-// Who is signed in. Sign-in (#19) registers its session-cookie resolver here instead. Until then no
-// request has a household, except under `func start` (which sets AZURE_FUNCTIONS_ENVIRONMENT to
-// Development; Azure does not), where an X-Household-Id header stands in for one.
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IPasswordHasher<UserRecord>, PasswordHasher<UserRecord>>();
+builder.Services.AddSingleton<IUserStore, TableUserStore>();
+builder.Services.AddSingleton<ISessionStore, TableSessionStore>();
+builder.Services.AddSingleton<ILoginAttemptStore, TableLoginAttemptStore>();
+builder.Services.AddSingleton<AccountService>();
+builder.Services.AddSingleton<SessionHouseholdResolver>();
+
+// Who is signed in: the session cookie. Under `func start` (which sets AZURE_FUNCTIONS_ENVIRONMENT to
+// Development; Azure does not), an X-Household-Id header also works, to try the API without signing in.
 if (string.Equals(
         Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT"),
         "Development",
         StringComparison.OrdinalIgnoreCase))
 {
-    builder.Services.AddSingleton<IHouseholdResolver, DevHeaderHouseholdResolver>();
+    builder.Services.AddSingleton<IHouseholdResolver>(services => new FirstHouseholdResolver(
+        services.GetRequiredService<SessionHouseholdResolver>(),
+        new DevHeaderHouseholdResolver()));
 }
 else
 {
-    builder.Services.AddSingleton<IHouseholdResolver, NoSessionHouseholdResolver>();
+    builder.Services.AddSingleton<IHouseholdResolver>(services =>
+        services.GetRequiredService<SessionHouseholdResolver>());
 }
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
