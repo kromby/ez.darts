@@ -107,18 +107,16 @@ function Scoreboard({ state, playerName, hint }: ScoreboardProps<KillerState>) {
       avatar: sideAvatar(side, playerName),
       color: sideColor(side, index),
       // One tag that never comes or goes, so the chips keep their height.
-      tags: active && (
-        <>
-          {options.mode === 'lives' ? (
-            <Tag
-              text={t('killer.livesTag', { count: player.lives })}
-              spoken={t('killer.livesCount', { count: player.lives })}
-            />
-          ) : (
-            <Tag text={progress(player)} />
-          )}
-        </>
-      ),
+      tags:
+        active &&
+        (options.mode === 'lives' ? (
+          <Tag
+            text={t('killer.livesTag', { count: player.lives })}
+            spoken={t('killer.livesCount', { count: player.lives })}
+          />
+        ) : (
+          <Tag text={progress(player)} />
+        )),
       line: t('killer.playerLine', {
         hits: progress(player),
         darts: t('game.dartCount', { count: playerStats?.darts ?? 0 }),
