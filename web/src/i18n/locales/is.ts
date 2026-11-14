@@ -17,6 +17,19 @@ const is = {
   settings: {
     language: 'Tungumál',
   },
+  setup: {
+    presets: 'Forstillingar',
+    options: 'Stillingar',
+    players: 'Leikmenn',
+    custom: 'Annað',
+    start: 'Byrja leik',
+    wholeNumber: 'Sláðu inn heila tölu',
+    wholeNumberRange: 'Heil tala frá {{min}} til {{max}}',
+    // Placeholders until player selection (#8) and the game screen (#10).
+    demoPlayer: 'Leikmaður {{number}}',
+    comingSoon: 'Leikskjárinn kemur fljótlega.',
+    back: 'Til baka',
+  },
 }
 
 export default is

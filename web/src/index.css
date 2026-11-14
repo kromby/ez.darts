@@ -1,9 +1,64 @@
+/* Visual tokens from docs/design/README.md */
 :root {
-  font-family: system-ui, sans-serif;
-  color-scheme: light dark;
+  --bg: #0a0d12;
+  --surface: #121821;
+  --surface-2: #1a2029;
+  --surface-3: #27303c;
+  --line: #222a35;
+  --ink: #e9eef4;
+  --muted: #93a0b0;
+  --single: #5b6b80;
+  --double: #22a55c;
+  --triple: #e8890c;
+  --bust: #e5484d;
+  --accent: #38bdf8;
+  --accent-bg: #0f2a3a;
+
+  --radius: 14px;
+  --key-height: 56px;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.4;
+  color-scheme: dark;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  padding: 1rem;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+select {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-weight: 600;
 }
