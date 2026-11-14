@@ -1,10 +1,16 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { MISS, dart, type Dart } from '../../engine/dart'
 import type { PlayerSlot } from '../../engine/game'
 import { createGameRecord, createGameRunner } from '../../engine/runner'
 import { currentThrower } from '../../engine/turns'
-import { toX01Options, x01, type X01Options, type X01State } from './x01'
+import {
+  average,
+  toX01Options,
+  x01,
+  type X01Options,
+  type X01State,
+} from './x01'
 
 /** `T20`, `D16`, `S5`, `D25` (bullseye) or `M` (miss). */
 function d(notation: string): Dart {
@@ -389,15 +395,252 @@ describe('toX01Options', () => {
   })
 })
 
+describe('x01 stats', () => {
+  const stats = (state: X01State, id: string) => state.stats[id]
+
+  it('counts darts and points for the 3-dart average', () => {
+    const { state } = play({}, ['T20', 'T20', 'S20', 'S1', 'S1', 'S1'])
+
+    expect(stats(state, 'anna')).toEqual({
+      darts: 3,
+      scored: 140,
+      bestTurn: 140,
+      checkout: null,
+    })
+    expect(average(stats(state, 'anna'))).toBeCloseTo(140)
+    expect(average(stats(state, 'oli'))).toBeCloseTo(3)
+  })
+
+  it('counts the darts of a bust but none of its points', () => {
+    const { state } = play({ startScore: 50 }, ['S20', 'S20', 'S20'])
+
+    expect(stats(state, 'anna')).toMatchObject({
+      darts: 3,
+      scored: 0,
+      bestTurn: 0,
+    })
+  })
+
+  it('records the best turn and the checkout', () => {
+    const { state } = play({ startScore: 101 }, [
+      'S1',
+      'S1',
+      'S1',
+      'M',
+      'M',
+      'M',
+      'T20',
+      'D19',
+    ])
+
+    expect(stats(state, 'anna')).toEqual({
+      darts: 5,
+      scored: 101,
+      bestTurn: 98,
+      checkout: 98,
+    })
+  })
+
+  it('does not count darts before a double in', () => {
+    const { state } = play({ in: 'double' }, ['S20', 'D20', 'S20'])
+
+    expect(stats(state, 'anna')).toMatchObject({ darts: 3, scored: 60 })
+  })
+
+  it('has no average before the first dart', () => {
+    expect(average(stats(play({}, []).state, 'anna'))).toBeNull()
+  })
+})
+
+const names: Record<string, string> = {
+  anna: 'Anna',
+  oli: 'Óli',
+  dagny: 'Dagný',
+}
+const playerName = (id: string) => names[id]
+
+function renderBoard(state: X01State, hint?: string | null) {
+  const { Scoreboard } = x01
+  return render(
+    <Scoreboard state={state} playerName={playerName} hint={hint} />,
+  )
+}
+
 describe('x01 Scoreboard', () => {
-  it('shows each side with what is left', () => {
-    const { state } = play({ in: 'double' }, ['D20'])
-    const names: Record<string, string> = { anna: 'Anna', oli: 'Óli' }
+  it('shows the thrower, their score and stats, and every side', () => {
+    const { state } = play({}, ['T20', 'T20', 'T20', 'S20'])
+
+    renderBoard(state)
+
+    const current = screen.getByRole('region', { name: 'Kastar: Óli' })
+    expect(within(current).getByTestId('remaining')).toHaveTextContent('481')
+    expect(within(current).getByText('Pílur').nextSibling).toHaveTextContent(
+      '1',
+    )
+    expect(
+      within(current).getByText('Umferð frá').nextSibling,
+    ).toHaveTextContent('501')
+    expect(within(current).getByText('Meðaltal').nextSibling).toHaveTextContent(
+      '60,0',
+    )
+
+    const sides = within(screen.getByRole('list', { name: 'Staðan' }))
+      .getAllByRole('listitem')
+      .map((item) => item.textContent)
+    expect(sides).toEqual([
+      'AAnnameðaltal 180,0 · 3 pílur321',
+      'ÓÓlimeðaltal 60,0 · 1 píla481',
+    ])
+    expect(screen.getByRole('listitem', { current: true })).toHaveTextContent(
+      'Óli',
+    )
+  })
+
+  it('fills the dart slots as the turn goes', () => {
+    renderBoard(play({}, ['T20', 'M']).state)
+
+    const slots = within(
+      screen.getByRole('list', { name: 'Pílur í umferðinni' }),
+    ).getAllByRole('listitem')
+    expect(slots.map((slot) => slot.textContent)).toEqual([
+      'T2060',
+      'Framhjá0',
+      'Píla 3',
+    ])
+    expect(slots[2]).toHaveAttribute('aria-current', 'step')
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
+  it('reports a scored turn until the next dart', () => {
+    renderBoard(play({}, ['T20', 'S5', 'M']).state)
+
+    expect(screen.getByRole('status')).toHaveTextContent('Anna: 65')
+    expect(screen.getByRole('status')).toHaveTextContent('T20 S5 Framhjá')
+    expect(
+      screen.queryByRole('list', { name: 'Pílur í umferðinni' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('reports a bust', () => {
+    renderBoard(play({ startScore: 50 }, ['S20', 'S20', 'S20']).state)
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Anna sprakk – aftur á 50',
+    )
+    expect(screen.getByRole('region', { name: 'Kastar: Óli' })).toHaveAttribute(
+      'data-result',
+      'bust',
+    )
+  })
+
+  it('reports a checkout and the place it earned with play-on', () => {
+    const { state } = play(
+      { startScore: 40, playOn: true },
+      ['D20'],
+      [{ playerId: 'anna' }, { playerId: 'oli' }, { playerId: 'dagny' }],
+    )
+
+    renderBoard(state)
+
+    expect(screen.getByRole('status')).toHaveTextContent('Anna kláraði 40!')
+    expect(
+      within(screen.getByRole('list', { name: 'Staðan' })).getAllByRole(
+        'listitem',
+      )[0],
+    ).toHaveTextContent('1. sæti')
+  })
+
+  it('tags handicaps and sides that are not in yet', () => {
+    const { state } = play(
+      { in: 'double' },
+      ['D20'],
+      [{ playerId: 'anna' }, { playerId: 'oli', options: { startScore: 301 } }],
+    )
+
+    renderBoard(state)
+
+    const [anna, oli] = within(
+      screen.getByRole('list', { name: 'Staðan' }),
+    ).getAllByRole('listitem')
+    expect(anna).toHaveTextContent('461')
+    expect(anna).not.toHaveTextContent('ekki inni')
+    expect(oli).toHaveTextContent('Forgjöf 301')
+    expect(oli).toHaveTextContent('ekki inni')
+  })
+
+  it('names a team by its members', () => {
+    const { state } = play(
+      {},
+      [],
+      [
+        { playerId: 'anna', teamId: 'A' },
+        { playerId: 'oli', teamId: 'B' },
+        { playerId: 'dagny', teamId: 'A' },
+      ],
+    )
+
+    renderBoard(state)
+
+    expect(
+      within(screen.getByRole('list', { name: 'Staðan' })).getAllByRole(
+        'listitem',
+      )[0],
+    ).toHaveTextContent('Anna & Dagný')
+  })
+
+  it('keeps a hint slot only when the game gives hints', () => {
+    const { state } = play({}, [])
+
+    const { rerender } = renderBoard(state)
+    expect(screen.queryByText('Útskot')).not.toBeInTheDocument()
+
     const { Scoreboard } = x01
+    rerender(
+      <Scoreboard state={state} playerName={playerName} hint="T20 D20" />,
+    )
+    expect(screen.getByText('Útskot').parentElement).toHaveTextContent(
+      'ÚtskotT20 D20',
+    )
+  })
+})
 
-    render(<Scoreboard state={state} playerName={(id) => names[id]} />)
+describe('x01 Status', () => {
+  it('names the start score, rules and round', () => {
+    const { Status } = x01
+    if (!Status) throw new Error('x01 has a Status')
+    const { state } = play({ in: 'double', out: 'master' }, [
+      'M',
+      'M',
+      'M',
+      'M',
+      'M',
+      'M',
+    ])
 
-    expect(screen.getByText('Anna: 461')).toBeInTheDocument()
-    expect(screen.getByText('Óli: 501 (ekki inni)')).toBeInTheDocument()
+    const { container } = render(
+      <Status state={state} playerName={playerName} />,
+    )
+
+    expect(container).toHaveTextContent(
+      '501 · Tvöfalt inn · Meistara út · Umferð 2',
+    )
+  })
+})
+
+describe('x01 PlayerSummary', () => {
+  it('lists the key numbers, with the checkout once there is one', () => {
+    const { PlayerSummary } = x01
+    if (!PlayerSummary) throw new Error('x01 has a PlayerSummary')
+    const { state } = play({ startScore: 40 }, ['D20'])
+
+    const anna = render(<PlayerSummary state={state} playerId="anna" />)
+    expect(anna.container).toHaveTextContent(
+      'Meðaltal120,0Pílur1Besta umferð40Útskot40',
+    )
+    anna.unmount()
+
+    const oli = render(<PlayerSummary state={state} playerId="oli" />)
+    expect(oli.container).toHaveTextContent('Meðaltal–Pílur0Besta umferð0')
+    expect(oli.container).not.toHaveTextContent('Útskot')
   })
 })

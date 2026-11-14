@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -74,17 +74,36 @@ describe('App', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Áfram' }))
 
+    // Handicaps carry over from setup into the game.
+    const anna = within(screen.getByRole('group', { name: 'Anna' }))
+    await user.type(anna.getByLabelText('Forgjöf (byrjunarstig)'), '40')
     await user.click(screen.getByRole('button', { name: 'Byrja leik' }))
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Leikskjárinn kemur fljótlega.',
-    )
-
-    await user.click(screen.getByRole('button', { name: 'Þrefalt' }))
-    await user.click(screen.getByRole('button', { name: 'Þrefalt 20' }))
-    await user.click(screen.getByRole('button', { name: 'Framhjá' }))
     expect(
-      screen.getByRole('list', { name: 'Síðustu pílur' }),
-    ).toHaveTextContent('T20Framhjá')
+      screen.getByRole('heading', { name: '501 · Tvöfalt út · Umferð 1' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Kastar: Anna')).toBeInTheDocument()
+    expect(screen.getByTestId('remaining')).toHaveTextContent('40')
+
+    await user.click(screen.getByRole('button', { name: 'Tvöfalt' }))
+    await user.click(screen.getByRole('button', { name: 'Tvöfalt 20' }))
+
+    expect(
+      screen.getByRole('heading', { name: 'Anna vann!' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Spila aftur' }))
+    expect(screen.getByText('Kastar: Anna')).toBeInTheDocument()
+    expect(screen.getByTestId('remaining')).toHaveTextContent('40')
+
+    // Quitting goes back to setup, which keeps the last game's values.
+    await user.click(screen.getByRole('button', { name: 'Valmynd' }))
+    await user.click(screen.getByRole('button', { name: 'Hætta leik' }))
+    await user.click(screen.getByRole('button', { name: 'Já, hætta' }))
+    expect(
+      within(screen.getByRole('group', { name: 'Anna' })).getByLabelText(
+        'Forgjöf (byrjunarstig)',
+      ),
+    ).toHaveValue('40')
   })
 })

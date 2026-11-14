@@ -17,6 +17,7 @@ type RaceState = {
 
 const race: GameModule<RaceOptions, RaceState> = {
   id: 'race',
+  toOptions: (values) => ({ target: Number(values.target) }),
   init: (options, slots) => ({
     target: options.target,
     order: slots.map((slot) => slot.playerId),

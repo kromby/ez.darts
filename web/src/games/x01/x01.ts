@@ -19,7 +19,10 @@ import {
   type SideId,
   type Turns,
 } from '../../engine/turns'
+import PlayerSummary from './PlayerSummary'
+import type { X01Stats } from './stats'
 import Scoreboard from './Scoreboard'
+import Status from './Status'
 
 export type X01Options = {
   startScore: number
@@ -30,6 +33,8 @@ export type X01Options = {
 }
 
 export type SideScore = {
+  /** The side's start score: the game's, or a handicap. */
+  start: number
   /** Points still needed to finish. */
   remaining: number
   /** Whether the side has met the "in" rule and scores. */
@@ -54,7 +59,10 @@ export type X01State = {
   /** Darts thrown so far in the current turn. */
   turnDarts: Dart[]
   lastTurn: X01Turn | null
+  stats: Record<PlayerId, X01Stats>
 }
+
+export { average, type X01Stats } from './stats'
 
 const rules: readonly FitRule[] = ['single', 'double', 'master']
 
@@ -101,7 +109,12 @@ function init(options: X01Options, slots: readonly PlayerSlot[]): X01State {
           .filter((slot) => side.members.includes(slot.playerId))
           .map(handicap)
           .find((value) => value !== null) ?? options.startScore
-      return [side.id, { remaining: start, opened: options.in === 'single' }]
+      const score: SideScore = {
+        start,
+        remaining: start,
+        opened: options.in === 'single',
+      }
+      return [side.id, score]
     }),
   )
   return {
@@ -109,6 +122,12 @@ function init(options: X01Options, slots: readonly PlayerSlot[]): X01State {
     turns: startTurns(sides, board),
     turnDarts: [],
     lastTurn: null,
+    stats: Object.fromEntries(
+      slots.map((slot) => [
+        slot.playerId,
+        { darts: 0, scored: 0, bestTurn: 0, checkout: null },
+      ]),
+    ),
   }
 }
 
@@ -144,6 +163,11 @@ function applyDart(state: X01State, dart: Dart): X01State {
     from: turnStart.remaining,
     result,
   })
+  const player = state.stats[playerId]
+  const stats = (next: Partial<X01Stats>) => ({
+    ...state.stats,
+    [playerId]: { ...player, darts: player.darts + 1, ...next },
+  })
 
   if (isBust(remaining, dart, options.out)) {
     return {
@@ -151,10 +175,16 @@ function applyDart(state: X01State, dart: Dart): X01State {
       turns: bust(turns),
       turnDarts: [],
       lastTurn: lastTurn('bust'),
+      // Take back the points from the turn's earlier darts.
+      stats: stats({
+        scored: player.scored - (turnStart.remaining - score.remaining),
+      }),
     }
   }
 
-  const board = { ...turns.board, [side.id]: { remaining, opened } }
+  const board = { ...turns.board, [side.id]: { ...score, remaining, opened } }
+  const scored = player.scored + (score.remaining - remaining)
+  const turnTotal = turnStart.remaining - remaining
 
   if (remaining === 0) {
     return {
@@ -162,6 +192,11 @@ function applyDart(state: X01State, dart: Dart): X01State {
       turns: endTurn(finish({ ...turns, board }, side.id)),
       turnDarts: [],
       lastTurn: lastTurn('finished'),
+      stats: stats({
+        scored,
+        bestTurn: Math.max(player.bestTurn, turnTotal),
+        checkout: turnStart.remaining,
+      }),
     }
   }
 
@@ -172,6 +207,12 @@ function applyDart(state: X01State, dart: Dart): X01State {
     turns: next,
     turnDarts: turnEnded ? [] : turnDarts,
     lastTurn: turnEnded ? lastTurn('scored') : state.lastTurn,
+    stats: stats({
+      scored,
+      bestTurn: turnEnded
+        ? Math.max(player.bestTurn, turnTotal)
+        : player.bestTurn,
+    }),
   }
 }
 
@@ -199,10 +240,13 @@ function standings(state: X01State): PlayerId[] {
 
 export const x01: GameModule<X01Options, X01State> = {
   id: 'x01',
+  toOptions: toX01Options,
   init,
   applyDart,
   isOver,
   currentThrower: (state) => currentThrower(state.turns),
   standings,
   Scoreboard,
+  Status,
+  PlayerSummary,
 }
