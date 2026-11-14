@@ -13,7 +13,7 @@ type Call = {
 /** A fake API: answers from `routes` by "METHOD /path" and records calls. */
 function fakeApi(routes: Record<string, () => Response> = {}) {
   const calls: Call[] = []
-  const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+  const fetch = vi.fn<typeof globalThis.fetch>((input, init) => {
     const url = String(input)
     const method = init?.method ?? 'GET'
     calls.push({
@@ -23,7 +23,9 @@ function fakeApi(routes: Record<string, () => Response> = {}) {
       body: init?.body ? JSON.parse(String(init.body)) : undefined,
     })
     const route = routes[`${method} ${url}`]
-    return route ? route() : new Response(null, { status: 204 })
+    return Promise.resolve(
+      route ? route() : new Response(null, { status: 204 }),
+    )
   })
   return { fetch, calls }
 }
@@ -193,8 +195,9 @@ describe('latestOnly', () => {
 
   it('keeps ids apart', async () => {
     const sent: string[] = []
-    const save = latestOnly<string>(async (value) => {
+    const save = latestOnly<string>((value) => {
       sent.push(value)
+      return Promise.resolve()
     })
 
     await Promise.all([save('a', 'a1'), save('b', 'b1')])
@@ -203,9 +206,9 @@ describe('latestOnly', () => {
   })
 
   it('rejects the callers whose save failed, and carries on', async () => {
-    const save = latestOnly<number>(async (value) => {
-      if (value === 1) throw new Error('offline')
-    })
+    const save = latestOnly<number>((value) =>
+      value === 1 ? Promise.reject(new Error('offline')) : Promise.resolve(),
+    )
 
     await expect(save('game', 1)).rejects.toThrow('offline')
     await expect(save('game', 2)).resolves.toBeUndefined()

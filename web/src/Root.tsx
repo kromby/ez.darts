@@ -108,7 +108,11 @@ function Root({ local, auth, createHouseholdStore }: Props) {
         offer && (
           <ImportOffer
             state={offer}
-            onImport={() => void runImport()}
+            onImport={() => {
+              runImport().catch((error: unknown) =>
+                console.error('Could not import guest data', error),
+              )
+            }}
             onClose={() => {
               if (offer.step !== 'done') {
                 markOffered().catch((error: unknown) =>
