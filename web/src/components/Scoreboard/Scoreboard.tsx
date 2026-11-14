@@ -14,6 +14,8 @@ export function Board({ children }: { children: ReactNode }) {
 export type Stat = { label: string; value: ReactNode }
 
 export type Slot = {
+  /** Which dart of the turn: 1, 2 or 3. */
+  number: number
   /** `T20`, or "Dart 2" for one not thrown yet. */
   label: string
   /** Shown small under a thrown dart, e.g. its points. */
@@ -53,9 +55,9 @@ function Slots({
 }) {
   return (
     <ol className={styles.slots} aria-label={label} hidden={hidden}>
-      {slots.map((slot, index) => (
+      {slots.map((slot) => (
         <li
-          key={index}
+          key={slot.number}
           className={styles.slot}
           data-state={slot.state}
           aria-current={slot.state === 'next' ? 'step' : undefined}

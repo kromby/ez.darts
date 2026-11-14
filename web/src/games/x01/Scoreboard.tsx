@@ -61,12 +61,14 @@ function Scoreboard({ state, playerName, hint }: ScoreboardProps<X01State>) {
       const thrown = turnDarts.at(index)
       if (thrown) {
         return {
+          number: index + 1,
           label: dartName(thrown),
           detail: points(thrown),
           state: 'thrown',
         }
       }
       return {
+        number: index + 1,
         label: t('game.dartSlot', { number: index + 1 }),
         state: index === turnDarts.length ? 'next' : 'empty',
       }

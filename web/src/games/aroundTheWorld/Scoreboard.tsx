@@ -58,12 +58,14 @@ function Scoreboard({ state, playerName }: ScoreboardProps<AtwState>) {
       if (thrown) {
         const moved = turnSteps.at(index) ?? 0
         return {
+          number: index + 1,
           label: dartName(thrown),
           detail: moved > 0 ? `+${moved}` : '–',
           state: 'thrown',
         }
       }
       return {
+        number: index + 1,
         label: t('game.dartSlot', { number: index + 1 }),
         state: index === turnDarts.length ? 'next' : 'empty',
       }
