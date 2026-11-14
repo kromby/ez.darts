@@ -1,4 +1,4 @@
-import { useId, useState, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   colorValue,
@@ -25,6 +25,12 @@ type Props = {
 function PlayerForm({ players, editing, color, onSubmit, onCancel }: Props) {
   const { t } = useTranslation()
   const id = useId()
+  const nameInput = useRef<HTMLInputElement>(null)
+  // The form opens on a tap of Edit or New player, so move focus to where
+  // typing starts; screen readers then announce the name field.
+  useEffect(() => {
+    nameInput.current?.focus()
+  }, [])
   const [name, setName] = useState(editing?.name ?? '')
   const [chosen, setChosen] = useState<PlayerColor>(color)
   const other = playerNamed(players, name)
@@ -53,9 +59,7 @@ function PlayerForm({ players, editing, color, onSubmit, onCancel }: Props) {
           placeholder={t('manage.name')}
           autoComplete="off"
           maxLength={40}
-          // Focus where typing starts, as the form opens on a tap.
-          // oxlint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
+          ref={nameInput}
           value={name}
           aria-invalid={taken || undefined}
           aria-describedby={taken ? `${id}-taken` : undefined}

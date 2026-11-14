@@ -74,6 +74,7 @@ describe('ManagePlayers', () => {
     await user.click(screen.getByRole('button', { name: 'Breyta Anna' }))
     const form = screen.getByRole('form', { name: 'Breyta Anna' })
     expect(within(form).getByLabelText('Nafn')).toHaveValue('Anna')
+    expect(within(form).getByLabelText('Nafn')).toHaveFocus()
     expect(within(form).getByRole('radio', { name: 'Himinblár' })).toBeChecked()
     await user.clear(within(form).getByLabelText('Nafn'))
     await user.type(within(form).getByLabelText('Nafn'), 'Anna Jóns')
