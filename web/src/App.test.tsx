@@ -49,19 +49,30 @@ describe('App', () => {
     expect(document.documentElement.lang).toBe('en')
   })
 
-  it('shows the x01 setup screen and starts a game', async () => {
+  it('picks players, sets up x01 and starts a game', async () => {
     mockHealth('ok')
     const user = userEvent.setup()
 
     render(<App />)
 
+    expect(
+      screen.getByRole('heading', { name: 'Leikmenn' }),
+    ).toBeInTheDocument()
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Anna{Enter}')
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Óli{Enter}')
+    await user.click(screen.getByRole('button', { name: 'Áfram' }))
+
     expect(screen.getByRole('heading', { name: 'x01' })).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: '501 tvöfalt út' }),
     ).toHaveAttribute('aria-pressed', 'true')
-    expect(
-      screen.getByRole('group', { name: 'Leikmaður 2' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Óli' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Til baka' }))
+    expect(screen.getByRole('list', { name: 'Kaströð' })).toHaveTextContent(
+      /Anna.*Óli/,
+    )
+    await user.click(screen.getByRole('button', { name: 'Áfram' }))
 
     await user.click(screen.getByRole('button', { name: 'Byrja leik' }))
 

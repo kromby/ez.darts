@@ -1,0 +1,257 @@
+.selection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 850;
+  letter-spacing: -0.5px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--key-height);
+  padding: 4px 6px 4px 0;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.row[data-dragging] {
+  z-index: 1;
+  background: var(--accent-bg);
+  box-shadow:
+    inset 0 0 0 2px var(--accent),
+    0 8px 24px rgb(0 0 0 / 0.45);
+}
+
+.handle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 48px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+}
+
+.handle svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.position {
+  flex: none;
+  width: 1.4em;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Long Icelandic names wrap to a second line rather than being cut off. */
+.name {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.teams {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+
+.team {
+  width: 36px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Team colours follow the player avatars in the design, not the S/D/T colours. */
+.team[aria-checked='true'][data-team='A'] {
+  background: var(--team-a);
+  color: #04141c;
+}
+
+.team[aria-checked='true'][data-team='B'] {
+  background: var(--team-b);
+  color: #2a0716;
+}
+
+.team[aria-checked='true'][data-team='C'] {
+  background: var(--team-c);
+  color: #142004;
+}
+
+.remove {
+  flex: none;
+  width: 40px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.tool {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tool:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--accent);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.newPlayer {
+  display: flex;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 17px;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--bust);
+}
+
+.error {
+  margin: 0;
+  color: var(--bust);
+  font-size: 14px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.continue {
+  min-height: 60px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--double);
+  color: #04140a;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.continue:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -5,14 +5,15 @@ import {
   languageNames,
   supportedLanguages,
 } from '../i18n/languages'
+import styles from './LanguageSwitcher.module.css'
 
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation()
   const id = useId()
 
   return (
-    <div>
-      <label htmlFor={id}>{t('settings.language')}</label>{' '}
+    <div className={styles.switcher}>
+      <label htmlFor={id}>{t('settings.language')}</label>
       <select
         id={id}
         value={i18n.resolvedLanguage}

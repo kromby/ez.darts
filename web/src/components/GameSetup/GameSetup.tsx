@@ -9,11 +9,10 @@ import {
   type OptionValues,
 } from '../../engine/config'
 import type { PlayerId } from '../../engine/game'
+import type { Player } from '../../players/player'
 import { localize } from '../../i18n/languages'
 import OptionField from './OptionField'
 import styles from './GameSetup.module.css'
-
-export type SetupPlayer = { id: PlayerId; name: string }
 
 export type GameSetupResult = {
   options: OptionValues
@@ -22,15 +21,17 @@ export type GameSetupResult = {
 
 type Props = {
   config: GameConfig
-  players: SetupPlayer[]
+  players: Player[]
   onStart(setup: GameSetupResult): void
+  /** Shows a back button, e.g. to return to player selection. */
+  onBack?(): void
 }
 
 /**
  * Setup screen generated from a game config: presets, game options and
  * per-player options. Games add no setup-screen code of their own.
  */
-function GameSetup({ config, players, onStart }: Props) {
+function GameSetup({ config, players, onStart, onBack }: Props) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? ''
   const id = useId()
@@ -128,9 +129,16 @@ function GameSetup({ config, players, onStart }: Props) {
         </section>
       )}
 
-      <button type="submit" className={styles.start} disabled={!valid}>
-        {t('setup.start')}
-      </button>
+      <div className={styles.actions}>
+        {onBack && (
+          <button type="button" className={styles.back} onClick={onBack}>
+            {t('setup.back')}
+          </button>
+        )}
+        <button type="submit" className={styles.start} disabled={!valid}>
+          {t('setup.start')}
+        </button>
+      </div>
     </form>
   )
 }
