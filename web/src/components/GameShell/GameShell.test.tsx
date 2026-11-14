@@ -78,7 +78,10 @@ describe('GameShell', () => {
   it('shows a bust and puts the score back', async () => {
     const { user } = renderGame()
 
+    const hint = () => screen.getByText('Útskot').parentElement
+    expect(hint()).toHaveTextContent('ÚtskotD20')
     await user.click(pad('Einfalt 20'))
+    expect(hint()).toHaveTextContent('ÚtskotD10')
     await user.click(pad('Einfalt 19'))
 
     expect(screen.getByRole('status')).toHaveTextContent(

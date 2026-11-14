@@ -604,6 +604,42 @@ describe('x01 Scoreboard', () => {
   })
 })
 
+describe('x01 checkout hints', () => {
+  const hint = (state: X01State) => x01.hint?.(state) ?? null
+
+  it('suggests a finish once one is possible', () => {
+    expect(hint(play({}, []).state)).toBeNull()
+    expect(hint(play({ startScore: 104 }, []).state)).toBe('T18 D25')
+    expect(hint(play({ startScore: 170 }, []).state)).toBe('T20 T20 D25')
+  })
+
+  it('updates after every dart with the darts left', () => {
+    expect(hint(play({ startScore: 104 }, ['S4']).state)).toBe('T20 D20')
+    expect(hint(play({ startScore: 104 }, ['S4', 'M']).state)).toBeNull()
+    expect(hint(play({ startScore: 104 }, ['S4', 'T20']).state)).toBe('D20')
+  })
+
+  it('follows the out rule', () => {
+    expect(hint(play({ startScore: 60, out: 'single' }, []).state)).toBe('T20')
+    expect(hint(play({ startScore: 3, out: 'master' }, []).state)).toBe('T1')
+  })
+
+  it('gives no hint before a double in or once the game is over', () => {
+    expect(hint(play({ startScore: 40, in: 'double' }, []).state)).toBeNull()
+    expect(hint(play({ startScore: 40 }, ['D20']).state)).toBeNull()
+  })
+
+  it('shows the hint and another finish on the scoreboard', () => {
+    const { state } = play({ startScore: 100 }, ['M'])
+
+    renderBoard(state, hint(state))
+
+    expect(screen.getByText('Útskot').parentElement).toHaveTextContent(
+      'ÚtskotT20 D20eða D25 D25',
+    )
+  })
+})
+
 describe('x01 Status', () => {
   it('names the start score, rules and round', () => {
     const { Status } = x01

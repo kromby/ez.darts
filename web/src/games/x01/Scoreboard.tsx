@@ -4,6 +4,7 @@ import { notation, points, type Dart } from '../../engine/dart'
 import type { PlayerId, ScoreboardProps } from '../../engine/game'
 import { currentSide, currentThrower, type Side } from '../../engine/turns'
 import { formatDecimal } from '../../i18n/format'
+import { formatRoute, x01Checkout } from './checkout'
 import { average, type X01Stats } from './stats'
 import type { X01State, X01Turn } from './x01'
 import styles from './Scoreboard.module.css'
@@ -164,8 +165,9 @@ function CurrentThrower({ state, playerName }: Names & { state: X01State }) {
 }
 
 /** Keeps its height while empty, so the pad below never moves. */
-function HintBar({ hint }: { hint: string | null }) {
+function HintBar({ state, hint }: { state: X01State; hint: string | null }) {
   const { t } = useTranslation()
+  const alternative = hint ? x01Checkout(state)?.alternative : null
   return (
     <p className={styles.hint} data-empty={hint === null}>
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -175,6 +177,11 @@ function HintBar({ hint }: { hint: string | null }) {
       </svg>
       <span>{t('x01.checkout')}</span>
       <strong>{hint}</strong>
+      {alternative && (
+        <small>
+          {t('x01.checkoutOr', { route: formatRoute(alternative) })}
+        </small>
+      )}
     </p>
   )
 }
@@ -272,7 +279,7 @@ function Scoreboard({ state, playerName, hint }: ScoreboardProps<X01State>) {
   return (
     <div className={styles.board}>
       <CurrentThrower state={state} playerName={playerName} />
-      {hint !== undefined && <HintBar hint={hint} />}
+      {hint !== undefined && <HintBar state={state} hint={hint} />}
       <SideList state={state} playerName={playerName} />
     </div>
   )

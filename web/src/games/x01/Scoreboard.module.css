@@ -234,6 +234,15 @@
   color: var(--ink);
   font-size: 22px;
   font-weight: 850;
+  white-space: nowrap;
+}
+
+.hint small {
+  margin-left: auto;
+  color: #d6b45a;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
 }
 
 /* ---- Every side: chips on a phone ---- */
@@ -378,6 +387,10 @@
     font-size: 28px;
   }
 
+  .hint small {
+    font-size: 16px;
+  }
+
   .players {
     order: 0;
   }
@@ -462,7 +475,7 @@
 
   .slot,
   .feedback {
-    min-height: 46px;
+    min-height: 44px;
   }
 
   .side {
@@ -471,5 +484,31 @@
 
   .points {
     font-size: 22px;
+  }
+}
+
+@media (max-height: 780px) and (orientation: portrait) {
+  .hint {
+    min-height: 42px;
+  }
+
+  .hint strong {
+    font-size: 19px;
+  }
+
+  .throwing {
+    font-size: 15px;
+  }
+
+  .stats {
+    gap: 2px;
+  }
+
+  .stats dt {
+    font-size: 12px;
+  }
+
+  .stats dd {
+    font-size: 15px;
   }
 }
