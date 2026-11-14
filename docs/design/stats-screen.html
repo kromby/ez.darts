@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stats Screen Mockup</title>
+<style>
+:root{
+  --pg:#0a0d12;--pg2:#121821;--card:#121821;--ink:#e9eef4;--ink2:#c3ccd7;--mut:#8592a3;--line:#222a35;--grid:#1f2732;
+  --S:#8a9bb0;--D:#22a55c;--T:#e8890c;--M:#4a5666;
+  --acc:#38bdf8;--good:#4ade80;--bad:#fb7185;
+  --pG:#38bdf8;--pA:#f472b6;--pO:#a3e635;--pK:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--pg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.45}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.tab{font-variant-numeric:tabular-nums}
+
+/* page */
+.wrap{max-width:1380px;margin:0 auto;padding:40px 32px 80px}
+h1{font-size:32px;line-height:1.15;font-weight:800;letter-spacing:-.4px}
+.lede{color:var(--mut);max-width:760px;margin-top:8px}
+.row{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;margin-top:32px}
+figure{display:flex;flex-direction:column;gap:12px}
+figcaption{font-size:13px;color:var(--mut);max-width:410px}
+figcaption b{color:var(--ink)}
+.why{flex:1 1 320px;max-width:460px;background:var(--pg2);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.why h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.why ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.why li{font-size:14px;color:var(--ink2);padding-left:16px;position:relative}
+.why li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.why li b{color:var(--ink)}
+.why h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:18px 0 8px}
+
+/* phone frame */
+.phone{width:410px;border:10px solid #1a2029;border-radius:46px;background:var(--pg);position:relative;overflow:hidden}
+.fold{position:absolute;left:0;right:0;top:844px;height:0;border-top:2px solid rgba(56,189,248,.45);z-index:5;pointer-events:none}
+.fold span{position:absolute;right:10px;top:-22px;font-size:10px;font-weight:700;letter-spacing:.05em;color:#0b0f14;background:#38bdf8;border-radius:6px;padding:2px 6px}
+.sb{display:flex;justify-content:space-between;padding:14px 26px 6px;font-size:13px;font-weight:700}
+.scr{padding:4px 16px 28px}
+
+/* app chrome */
+.appbar{display:flex;align-items:center;gap:10px;height:48px}
+.appbar .t{font-size:20px;font-weight:800;flex:1}
+.ib{width:40px;height:40px;border-radius:12px;background:var(--pg2);border:1px solid var(--line);display:grid;place-items:center;color:var(--ink2)}
+.ib svg{width:20px;height:20px}
+.chips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+.pc{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 6px;border-radius:22px;background:var(--pg2);border:1px solid var(--line);font-weight:700;font-size:14px;white-space:nowrap}
+.pc[aria-pressed=true]{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.pc.house{padding:0;width:44px;justify-content:center;flex:none;color:var(--ink2)}
+.pc.house svg{width:20px;height:20px}
+.av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:850;font-size:14px;color:#0b0f14;flex:none}
+.seg{display:flex;background:var(--pg2);border:1px solid var(--line);border-radius:12px;padding:3px;margin-top:10px}
+.seg button{flex:1;height:36px;border-radius:9px;font-size:13px;font-weight:700;color:var(--mut)}
+.seg button[aria-pressed=true]{background:#2a3442;color:#fff}
+.filters{display:flex;gap:8px;margin-top:8px}
+.sel{flex:1;height:40px;border-radius:12px;background:var(--pg2);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:13px;font-weight:700;color:var(--ink2)}
+.sel small{color:var(--mut);font-weight:600;margin-right:6px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px;position:relative}
+.ch{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+.ch h3{font-size:15px;font-weight:800}
+.ch span{font-size:12px;color:var(--mut)}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.hero .lab{font-size:13px;color:var(--mut);font-weight:700}
+.hero .big{font-size:64px;font-weight:850;line-height:1;letter-spacing:-2px;margin-top:4px}
+.hero .big small{font-size:30px;letter-spacing:0}
+.hero .sub{font-size:13px;color:var(--ink2);margin-top:6px}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:800;border-radius:7px;padding:2px 7px}
+.delta.good{color:var(--good);background:rgba(74,222,128,.1)}
+.delta.bad{color:var(--bad);background:rgba(251,113,133,.1)}
+.delta.neu{color:var(--mut);background:#1a212b}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.tile{background:var(--pg);border:1px solid var(--line);border-radius:14px;padding:10px}
+.tile .l{font-size:11.5px;color:var(--mut);font-weight:700}
+.tile .v{font-size:24px;font-weight:800;margin-top:2px}
+.tile .d{font-size:11px;color:var(--mut);margin-top:2px}
+.tile .d b{color:var(--good)}
+
+/* dart mix rows */
+.mix{display:flex;flex-direction:column;gap:10px}
+.mr{display:grid;grid-template-columns:40px 1fr 92px;align-items:center;gap:10px;border-radius:10px;padding:2px 0}
+.mr:hover .fill{filter:brightness(1.15)}
+.kc{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:850;font-size:16px}
+.kS{background:#2c3644;color:#dfe6ee}.kD{background:#14361f;color:#4ade80}.kT{background:#3d2709;color:#fbbf24}.kM{background:#1d232c;color:#9aa6b6;font-size:12px}
+.track{height:10px;position:relative}
+.fill{height:10px;border-radius:0 4px 4px 0}
+.mr .nm{font-size:12px;color:var(--mut);margin-top:5px}
+.mr .val{text-align:right}
+.mr .val b{font-size:18px;font-weight:800;display:block;line-height:1.1}
+
+/* charts */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible;touch-action:pan-y}
+.chart svg:focus{outline:2px solid var(--acc);outline-offset:4px;border-radius:6px}
+.tt{position:absolute;top:0;pointer-events:none;background:#0b0f14;border:1px solid #2f3a48;border-radius:10px;padding:6px 9px;font-size:12px;white-space:nowrap;opacity:0;transition:opacity .08s;z-index:3}
+.tt b{font-size:15px;display:block}
+.tt span{color:var(--mut)}
+.mini+.mini{margin-top:14px;padding-top:12px;border-top:1px solid var(--grid)}
+.mini h4{font-size:13px;font-weight:700;color:var(--ink2);display:flex;justify-content:space-between}
+.mini h4 span{color:var(--mut);font-weight:600}
+details{margin-top:8px}
+summary{font-size:12px;color:var(--mut);cursor:pointer;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--grid)}
+th{color:var(--mut);font-weight:700}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+
+/* head to head + leaderboard */
+.h2h{display:flex;flex-direction:column;gap:12px}
+.hr{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center}
+.hr .nm{font-size:14px;font-weight:700}
+.hr .nm small{display:block;font-size:12px;color:var(--mut);font-weight:600}
+.sbar{display:flex;gap:2px;height:8px;margin-top:6px}
+.sbar i{display:block;height:8px;border-radius:4px}
+.hr .pct{font-size:18px;font-weight:800;text-align:right}
+.hr .pct small{display:block;font-size:11px;color:var(--mut);font-weight:600}
+
+.games{width:100%}
+.games td:first-child{font-weight:700}
+
+.rg{display:flex;flex-direction:column}
+.rgi{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--grid)}
+.rgi:last-child{border:0}
+.place{width:44px;height:44px;border-radius:12px;background:var(--pg);border:1px solid var(--line);display:grid;place-items:center;font-weight:850;font-size:15px}
+.place.first{border-color:#7a5a12;background:#221d0c;color:#fbbf24}
+.rgi .g{font-size:14px;font-weight:700}
+.rgi .g small{display:block;font-size:12px;color:var(--mut);font-weight:600}
+.rgi .k{font-size:13px;color:var(--ink2);text-align:right}
+
+/* bars by player */
+.pb{display:grid;grid-template-columns:28px 64px 1fr;gap:8px;align-items:center;margin-top:8px}
+.pb .av{width:28px;height:28px;font-size:12px}
+.pb .nm{font-size:13px;font-weight:700}
+.pb .bw{display:flex;align-items:center;gap:8px}
+.pb .bar{height:14px;border-radius:0 4px 4px 0;background:var(--acc)}
+.pb .bv{font-size:13px;font-weight:800}
+
+/* matrix */
+.mx{display:grid;grid-template-columns:70px repeat(4,1fr);gap:3px;font-size:12px}
+.mx .h{color:var(--mut);font-weight:700;display:flex;align-items:center;justify-content:center;height:30px}
+.mx .rh{justify-content:flex-start;gap:6px;color:var(--ink2);height:auto}
+.mx .rh .av{width:22px;height:22px;font-size:10px}
+.mx .c{height:52px;border-radius:6px;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;cursor:default}
+.mx .c small{display:block;font-size:10px;font-weight:600;opacity:.85;text-align:center}
+.mx .c.self{background:transparent;border:1px solid var(--grid);color:var(--mut)}
+.mx .c:hover{outline:2px solid #fff;outline-offset:-2px}
+.leg{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:var(--mut)}
+.leg .ramp{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#e66767,#2a313b 50%,#3987e5)}
+.note{font-size:12px;color:var(--mut);margin-top:8px}
+
+@media (max-width:520px){
+  figure{width:100%}
+  .row{gap:28px}
+  .wrap{padding:24px 16px 60px}
+  h1{font-size:26px}
+  .phone{width:100%;max-width:410px;border-width:6px;border-radius:30px}
+  .fold{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Stats screen, in the Big Keys style</h1>
+  <p class="lede">Two views: a player's own stats, and a household overview for comparing players. Phones are drawn at full scroll length; the blue line marks the end of the first screen (844 px). Period: the last 12 weeks. The data is made up but adds up.</p>
+
+  <div class="row">
+
+  <!-- ===================== PLAYER VIEW ===================== -->
+  <figure>
+    <div class="phone" id="p1">
+      <div class="fold"><span>END OF FIRST SCREEN</span></div>
+      <div class="sb"><span>21:14</span><span>●●● 87%</span></div>
+      <div class="scr">
+        <div class="appbar">
+          <button class="ib" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="t">Stats</div>
+          <button class="ib" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        </div>
+        <div class="chips" role="group" aria-label="Player">
+          <button class="pc" aria-pressed="true"><span class="av" style="background:var(--pG)">G</span>Guðjón</button>
+          <button class="pc" aria-pressed="false"><span class="av" style="background:var(--pA)">A</span>Anna</button>
+          <button class="pc" aria-pressed="false"><span class="av" style="background:var(--pO)">Ó</span>Óli</button>
+          <button class="pc house" aria-label="Household" title="Household" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></button>
+        </div>
+        <div class="seg" role="group" aria-label="Period">
+          <button aria-pressed="false">4 wk</button><button aria-pressed="true">12 wk</button><button aria-pressed="false">Year</button><button aria-pressed="false">All</button>
+        </div>
+        <div class="filters">
+          <div class="sel"><span><small>Game</small>All games</span><span>▾</span></div>
+        </div>
+
+        <div class="card">
+          <div class="hero">
+            <div>
+              <div class="lab">Win ratio</div>
+              <div class="big">41<small>%</small></div>
+              <div class="sub">23 wins in 56 games</div>
+            </div>
+            <span class="delta good" title="Previous 12 weeks: 36%">▲ 5 pts</span>
+          </div>
+          <div class="tiles">
+            <div class="tile"><div class="l">Games</div><div class="v">56</div><div class="d">prev. 47</div></div>
+            <div class="tile"><div class="l">Darts</div><div class="v">2,184</div><div class="d">prev. 1,902</div></div>
+            <div class="tile"><div class="l">x01 avg</div><div class="v">56.2</div><div class="d"><b>▲ 4.3</b> vs 51.9</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Where your darts land</h3><span>vs prev. 12 wk</span></div>
+          <div class="mix" id="mix"></div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Trends</h3><span>per week</span></div>
+          <div class="mini"><h4>x01 3-dart average <span id="t-avg-l"></span></h4><div class="chart" id="c-avg"></div></div>
+          <div class="mini"><h4>Doubles, % of darts <span id="t-d-l"></span></h4><div class="chart" id="c-d"></div></div>
+          <div class="mini"><h4>Triples, % of darts <span id="t-t-l"></span></h4><div class="chart" id="c-t"></div></div>
+          <details><summary>Show data</summary><table id="trend-table"></table></details>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Head to head</h3><span>finished ahead</span></div>
+          <div class="h2h">
+            <div class="hr"><span class="av" style="background:var(--pA)">A</span>
+              <div><div class="nm">vs Anna <small>18 of 31 shared games</small></div><div class="sbar" aria-hidden="true"><i style="flex:18;background:var(--acc)"></i><i style="flex:13;background:#2a313b"></i></div></div>
+              <div class="pct">58%</div></div>
+            <div class="hr"><span class="av" style="background:var(--pO)">Ó</span>
+              <div><div class="nm">vs Óli <small>15 of 27 shared games</small></div><div class="sbar" aria-hidden="true"><i style="flex:15;background:var(--acc)"></i><i style="flex:12;background:#2a313b"></i></div></div>
+              <div class="pct">56%</div></div>
+            <div class="hr"><span class="av" style="background:var(--pK)">K</span>
+              <div><div class="nm">vs Kári <small>9 of 14 shared games</small></div><div class="sbar" aria-hidden="true"><i style="flex:9;background:var(--acc)"></i><i style="flex:5;background:#2a313b"></i></div></div>
+              <div class="pct">64%</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>By game</h3></div>
+          <table class="games">
+            <thead><tr><th>Game</th><th class="n">Played</th><th class="n">Won</th><th class="n">Win %</th><th class="n">Key stat</th></tr></thead>
+            <tbody>
+              <tr><td>x01</td><td class="n">32</td><td class="n">15</td><td class="n">47%</td><td class="n">avg 56.2</td></tr>
+              <tr><td>Killer</td><td class="n">14</td><td class="n">5</td><td class="n">36%</td><td class="n">—</td></tr>
+              <tr><td>Around the World</td><td class="n">10</td><td class="n">3</td><td class="n">30%</td><td class="n">41 darts</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Recent games</h3><span>See all</span></div>
+          <div class="rg">
+            <div class="rgi"><div class="place first">1st</div><div class="g">x01 · 501 <small>Fri 6 Nov · vs Anna, Óli</small></div><div class="k">avg 64.1</div></div>
+            <div class="rgi"><div class="place">2nd</div><div class="g">Killer <small>Fri 6 Nov · 4 players</small></div><div class="k">—</div></div>
+            <div class="rgi"><div class="place first">1st</div><div class="g">Around the World <small>Thu 5 Nov · 3 players</small></div><div class="k">38 darts</div></div>
+            <div class="rgi"><div class="place">3rd</div><div class="g">x01 · 301 <small>Thu 5 Nov · vs Anna, Kári</small></div><div class="k">avg 48.2</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <figcaption><b>Player view.</b> One headline number, then the dart mix and trends. Head to head and per-game detail are further down.</figcaption>
+  </figure>
+
+  <!-- ===================== HOUSEHOLD VIEW ===================== -->
+  <figure>
+    <div class="phone" id="p2">
+      <div class="fold"><span>END OF FIRST SCREEN</span></div>
+      <div class="sb"><span>21:14</span><span>●●● 87%</span></div>
+      <div class="scr">
+        <div class="appbar">
+          <button class="ib" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div class="t">Stats</div>
+          <button class="ib" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        </div>
+        <div class="chips" role="group" aria-label="Player">
+          <button class="pc" aria-pressed="false"><span class="av" style="background:var(--pG)">G</span>Guðjón</button>
+          <button class="pc" aria-pressed="false"><span class="av" style="background:var(--pA)">A</span>Anna</button>
+          <button class="pc" aria-pressed="false"><span class="av" style="background:var(--pO)">Ó</span>Óli</button>
+          <button class="pc house" aria-label="Household" title="Household" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></button>
+        </div>
+        <div class="seg" role="group" aria-label="Period">
+          <button aria-pressed="false">4 wk</button><button aria-pressed="true">12 wk</button><button aria-pressed="false">Year</button><button aria-pressed="false">All</button>
+        </div>
+        <div class="filters">
+          <div class="sel"><span><small>Game</small>All games</span><span>▾</span></div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Win ratio</h3><span>12 weeks</span></div>
+          <div class="h2h">
+            <div class="hr"><span class="av" style="background:var(--pG)">G</span>
+              <div><div class="nm">Guðjón <small>23 wins in 56 games</small></div><div class="sbar" aria-hidden="true"><i style="flex:23;background:var(--acc)"></i><i style="flex:33;background:#2a313b"></i></div></div>
+              <div class="pct">41%</div></div>
+            <div class="hr"><span class="av" style="background:var(--pA)">A</span>
+              <div><div class="nm">Anna <small>19 wins in 51 games</small></div><div class="sbar" aria-hidden="true"><i style="flex:19;background:var(--acc)"></i><i style="flex:32;background:#2a313b"></i></div></div>
+              <div class="pct">37%</div></div>
+            <div class="hr"><span class="av" style="background:var(--pO)">Ó</span>
+              <div><div class="nm">Óli <small>15 wins in 44 games</small></div><div class="sbar" aria-hidden="true"><i style="flex:15;background:var(--acc)"></i><i style="flex:29;background:#2a313b"></i></div></div>
+              <div class="pct">34%</div></div>
+            <div class="hr"><span class="av" style="background:var(--pK)">K</span>
+              <div><div class="nm">Kári <small>6 wins in 21 games</small></div><div class="sbar" aria-hidden="true"><i style="flex:6;background:var(--acc)"></i><i style="flex:15;background:#2a313b"></i></div></div>
+              <div class="pct">29%</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Head to head</h3><span>row finished ahead of column</span></div>
+          <div class="mx" id="mx"></div>
+          <div class="leg"><span>Behind more</span><span class="ramp"></span><span>Ahead more</span></div>
+          <div class="note">% of shared games. Works for games with more than two players.</div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>x01 3-dart average</h3><span>12 weeks</span></div>
+          <div id="pbars"></div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Doubles &amp; triples</h3><span>% of darts</span></div>
+          <table>
+            <thead><tr><th>Player</th><th class="n">Double</th><th class="n">Triple</th><th class="n">Miss</th></tr></thead>
+            <tbody>
+              <tr><td>Guðjón</td><td class="n">9.0%</td><td class="n">6.4%</td><td class="n">23.7%</td></tr>
+              <tr><td>Anna</td><td class="n">7.1%</td><td class="n">4.2%</td><td class="n">27.5%</td></tr>
+              <tr><td>Kári</td><td class="n">5.8%</td><td class="n">3.1%</td><td class="n">31.0%</td></tr>
+              <tr><td>Óli</td><td class="n">4.6%</td><td class="n">2.2%</td><td class="n">36.4%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <figcaption><b>Household view.</b> For comparing players: win ratio, a head-to-head grid, x01 averages, and the dart mix for everyone.</figcaption>
+  </figure>
+
+  <aside class="why">
+    <h2>Design notes</h2>
+    <ul>
+      <li><b>Same look as Big Keys.</b> The S/D/T chips use the same colours as the game pad, so "D" is green everywhere in the app.</li>
+      <li><b>One headline number</b> (win ratio) with the change from the previous period. Everything else is one scroll away.</li>
+      <li><b>The dart mix is labelled rows, not a pie.</b> Doubles and triples are small shares (6–9%), and rows make them easy to compare and show the change.</li>
+      <li><b>Three small trend charts</b> instead of one chart with two scales. Weekly points smooth out one bad evening. Tap or drag a chart to read a week.</li>
+      <li><b>Head to head = "finished ahead of"</b> in games both played, so it works for 3+ player games and Killer, not just 1-vs-1.</li>
+      <li><b>The grid suits up to about 6 players.</b> Past that, the household view falls back to a list per player.</li>
+    </ul>
+    <h3>To decide</h3>
+    <ul>
+      <li><b>Kids vs adults.</b> A child will usually be last on household rankings. Should the household view lead with each player's own improvement instead of the ranking?</li>
+      <li><b>Guests.</b> The same screens can work from local data, so guests get stats on their own device too.</li>
+    </ul>
+  </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- data ----------
+  const weeks=["17 Aug","24 Aug","31 Aug","7 Sep","14 Sep","21 Sep","28 Sep","5 Oct","12 Oct","19 Oct","26 Oct","2 Nov"];
+  const avg=[49.8,52.1,51.0,54.6,53.2,55.9,57.4,56.1,59.3,58.0,61.2,62.7];
+  const dbl=[7.2,7.8,8.1,7.5,8.6,8.9,9.4,8.8,9.9,9.6,10.4,10.8];
+  const trp=[4.9,5.3,5.1,5.8,6.0,5.7,6.4,6.9,6.6,7.1,7.4,7.8];
+  const mix=[
+    {k:"S",cls:"kS",name:"Single",n:1330,p:60.9,prev:59.5,good:null,col:"var(--S)"},
+    {k:"D",cls:"kD",name:"Double",n:197,p:9.0,prev:7.4,good:true,col:"var(--D)"},
+    {k:"T",cls:"kT",name:"Triple",n:140,p:6.4,prev:5.2,good:true,col:"var(--T)"},
+    {k:"Miss",cls:"kM",name:"Miss",n:517,p:23.7,prev:27.9,good:false,col:"var(--M)"}
+  ];
+  const h2h={ // row ahead of column: [ahead, shared]
+    G:{A:[18,31],O:[15,27],K:[9,14]},
+    A:{G:[13,31],O:[14,27],K:[9,15]},
+    O:{G:[12,27],A:[13,27],K:[6,11]},
+    K:{G:[5,14],A:[6,15],O:[5,11]}
+  };
+  const ppl=[["G","Guðjón","var(--pG)"],["A","Anna","var(--pA)"],["O","Óli","var(--pO)"],["K","Kári","var(--pK)"]];
+  const pavg=[["G","Guðjón",56.2,"var(--pG)"],["A","Anna",49.8,"var(--pA)"],["K","Kári",41.5,"var(--pK)"],["O","Óli",33.9,"var(--pO)"]];
+
+  const el=(t,c,txt)=>{const e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e};
+
+  // ---------- dart mix ----------
+  const mixEl=document.getElementById("mix");
+  mix.forEach(m=>{
+    const r=el("div","mr");
+    const k=el("div","kc "+m.cls,m.k);
+    const mid=el("div");
+    const tr=el("div","track");const f=el("div","fill");f.style.width=m.p+"%";f.style.background=m.col;tr.appendChild(f);
+    mid.appendChild(tr);mid.appendChild(el("div","nm",m.name+" · "+m.n.toLocaleString("en")+" darts"));
+    const v=el("div","val");v.appendChild(el("b","tab",m.p.toFixed(1)+"%"));
+    const d=+(m.p-m.prev).toFixed(1);
+    const dc=m.good===null?"neu":((d>0)===m.good?"good":"bad");
+    const ds=el("span","delta "+dc,(d>0?"▲ ":"▼ ")+Math.abs(d).toFixed(1)+" pts");
+    v.appendChild(ds);
+    r.title=m.name+": "+m.n+" of 2,184 darts ("+m.p.toFixed(1)+"%), previous period "+m.prev.toFixed(1)+"%";
+    r.append(k,mid,v);mixEl.appendChild(r);
+  });
+
+  // ---------- line chart ----------
+  function line(host,vals,o){
+    const W=330,H=118,L=30,R=44,T=8,B=20,n=vals.length;
+    const x=i=>L+i*(W-L-R)/(n-1), y=v=>T+(1-(v-o.min)/(o.max-o.min))*(H-T-B);
+    const NS="http://www.w3.org/2000/svg";
+    const s=document.createElementNS(NS,"svg");s.setAttribute("viewBox","0 0 "+W+" "+H);s.setAttribute("tabindex","0");
+    s.setAttribute("role","img");s.setAttribute("aria-label",o.label+": from "+o.fmt(vals[0])+" to "+o.fmt(vals[n-1])+" over 12 weeks");
+    const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+    o.ticks.forEach(t=>{
+      s.appendChild(mk("line",{x1:L,x2:W-R,y1:y(t),y2:y(t),stroke:"#1f2732","stroke-width":1}));
+      const tx=mk("text",{x:L-6,y:y(t)+3.5,"text-anchor":"end","font-size":10,fill:"#8592a3"});tx.textContent=o.tick(t);s.appendChild(tx);
+    });
+    [0,4,8,11].forEach(i=>{const tx=mk("text",{x:x(i),y:H-4,"text-anchor":i===0?"start":(i===11?"end":"middle"),"font-size":10,fill:"#8592a3"});tx.textContent=weeks[i];s.appendChild(tx)});
+    const pts=vals.map((v,i)=>x(i)+","+y(v));
+    s.appendChild(mk("path",{d:"M"+pts.join(" L")+" L"+x(n-1)+","+(H-B)+" L"+x(0)+","+(H-B)+"Z",fill:o.col,"fill-opacity":.1}));
+    s.appendChild(mk("polyline",{points:pts.join(" "),fill:"none",stroke:o.col,"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"}));
+    s.appendChild(mk("circle",{cx:x(n-1),cy:y(vals[n-1]),r:4,fill:o.col,stroke:"#121821","stroke-width":2}));
+    const el2=mk("text",{x:x(n-1)+8,y:y(vals[n-1])+4,"font-size":12,"font-weight":800,fill:"#e9eef4"});el2.textContent=o.fmt(vals[n-1]);s.appendChild(el2);
+    // hover layer
+    const cl=mk("line",{y1:T,y2:H-B,stroke:"#8592a3","stroke-width":1,opacity:0});
+    const hd=mk("circle",{r:5,fill:o.col,stroke:"#121821","stroke-width":2,opacity:0});
+    s.append(cl,hd);
+    const tt=el("div","tt");const tb=el("b");const ts=el("span");tt.append(tb,ts);
+    host.append(s,tt);
+    function show(i){
+      cl.setAttribute("x1",x(i));cl.setAttribute("x2",x(i));cl.setAttribute("opacity",1);
+      hd.setAttribute("cx",x(i));hd.setAttribute("cy",y(vals[i]));hd.setAttribute("opacity",1);
+      tb.textContent=o.fmt(vals[i]);ts.textContent="Week of "+weeks[i];
+      const sc=s.getBoundingClientRect().width/W;let px=x(i)*sc+10;
+      tt.style.opacity=1;const tw=tt.offsetWidth;if(px+tw>s.getBoundingClientRect().width)px=x(i)*sc-tw-10;
+      tt.style.left=px+"px";tt.style.top=Math.max(0,y(vals[i])*sc-40)+"px";
+    }
+    function hide(){cl.setAttribute("opacity",0);hd.setAttribute("opacity",0);tt.style.opacity=0}
+    let cur=n-1;
+    s.addEventListener("pointermove",e=>{const r=s.getBoundingClientRect();const vx=(e.clientX-r.left)*W/r.width;cur=Math.max(0,Math.min(n-1,Math.round((vx-L)/((W-L-R)/(n-1)))));show(cur)});
+    s.addEventListener("pointerleave",hide);
+    s.addEventListener("focus",()=>show(cur));s.addEventListener("blur",hide);
+    s.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){cur=Math.max(0,cur-1);show(cur);e.preventDefault()}if(e.key==="ArrowRight"){cur=Math.min(n-1,cur+1);show(cur);e.preventDefault()}});
+  }
+  line(document.getElementById("c-avg"),avg,{min:40,max:70,ticks:[40,50,60,70],tick:t=>t,fmt:v=>v.toFixed(1),col:"#38bdf8",label:"x01 3-dart average"});
+  line(document.getElementById("c-d"),dbl,{min:0,max:12,ticks:[0,4,8,12],tick:t=>t+"%",fmt:v=>v.toFixed(1)+"%",col:"#22a55c",label:"Doubles, % of darts"});
+  line(document.getElementById("c-t"),trp,{min:0,max:12,ticks:[0,4,8,12],tick:t=>t+"%",fmt:v=>v.toFixed(1)+"%",col:"#e8890c",label:"Triples, % of darts"});
+  document.getElementById("t-avg-l").textContent="▲ "+(avg[11]-avg[0]).toFixed(1);
+  document.getElementById("t-d-l").textContent="▲ "+(dbl[11]-dbl[0]).toFixed(1)+" pts";
+  document.getElementById("t-t-l").textContent="▲ "+(trp[11]-trp[0]).toFixed(1)+" pts";
+  const tt=document.getElementById("trend-table");
+  const hr=el("tr");["Week","Avg","Double","Triple"].forEach((h,i)=>hr.appendChild(el("th",i?"n":"",h)));tt.appendChild(hr);
+  weeks.forEach((w,i)=>{const r=el("tr");r.append(el("td","",w),el("td","n",avg[i].toFixed(1)),el("td","n",dbl[i].toFixed(1)+"%"),el("td","n",trp[i].toFixed(1)+"%"));tt.appendChild(r)});
+
+  // ---------- matrix ----------
+  const mx=document.getElementById("mx");
+  const mixc=(a,b,t)=>{const h=c=>[1,3,5].map(i=>parseInt(c.substr(i,2),16));const A=h(a),B=h(b);return "rgb("+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(",")+")"};
+  mx.appendChild(el("div","h",""));
+  ppl.forEach(p=>{const h=el("div","h");const a=el("span","av",p[0]==="O"?"Ó":p[0]);a.style.cssText="width:22px;height:22px;font-size:10px;background:"+p[2];h.appendChild(a);mx.appendChild(h)});
+  ppl.forEach(r=>{
+    const rh=el("div","h rh");const a=el("span","av",r[0]==="O"?"Ó":r[0]);a.style.background=r[2];rh.append(a,el("span","",r[1]));mx.appendChild(rh);
+    ppl.forEach(c=>{
+      if(r[0]===c[0]){mx.appendChild(el("div","c self","—"));return}
+      const [w,n]=h2h[r[0]][c[0]];const pct=Math.round(w/n*100);
+      const t=Math.min(1,Math.abs(pct-50)/15);
+      const cell=el("div","c");cell.style.background=mixc("#2a313b",pct>=50?"#3987e5":"#e66767",t);
+      cell.appendChild(document.createTextNode(pct+"%"));cell.appendChild(el("small","",w+"/"+n));
+      cell.title=r[1]+" finished ahead of "+c[1]+" in "+w+" of "+n+" shared games";
+      mx.appendChild(cell);
+    });
+  });
+
+  // ---------- player bars ----------
+  const pb=document.getElementById("pbars");const max=70;
+  pavg.forEach(p=>{
+    const r=el("div","pb");const a=el("span","av",p[0]==="O"?"Ó":p[0]);a.style.background=p[3];
+    const bw=el("div","bw");const b=el("div","bar");b.style.width=(p[2]/max*100)+"%";b.title=p[1]+": "+p[2].toFixed(1);
+    bw.append(b,el("span","bv tab",p[2].toFixed(1)));
+    r.append(a,el("span","nm",p[1]),bw);pb.appendChild(r);
+  });
+})();
+</script>
+</body>
+</html>

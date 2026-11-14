@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>x01 Screen Concepts</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--pg:#0a0d12;--pg2:#121821;--ink:#e9eef4;--mut:#93a0b0;--line:#222a35;--S:#5b6b80;--D:#22a55c;--T:#e8890c;--bust:#e5484d}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--pg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.5}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.num{font-variant-numeric:tabular-nums}
+svg.i{width:1em;height:1em;flex:none}
+
+/* ---------- page ---------- */
+.wrap{max-width:1380px;margin:0 auto;padding:40px 32px 80px}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.ph h1{font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-.5px}
+.ph p{color:var(--mut);max-width:720px;margin-top:8px}
+.lang{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut)}
+.lang .seg{display:flex;background:var(--pg2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.lang .seg button{padding:6px 14px;border-radius:7px;font-weight:700;font-size:13px;color:var(--mut)}
+.lang .seg button[aria-pressed=true]{background:#2a3442;color:#fff}
+.state{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.state .card{background:var(--pg2);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.state h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:700;margin-bottom:6px}
+.state p,.state li{font-size:14px}
+.state ul{list-style:none}
+.state li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding:3px 0}
+.state li:last-child{border:0}
+.chipS,.chipD,.chipT{display:inline-block;font-weight:800;font-size:12px;border-radius:6px;padding:1px 7px;margin-right:4px}
+.chipS{background:#2c3644;color:#cfd8e3}.chipD{background:#14361f;color:#4ade80}.chipT{background:#3d2709;color:#fbbf24}
+
+.concept{margin-top:64px;padding-top:36px;border-top:1px solid var(--line)}
+.c-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.c-no{font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--mut)}
+.c-title{font-size:28px;font-weight:800;letter-spacing:-.3px}
+.c-tag{color:var(--mut);font-size:16px}
+.c-body{display:flex;gap:44px;flex-wrap:wrap;align-items:flex-start;margin-top:26px}
+.frames{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start}
+figure{display:flex;flex-direction:column;gap:14px}
+figcaption{font-size:13px;color:var(--mut);max-width:260px}
+figcaption b{color:var(--ink);font-weight:700}
+.why.wide{max-width:none;flex-basis:100%}
+.why.wide ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 28px}
+.why{flex:1 1 300px;max-width:440px;background:var(--pg2);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.why h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.why ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.why li{font-size:14px;padding-left:26px;position:relative}
+.why li::before{position:absolute;left:0;top:1px;width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:13px;font-weight:800}
+.why li.p::before{content:"+";background:#14361f;color:#4ade80}
+.why li.m::before{content:"\2212";background:#3a1a1c;color:#fb7185}
+.why li.n::before{content:"\2192";background:#1d2a3a;color:#93c5fd}
+
+table.cmp{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+.cmp th,.cmp td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp th{color:var(--mut);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.cmp td:first-child{font-weight:700;white-space:nowrap}
+.tblwrap{overflow-x:auto}
+
+/* ---------- device frames ---------- */
+.dev{position:relative;flex:none;width:calc(var(--w) * var(--s) * 1px);height:calc(var(--h) * var(--s) * 1px);border-radius:calc(var(--r) * var(--s) * 1px);overflow:hidden;box-shadow:0 0 0 7px #1b2028,0 0 0 8px #303845,0 24px 60px rgba(0,0,0,.55)}
+.dev>.screen{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px);transform:scale(var(--s));transform-origin:0 0}
+.phone{--w:390;--h:844;--r:46;--s:.62}
+.tablet{--w:1180;--h:820;--r:30;--s:.56}
+.mini{--s:.46}
+.screen{position:relative;overflow:hidden;font-variant-numeric:tabular-nums;line-height:1.2}
+.screen .k{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;font-weight:800;border-radius:14px;line-height:1;text-align:center;user-select:none}
+.screen .k sup{position:absolute;top:6px;right:8px;font-size:12px;font-weight:700;line-height:1}
+.screen .k small{display:block;font-size:11px;font-weight:700;margin-top:4px;opacity:.75;letter-spacing:.02em}
+.screen .k svg.i{width:20px;height:20px;margin-bottom:3px}
+.hc{display:inline-block;font-size:10px;font-weight:800;background:#3a2f12;color:#f5c451;border-radius:5px;padding:2px 5px;margin-left:5px;vertical-align:3px;letter-spacing:.02em;white-space:nowrap}
+
+/* =================== C1  BIG KEYS =================== */
+.c1{--bg:#11151b;--pn:#1a2029;--pn2:#242c37;--ln:#2b3442;--tx:#f1f5f9;--mu:#8d9aab;--ac:#38bdf8;background:var(--bg);color:var(--tx);display:flex;flex-direction:column}
+.c1p{padding:14px 12px 16px;gap:10px}
+.c1-top{display:flex;align-items:center;justify-content:space-between;height:36px;font-size:15px;color:var(--mu);font-weight:600}
+.c1-top .menu{width:40px;height:36px;border-radius:10px;background:var(--pn);display:grid;place-items:center;font-size:20px;color:var(--tx)}
+.c1-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.c1-chip{background:var(--pn);border-radius:14px;padding:8px 10px;border:2px solid transparent;min-width:0}
+.c1-chip .nm{font-size:14px;font-weight:700;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c1-chip .sc{font-size:30px;font-weight:850;line-height:1.1}
+.c1-chip.on{border-color:var(--ac);background:#0f2a3a}
+.c1-chip.on .nm{color:var(--ac)}
+.c1-hero{background:linear-gradient(180deg,#0f2636,#141a22);border:1px solid #1f3a4d;border-radius:20px;padding:12px 16px 14px}
+.c1-hero .row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+.c1-who{font-size:17px;font-weight:700;color:var(--ac)}
+.c1-rem{font-size:104px;font-weight:850;line-height:.92;letter-spacing:-3px}
+.c1-meta{text-align:right;font-size:13px;color:var(--mu);line-height:1.55;padding-bottom:6px}
+.c1-meta b{color:var(--tx);font-size:17px}
+.c1-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.c1 .slot{height:54px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:850;font-size:22px;line-height:1.05}
+.c1 .slot small{font-size:12px;font-weight:700;color:var(--mu)}
+.c1 .slot.f{background:var(--pn2)}
+.c1 .slot.a{border:2px dashed var(--ac);color:var(--ac);font-size:15px;background:rgba(56,189,248,.07)}
+.c1 .slot.e{border:2px solid var(--ln);color:#5a677b;font-size:15px}
+.c1-hint{display:flex;align-items:center;gap:10px;background:#2a2410;border:1px solid #4d3f12;color:#fbd468;border-radius:14px;padding:0 14px;height:52px;font-size:14px;font-weight:700;white-space:nowrap}
+.c1-hint svg.i{width:22px;height:22px}
+.c1-hint .route{font-size:23px;font-weight:850;color:#fff;letter-spacing:.5px}
+.c1-hint .alt{margin-left:auto;font-size:13px;color:#c9a94a;font-weight:600}
+.c1-pad{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.c1-mods,.c1-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.c1 .mod{height:60px;font-size:18px}
+.c1 .mod.s{background:#252e3a;color:#c9d3df}
+.c1 .mod.d{background:#11301f;color:#4ade80;box-shadow:inset 0 0 0 2px #1f6b3d}
+.c1 .mod.t{background:#3a260b;color:#fbbf24;box-shadow:inset 0 0 0 2px #7a4d0c}
+.c1 .mod.t.on{background:#f0950f;color:#1a0f00;box-shadow:0 0 0 3px #fcd34d,0 6px 22px rgba(232,137,12,.5)}
+.c1 .mod small{opacity:.8}
+.c1-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.c1 .n{height:60px;background:#27303c;font-size:27px;border-bottom:3px solid #1a2029}
+.c1 .n sup{color:#fbbf24}
+.c1 .bull{background:#27303c;font-size:18px;height:60px;opacity:.4;border:2px dashed #4b5768}
+.c1 .bull small{color:#fda4af;opacity:1}
+.c1 .miss{background:#3a1d24;color:#fda4af;font-size:18px;height:60px}
+.c1 .undo{background:#1b2a3d;color:#93c5fd;font-size:18px;height:60px;flex-direction:row;gap:8px}
+.c1 .undo svg.i{margin:0}
+/* C1 tablet */
+.c1t{display:grid;grid-template-columns:440px 1fr;gap:26px;padding:22px 24px}
+.c1t .left{display:flex;flex-direction:column;gap:14px;min-width:0}
+.c1t .c1-top{font-size:18px;height:44px}
+.c1t .c1-hero{padding:18px 22px 20px;border-radius:24px}
+.c1t .c1-who{font-size:22px}
+.c1t .c1-rem{font-size:150px;letter-spacing:-5px}
+.c1t .c1-meta{font-size:16px}.c1t .c1-meta b{font-size:22px}
+.c1t .slot{height:72px;font-size:28px}
+.c1t .slot.a,.c1t .slot.e{font-size:18px}
+.c1t .c1-hint{height:62px;font-size:17px;border-radius:16px}
+.c1t .c1-hint .route{font-size:28px}
+.c1t .c1-hint .alt{font-size:15px}
+.c1-lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:4px}
+.c1-list{display:flex;flex-direction:column;gap:8px}
+.c1-row{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;background:var(--pn);border-radius:16px;padding:0 16px;height:70px;border:2px solid transparent}
+.c1-row.on{border-color:var(--ac);background:#0f2a3a}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:850;font-size:18px;color:#0b0f14}
+.c1-row .nm{font-size:19px;font-weight:750;white-space:nowrap}
+.c1-row .sub{font-size:13px;color:var(--mu)}
+.c1-row .sc{font-size:38px;font-weight:850}
+.c1t .c1-pad{margin:0;gap:12px;height:100%}
+.c1t .c1-mods,.c1t .c1-row3{gap:12px}
+.c1t .mod{height:88px;font-size:26px;border-radius:18px}
+.c1t .c1-grid{flex:1;gap:12px;grid-auto-rows:1fr}
+.c1t .n{height:auto;font-size:44px;border-radius:18px}
+.c1t .n sup{font-size:16px;top:10px;right:12px}
+.c1t .bull,.c1t .miss,.c1t .undo{height:110px;font-size:26px;border-radius:18px}
+.c1t .k small{font-size:14px}
+.c1t .undo svg.i{width:28px;height:28px}
+
+/* =================== C2  LIVING ROOM =================== */
+.c2{--card:#0e1527;--ln:#1c2640;--tx:#f8fafc;--mu:#8391b0;--gold:#f5c84c;background:radial-gradient(ellipse 90% 60% at 50% -10%,#1b2654 0%,#080c18 62%);color:var(--tx);display:flex;flex-direction:column}
+.c2t{padding:16px 18px;gap:10px}
+.c2-top{height:40px;display:flex;align-items:center;justify-content:space-between;font-size:17px;color:var(--mu);font-weight:600}
+.c2-top b{color:var(--tx)}
+.c2-top .pill{border:1px solid var(--ln);border-radius:20px;padding:5px 14px;background:rgba(255,255,255,.03)}
+.c2-board{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;height:438px}
+.c2-col{background:var(--card);border:2px solid var(--ln);border-radius:24px;padding:22px 22px 18px;display:flex;flex-direction:column;position:relative;overflow:hidden;min-width:0}
+.c2-col::before{content:"";position:absolute;left:0;right:0;top:0;height:7px;background:var(--pc)}
+.c2-ch{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.c2-nm{font-size:32px;font-weight:800;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.c2-nm .dot{width:14px;height:14px;border-radius:50%;background:var(--pc)}
+.c2-live{font-size:14px;font-weight:850;letter-spacing:.08em;color:#1b1400;background:var(--gold);border-radius:20px;padding:5px 12px;white-space:nowrap}
+.c2-next{font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--mu);border:1px solid var(--ln);border-radius:20px;padding:4px 10px;text-transform:uppercase}
+.c2-sc{flex:1;display:flex;align-items:center;font-size:158px;font-weight:850;letter-spacing:-6px;line-height:1}
+.c2-col:not(.on) .c2-sc{color:#cdd6e6}
+.c2-st{display:flex;gap:18px;font-size:16px;color:var(--mu);flex-wrap:wrap}
+.c2-st b{color:var(--tx);font-size:19px}
+.c2-col.on{border-color:var(--gold);background:linear-gradient(180deg,#221d0c 0%,#0e1527 70%);box-shadow:0 0 0 1px var(--gold),0 0 48px rgba(245,200,76,.18)}
+.c2-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.c2 .slot{height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:850}
+.c2 .slot.f{background:#2a2a1a;color:#fff;box-shadow:inset 0 0 0 2px #4a4120}
+.c2 .slot.a{border:3px dashed var(--gold);color:var(--gold);font-size:17px}
+.c2 .slot.e{border:2px solid var(--ln);color:#4b5878;font-size:17px}
+.c2-co{display:flex;align-items:center;gap:14px;height:58px;border-radius:16px;background:linear-gradient(90deg,#3b300c,#1a1608);border:1px solid #5a4815;padding:0 20px;color:#f6dc8a;font-size:18px;font-weight:700;white-space:nowrap}
+.c2-co svg.i{width:26px;height:26px}
+.c2-co .route{font-size:30px;font-weight:850;color:#fff;letter-spacing:1px}
+.c2-co .alt{color:#c8ad57;font-size:16px}
+.c2-co .nxt{margin-left:auto;color:var(--mu);font-size:16px;font-weight:600}
+.c2-pad{display:grid;grid-template-columns:150px 1fr 150px;gap:10px;flex:1}
+.c2-mods,.c2-side{display:grid;grid-template-rows:repeat(3,1fr);gap:9px}
+.c2-nums{display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(2,1fr);gap:8px}
+.c2 .n{background:#18213a;font-size:36px;border-radius:16px;box-shadow:inset 0 -3px 0 #0b1122}
+.c2 .mod{font-size:21px;border-radius:16px}
+.c2 .mod.s{background:#222c45;color:#d6deeb}
+.c2 .mod.s.on{background:#e7ecf5;color:#0b1020;box-shadow:0 0 0 3px #8aa0c8}
+.c2 .mod.d{background:#0f2c1c;color:#4ade80;box-shadow:inset 0 0 0 2px #1f6b3d}
+.c2 .mod.t{background:#35230a;color:#fbbf24;box-shadow:inset 0 0 0 2px #7a4d0c}
+.c2 .bull{background:#3a1420;color:#fda4af;font-size:21px;border-radius:16px;box-shadow:inset 0 0 0 2px #6b2236}
+.c2 .miss{background:#1d2333;color:#b8c2d6;font-size:21px;border-radius:16px}
+.c2 .undo{background:#132544;color:#93c5fd;font-size:21px;border-radius:16px;flex-direction:row;gap:8px}
+.c2 .undo svg.i{margin:0}
+/* C2 phone */
+.c2p{padding:14px 12px 14px;gap:8px}
+.c2p .c2-top{height:32px;font-size:14px}
+.c2p .c2-top .pill{padding:3px 10px}
+.c2-act{background:linear-gradient(180deg,#221d0c 0%,#0e1527 80%);border:2px solid var(--gold);border-radius:22px;padding:14px 14px 12px;position:relative;box-shadow:0 0 30px rgba(245,200,76,.15)}
+.c2-act .c2-nm{font-size:22px}
+.c2-act .c2-live{font-size:11px;padding:4px 9px}
+.c2-act .big{display:flex;align-items:flex-end;justify-content:space-between}
+.c2-act .c2-sc{font-size:112px;letter-spacing:-4px;flex:none}
+.c2-act .c2-st{flex-direction:column;gap:0;font-size:13px;text-align:right;padding-bottom:12px;line-height:1.5}
+.c2-act .c2-st b{font-size:16px}
+.c2p .c2-slots{margin-bottom:10px;gap:8px}
+.c2p .slot{height:50px;font-size:22px}
+.c2p .slot.a,.c2p .slot.e{font-size:14px}
+.c2p .c2-co{height:46px;font-size:13px;padding:0 12px;gap:8px;border-radius:12px}
+.c2p .c2-co svg.i{width:20px;height:20px}
+.c2p .c2-co .route{font-size:21px}
+.c2p .c2-co .alt{margin-left:auto;font-size:12px}
+.c2-lbl{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;padding:2px 4px 0}
+.c2-row{display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;height:62px;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:0 16px 0 0;overflow:hidden}
+.c2-row .bar{height:100%;background:var(--pc)}
+.c2-row .nm{font-size:19px;font-weight:750;white-space:nowrap}
+.c2-row .sub{font-size:12px;color:var(--mu)}
+.c2-row .sc{font-size:40px;font-weight:850;color:#d8e0ee}
+.c2p .c2-pad{margin-top:auto;display:flex;flex-direction:column;gap:6px;flex:none}
+.c2p .c2-mods{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;grid-template-rows:none;gap:6px}
+.c2p .c2-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.c2p .k{height:56px;border-radius:12px}
+.c2p .n{font-size:22px}
+.c2p .mod,.c2p .bull,.c2p .miss,.c2p .undo{font-size:15px}
+.c2p .undo{flex-direction:column;gap:0}
+.c2p .undo svg.i{width:18px;height:18px;margin-bottom:2px}
+.c2p .span2{grid-column:span 2}
+.c2-team{display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--mu);margin-top:2px}
+.c2-team b{color:var(--tx)}
+.thr{display:inline-flex;align-items:center;gap:5px;background:rgba(245,200,76,.14);color:var(--gold);border-radius:12px;padding:2px 9px;font-size:12px;font-weight:800}
+
+/* =================== C3  TURN LANE (light) =================== */
+.c3{--bg:#f3efe6;--ink:#15171c;--mu:#6b6f78;--card:#fff;--ln:#e0d9cb;--ac:#e4572e;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+.c3p{padding:14px 12px 16px;gap:10px}
+.c3-tabs{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:6px}
+.c3-tab{background:var(--card);border-radius:14px;padding:7px 11px;border:2px solid var(--ln);min-width:0}
+.c3-tab .nm{font-size:13px;font-weight:700;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c3-tab .sc{font-size:27px;font-weight:850;line-height:1.1}
+.c3-tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.c3-tab.on .nm{color:#ffb79f}
+.c3 .hc{background:#fde7b0;color:#7a4b00}
+.c3-head{display:flex;align-items:flex-end;justify-content:space-between;padding:2px 4px 0}
+.c3-head .who{font-size:22px;font-weight:850}
+.c3-head .sub{font-size:14px;color:var(--mu);font-weight:600;margin-top:2px}
+.c3-head .rem{font-size:100px;font-weight:900;line-height:.86;letter-spacing:-4px}
+.c3-lane{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lane{height:172px;border-radius:20px;background:var(--card);border:2px solid var(--ln);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 6px 12px;position:relative}
+.lane .lb{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.1em}
+.lane .v{font-size:46px;font-weight:900;letter-spacing:-1px}
+.lane .after{font-size:15px;font-weight:800;color:var(--mu);display:flex;align-items:center;gap:4px}
+.lane .after b{color:var(--ink);font-size:20px}
+.lane.done{background:var(--ink);border-color:var(--ink);color:#fff}
+.lane.done .lb,.lane.done .after{color:#a6a9b0}
+.lane.done .after b{color:#fff}
+.lane.ghost .v{color:transparent;-webkit-text-stroke:2px #b8b0a0}
+.lane.ghost .after b{color:#9a9384}
+.lane.now{border:3px solid var(--ac);box-shadow:0 10px 26px rgba(228,87,46,.22)}
+.lane.now .lb{color:var(--ac)}
+.lane.now .v{-webkit-text-stroke-color:var(--ac)}
+.lane .fin{position:absolute;top:-10px;right:8px;background:#15803d;color:#fff;font-size:11px;font-weight:850;border-radius:10px;padding:2px 8px;letter-spacing:.04em}
+.c3-route{display:flex;align-items:center;gap:8px;height:44px;font-size:14px;font-weight:700;color:var(--mu);padding:0 2px;white-space:nowrap}
+.c3-route .opt{border-radius:22px;padding:0 14px;height:40px;display:inline-flex;align-items:center;gap:6px;border:2px solid var(--ln);background:var(--card);color:var(--ink);font-weight:800;font-size:15px}
+.c3-route .opt.on{border-color:var(--ac);color:var(--ac)}
+.c3-pad{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.c3-padlbl{font-size:13px;font-weight:700;color:var(--mu);text-align:center}
+.c3-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.c3-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.c3 .k{height:60px;border-radius:16px}
+.c3 .n{background:var(--card);font-size:27px;box-shadow:0 2px 0 #d6cfbf,inset 0 0 0 1.5px var(--ln)}
+.c3 .n.mark{box-shadow:0 2px 0 #d6cfbf,inset 0 0 0 3px var(--ac)}
+.c3 .n.mark::after{content:"";position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--ac)}
+.c3 .bull{background:#15171c;color:#fff;font-size:18px}
+.c3 .bull small{opacity:.7}
+.c3 .miss{background:#fde2e1;color:#b42318;font-size:18px}
+.c3 .undo{background:#e3ecf7;color:#1d4f91;font-size:18px;flex-direction:row;gap:8px}
+.c3 .undo svg.i{margin:0}
+.c3-scrim{position:absolute;inset:0;background:rgba(21,23,28,.58)}
+.c3-sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:30px 30px 0 0;padding:14px 16px 20px;display:flex;flex-direction:column;gap:10px}
+.c3-sheet .grab{width:44px;height:5px;border-radius:3px;background:#d9d2c3;margin:0 auto 4px}
+.c3-sheet .ttl{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px}
+.c3-sheet .ttl b{font-size:52px;font-weight:900;line-height:1}
+.c3-sheet .ttl span{font-size:15px;font-weight:700;color:var(--mu)}
+.ring{height:82px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:24px;font-weight:850}
+.ring .pts{font-size:34px;font-weight:900}
+.ring.s{background:#eef0f3;color:#2b3440}
+.ring.d{background:#dcf5e5;color:#11602f}
+.ring.t{background:#ffe7c7;color:#8a3d00;box-shadow:inset 0 0 0 3px var(--ac)}
+.ring .tag{font-size:12px;background:var(--ac);color:#fff;border-radius:10px;padding:2px 8px;margin-left:8px;vertical-align:4px;letter-spacing:.04em}
+.c3-cancel{height:56px;border-radius:16px;border:2px solid var(--ln);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:var(--mu)}
+.lane.bust{background:#e5484d;border-color:#e5484d;color:#fff}
+.lane.bust .lb,.lane.bust .after{color:#ffe1e1}
+.lane.bust .v{text-decoration:line-through;text-decoration-thickness:4px}
+.c3-bust{background:#e5484d;color:#fff;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.c3-bust .t1{font-size:36px;font-weight:900;letter-spacing:1px;line-height:1}
+.c3-bust .t2{font-size:16px;font-weight:700;opacity:.95}
+.c3-bust .acts{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
+.c3-bust .acts div{height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:850;font-size:17px}
+.c3-bust .a1{background:rgba(255,255,255,.18)}
+.c3-bust .a2{background:#fff;color:#b42318}
+.c3-lock{opacity:.32;filter:grayscale(1)}
+.strike{position:relative;color:var(--mu);font-size:22px;font-weight:800;text-decoration:line-through;margin-right:8px}
+
+/* =================== C4  THUMB RAIL =================== */
+.c4{--bg:#0d0f12;--pn:#171a1f;--pn2:#20242b;--ln:#2a2f37;--tx:#f4f6f8;--mu:#8a929e;--ac:#c6f135;background:var(--bg);color:var(--tx);display:flex;flex-direction:column}
+.c4p{padding:12px 12px 14px;gap:10px}
+.c4-tick{display:flex;gap:6px;align-items:center;height:44px;overflow:hidden}
+.c4-tick .g{font-size:12px;font-weight:800;color:var(--mu);line-height:1.2;padding-right:4px;white-space:nowrap}
+.pl{height:44px;border-radius:22px;background:var(--pn);display:flex;align-items:center;gap:7px;padding:0 13px 0 6px;white-space:nowrap;border:1px solid var(--ln);flex:none}
+.pl .av{width:32px;height:32px;font-size:14px}
+.pl .nm{font-size:13px;font-weight:700;color:var(--mu)}
+.pl .sc{font-size:20px;font-weight:850}
+.pl.on{background:var(--ac);border-color:var(--ac);color:#111}
+.pl.on .nm{color:#2b3510}
+.c4-g{font-size:13px;font-weight:700;color:var(--mu);padding:0 4px;margin-bottom:-4px}
+.c4-hero{display:grid;grid-template-columns:1fr 118px;gap:12px;background:var(--pn);border-radius:24px;padding:14px 14px 14px 18px;border:1px solid var(--ln)}
+.c4-hero .who{font-size:17px;font-weight:800;color:var(--ac)}
+.c4-hero .rem{font-size:100px;font-weight:900;line-height:.95;letter-spacing:-4px}
+.c4-hero .meta{font-size:13px;color:var(--mu);font-weight:600}
+.c4-hero .meta b{color:var(--tx)}
+.c4-vs{display:flex;flex-direction:column;gap:6px}
+.c4 .vs{height:50px;border-radius:12px;display:flex;align-items:center;gap:8px;padding:0 10px;font-weight:850;font-size:20px}
+.c4 .vs i{font-style:normal;font-size:11px;font-weight:800;color:var(--mu);width:12px}
+.c4 .vs small{margin-left:auto;font-size:12px;color:var(--mu);font-weight:700}
+.c4 .vs.f{background:var(--pn2)}
+.c4 .vs.a{border:2px solid var(--ac);color:var(--ac);font-size:13px}
+.c4 .vs.e{border:2px solid var(--ln);color:#4d5562;font-size:13px}
+.c4-co{display:flex;align-items:center;gap:10px;height:52px;border-radius:16px;background:#1f2610;border:1px solid #3d4d14;padding:0 14px;color:#d9f27a;font-weight:700;font-size:14px;white-space:nowrap}
+.c4-co svg.i{width:22px;height:22px}
+.c4-co .route{font-size:23px;font-weight:900;color:#fff;letter-spacing:.5px}
+.c4-co .alt{margin-left:auto;font-size:12px;color:#9fb35a}
+.c4-zone{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.c4-zl{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mu);font-weight:700;padding:0 2px}
+.c4-zl .sw{border:1px solid var(--ln);border-radius:14px;padding:3px 10px;color:var(--tx)}
+.c4-pad{display:grid;grid-template-columns:1fr 86px;gap:8px}
+.c4-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;grid-auto-rows:60px}
+.c4-rail{display:grid;grid-template-rows:repeat(3,1fr);gap:6px}
+.c4 .n{background:var(--pn2);font-size:26px;border-radius:14px;box-shadow:inset 0 -3px 0 #121418}
+.c4 .rm{border-radius:18px;font-size:16px;gap:4px}
+.c4 .rm b{font-size:30px;font-weight:900;line-height:1}
+.c4 .rm.s{background:#e9edf2;color:#111;box-shadow:0 0 0 3px #6b7480}
+.c4 .rm.d{background:#0f2c1c;color:#4ade80;box-shadow:inset 0 0 0 2px #1f6b3d}
+.c4 .rm.t{background:#35230a;color:#fbbf24;box-shadow:inset 0 0 0 2px #7a4d0c}
+.c4-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.c4 .bull{height:64px;background:#2a1a1f;color:#fda4af;font-size:17px;border-radius:16px}
+.c4 .miss{height:64px;background:#24282f;color:#c5ccd6;font-size:17px;border-radius:16px}
+.c4 .undo{height:64px;background:#14243a;color:#93c5fd;font-size:17px;border-radius:16px;flex-direction:row;gap:8px}
+.c4 .undo svg.i{margin:0}
+/* C4 tablet */
+.c4t{display:grid;grid-template-columns:210px 1fr 430px;gap:22px;padding:20px 20px}
+.c4t .rail{display:flex;flex-direction:column;gap:12px}
+.c4t .rail .lbl,.c4t .right .lbl{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);height:20px}
+.c4t .rm{flex:1;font-size:22px;border-radius:22px}
+.c4t .rm b{font-size:46px}
+.c4t .undo{height:110px;font-size:22px;border-radius:22px;flex-direction:column;gap:4px}
+.c4t .undo svg.i{width:30px;height:30px}
+.c4t .mid{display:flex;flex-direction:column;gap:14px;min-width:0}
+.c4t .mtop{display:flex;justify-content:space-between;align-items:center;font-size:17px;color:var(--mu);font-weight:600;height:40px}
+.c4t .hero{background:var(--pn);border:1px solid var(--ln);border-radius:26px;padding:18px 24px 20px}
+.c4t .hero .who{font-size:22px;font-weight:800;color:var(--ac)}
+.c4t .hero .rem{font-size:168px;font-weight:900;line-height:.92;letter-spacing:-7px}
+.c4t .hero .row{display:flex;justify-content:space-between;align-items:flex-end}
+.c4t .hero .meta{white-space:nowrap;font-size:15px;text-align:right;line-height:1.6;color:var(--mu);padding-bottom:12px}
+.c4t .hero .meta b{color:var(--tx);font-size:21px}
+.c4t .hs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.c4t .vs{height:70px;justify-content:center;font-size:28px}
+.c4t .vs.a,.c4t .vs.e{font-size:17px}
+.c4t .c4-co{height:62px;font-size:17px;border-radius:18px}
+.c4t .c4-co .route{font-size:28px}
+.c4t .c4-co .alt{font-size:15px}
+.lad{display:flex;flex-direction:column;gap:8px}
+.lad .r{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;height:62px;background:var(--pn);border:1px solid var(--ln);border-radius:16px;padding:0 18px 0 12px}
+.lad .r.on{border:2px solid var(--ac)}
+.lad .av{width:38px;height:38px;font-size:16px}
+.lad .nm{font-size:18px;font-weight:750;white-space:nowrap}
+.lad .sub{font-size:13px;color:var(--mu)}
+.lad .sc{font-size:34px;font-weight:900}
+.c4t .right{display:flex;flex-direction:column;gap:12px}
+.c4t .c4-nums{flex:1;gap:10px;grid-auto-rows:1fr}
+.c4t .n{font-size:40px;border-radius:18px}
+.c4t .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.c4t .bull,.c4t .miss{height:110px;font-size:22px;border-radius:20px}
+.c4t .k small{font-size:14px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tgt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+  <symbol id="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="ph">
+    <div>
+      <h1>x01 in-game screen: four concepts</h1>
+      <p>Static mockups for the family dart scorer. Every concept shows the same moment so they can be compared directly. Frames are drawn at real pixel size (phone 390&times;844, tablet 1180&times;820) and scaled down.</p>
+    </div>
+    <div class="lang">
+      <span>Label language (draft IS, to test longer labels)</span>
+      <div class="seg" role="group" aria-label="Label language">
+        <button data-l="en" aria-pressed="true">EN</button>
+        <button data-l="is" aria-pressed="false">IS</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="state" aria-label="Shared game state">
+    <div class="card">
+      <h3>Game</h3>
+      <p><b>501 &middot; double out</b>, 3 players, round 7. Guðjón is on his <b>2nd dart</b>: 1st dart S20, so 124 &rarr; <b>104</b>.</p>
+    </div>
+    <div class="card">
+      <h3>Scores</h3>
+      <ul>
+        <li><span>Guðjón (throwing)</span><span class="num"><b>104</b> &middot; avg 62.7 &middot; 19 darts</span></li>
+        <li><span>Anna</span><span class="num"><b>187</b> &middot; avg 52.3 &middot; 18 darts</span></li>
+        <li><span>Óli (handicap 301)</span><span class="num"><b>96</b> &middot; avg 34.2 &middot; 18 darts</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Checkout and colour key</h3>
+      <p>104 with 2 darts: <b>T18 D25</b> (alt. T20 D22).</p>
+      <p style="margin-top:6px"><span class="chipS">S</span>single <span class="chipD">D</span>double <span class="chipT">T</span>triple, same in every concept. Bull: S = 25, D = 50, no triple.</p>
+    </div>
+  </section>
+
+  <!-- ===================================================== C1 -->
+  <section class="concept" id="c1">
+    <div class="c-head"><span class="c-no">CONCEPT 1</span><h2 class="c-title">Big Keys</h2><span class="c-tag">Input-first. The pad owns the screen and the scores sit on top.</span></div>
+    <div class="c-body">
+      <div class="frames">
+        <figure>
+          <div class="dev phone"><div class="screen c1 c1p">
+            <div class="c1-top"><span><span data-is="501 · tvöfalt út">501 · Double out</span> · <span data-is="Umferð 7">Round 7</span></span><span class="menu">&#8801;</span></div>
+            <div class="c1-chips">
+              <div class="c1-chip on"><div class="nm">Guðjón</div><div class="sc">104</div></div>
+              <div class="c1-chip"><div class="nm">Anna</div><div class="sc">187</div></div>
+              <div class="c1-chip"><div class="nm">Óli <span class="hc" data-is="F 301">HC 301</span></div><div class="sc">96</div></div>
+            </div>
+            <div class="c1-hero">
+              <div class="row">
+                <div><div class="c1-who"><span data-is="Á leik">Throwing</span>: Guðjón</div><div class="c1-rem">104</div></div>
+                <div class="c1-meta"><span data-is="Meðaltal">Avg</span> <b>62.7</b><br><span data-is="Pílur">Darts</span> <b>19</b><br><span data-is="Byrjaði í">Turn from</span> <b>124</b></div>
+              </div>
+              <div class="c1-slots">
+                <div class="slot f">S20<small>20</small></div>
+                <div class="slot a"><span data-is="Píla 2">Dart 2</span></div>
+                <div class="slot e"><span data-is="Píla 3">Dart 3</span></div>
+              </div>
+            </div>
+            <div class="c1-hint"><svg class="i"><use href="#tgt"/></svg><span data-is="Klára">Checkout</span><span class="route">T18 D25</span><span class="alt"><span data-is="eða">or</span> T20 D22</span></div>
+            <div class="c1-pad">
+              <div class="c1-mods">
+                <button class="k mod s"><span data-is="Einfalt">Single</span></button>
+                <button class="k mod d"><span data-is="Tvöfalt">Double</span></button>
+                <button class="k mod t on"><span data-is="Þrefalt">Triple</span></button>
+              </div>
+              <div class="c1-grid" data-nums="k n" data-mult="3"></div>
+              <div class="c1-row3">
+                <button class="k bull"><span data-is="Miðja">Bull</span><small data-is="ekki þreföld">no triple</small></button>
+                <button class="k miss"><span data-is="Framhjá">Miss</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Phone, portrait.</b> Triple is armed: each key shows its triple value and Bull is disabled. The modifier drops back to Single after every dart.</figcaption>
+        </figure>
+        <figure>
+          <div class="dev tablet"><div class="screen c1 c1t">
+            <div class="left">
+              <div class="c1-top"><span><span data-is="501 · tvöfalt út">501 · Double out</span> · <span data-is="Umferð 7">Round 7</span></span><span class="menu">&#8801;</span></div>
+              <div class="c1-hero">
+                <div class="row">
+                  <div><div class="c1-who"><span data-is="Á leik">Throwing</span>: Guðjón</div><div class="c1-rem">104</div></div>
+                  <div class="c1-meta"><span data-is="Meðaltal">Avg</span> <b>62.7</b><br><span data-is="Pílur">Darts</span> <b>19</b><br><span data-is="Byrjaði í">Turn from</span> <b>124</b></div>
+                </div>
+                <div class="c1-slots">
+                  <div class="slot f">S20<small>20</small></div>
+                  <div class="slot a"><span data-is="Píla 2">Dart 2</span></div>
+                  <div class="slot e"><span data-is="Píla 3">Dart 3</span></div>
+                </div>
+              </div>
+              <div class="c1-hint"><svg class="i"><use href="#tgt"/></svg><span data-is="Klára">Checkout</span><span class="route">T18 D25</span><span class="alt"><span data-is="eða">or</span> T20 D22</span></div>
+              <div class="c1-lbl" data-is="Staðan">Players</div>
+              <div class="c1-list">
+                <div class="c1-row on"><div class="av" style="background:#38bdf8">G</div><div><div class="nm">Guðjón</div><div class="sub">avg 62.7 · 19 darts</div></div><div class="sc">104</div></div>
+                <div class="c1-row"><div class="av" style="background:#f472b6">A</div><div><div class="nm">Anna</div><div class="sub">avg 52.3 · 18 darts</div></div><div class="sc">187</div></div>
+                <div class="c1-row"><div class="av" style="background:#a3e635">Ó</div><div><div class="nm">Óli <span class="hc" data-is="F 301">HC 301</span></div><div class="sub">avg 34.2 · 18 darts</div></div><div class="sc">96</div></div>
+              </div>
+            </div>
+            <div class="c1-pad">
+              <div class="c1-mods">
+                <button class="k mod s"><span data-is="Einfalt">Single</span></button>
+                <button class="k mod d"><span data-is="Tvöfalt">Double</span></button>
+                <button class="k mod t on"><span data-is="Þrefalt">Triple</span></button>
+              </div>
+              <div class="c1-grid" data-nums="k n" data-mult="3"></div>
+              <div class="c1-row3">
+                <button class="k bull"><span data-is="Miðja">Bull</span><small data-is="ekki þreföld">no triple</small></button>
+                <button class="k miss"><span data-is="Framhjá">Miss</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Tablet, landscape.</b> The same parts side by side: game state on the left and a pad with keys about 128&times;110 px on the right.</figcaption>
+        </figure>
+      </div>
+      <aside class="why">
+        <h4>Rationale</h4>
+        <ul>
+          <li class="p">Lowest mis-tap risk. Keys are 60&nbsp;px on the phone and about 110&nbsp;px on the tablet, and they take half the screen. Showing values on the keys (T18 shows 54) helps kids add up.</li>
+          <li class="p">You pick the modifier first and it resets to Single after each dart, so the common case takes one tap. Triple disables Bull, so an impossible dart can't be entered.</li>
+          <li class="m">The other scores are only chips. That works for 2&ndash;4 players, but 5&ndash;6 need two rows of chips or a horizontal scroll, and they can't be read from across the room.</li>
+          <li class="m">The remaining score is large (104&nbsp;px on the phone) but shares the screen with the pad. The thrower can read it from 2&ndash;3&nbsp;m. Others in the room have a harder time.</li>
+          <li class="n">Teams: a chip shows the team score with the current thrower's name under it. Portrait and landscape use the same components in a different arrangement.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================================================== C2 -->
+  <section class="concept" id="c2">
+    <div class="c-head"><span class="c-no">CONCEPT 2</span><h2 class="c-title">Living Room</h2><span class="c-tag">Scoreboard-first: a TV-style board readable from the sofa, with the pad in one low band.</span></div>
+    <div class="c-body">
+      <div class="frames">
+        <figure>
+          <div class="dev tablet"><div class="screen c2 c2t">
+            <div class="c2-top"><span><b data-is="501 · tvöfalt út">501 · Double out</b></span><span class="pill"><span data-is="Umferð 7">Round 7</span> · Guðjón <span data-is="píla 2 af 3">dart 2 of 3</span></span></div>
+            <div class="c2-board">
+              <div class="c2-col on" style="--pc:#38bdf8">
+                <div class="c2-ch"><span class="c2-nm"><span class="dot"></span>Guðjón</span><span class="c2-live" data-is="Á LEIK">THROWING</span></div>
+                <div class="c2-sc">104</div>
+                <div class="c2-slots"><div class="slot f">S20</div><div class="slot a"><span data-is="Píla 2">Dart 2</span></div><div class="slot e"><span data-is="Píla 3">Dart 3</span></div></div>
+                <div class="c2-st"><span><span data-is="Meðaltal">Avg</span> <b>62.7</b></span><span><span data-is="Pílur">Darts</span> <b>19</b></span><span><span data-is="Byrjaði í">Turn from</span> <b>124</b></span></div>
+              </div>
+              <div class="c2-col" style="--pc:#f472b6">
+                <div class="c2-ch"><span class="c2-nm"><span class="dot"></span>Anna</span><span class="c2-next" data-is="Næst">Next</span></div>
+                <div class="c2-sc">187</div>
+                <div class="c2-st"><span><span data-is="Meðaltal">Avg</span> <b>52.3</b></span><span><span data-is="Pílur">Darts</span> <b>18</b></span></div>
+              </div>
+              <div class="c2-col" style="--pc:#a3e635">
+                <div class="c2-ch"><span class="c2-nm"><span class="dot"></span>Óli <span class="hc" data-is="F 301">HC 301</span></span></div>
+                <div class="c2-sc">96</div>
+                <div class="c2-st"><span><span data-is="Meðaltal">Avg</span> <b>34.2</b></span><span><span data-is="Pílur">Darts</span> <b>18</b></span></div>
+              </div>
+            </div>
+            <div class="c2-co"><svg class="i"><use href="#tgt"/></svg><span data-is="Guðjón getur klárað">Guðjón can finish</span><span class="route">T18 &nbsp;D25</span><span class="alt"><span data-is="eða">or</span> T20 D22</span><span class="nxt"><span data-is="Næst">Next</span>: Anna</span></div>
+            <div class="c2-pad">
+              <div class="c2-mods">
+                <button class="k mod s on"><span data-is="Einfalt">Single</span></button>
+                <button class="k mod d"><span data-is="Tvöfalt">Double</span></button>
+                <button class="k mod t"><span data-is="Þrefalt">Triple</span></button>
+              </div>
+              <div class="c2-nums" data-nums="k n"></div>
+              <div class="c2-side">
+                <button class="k bull"><span data-is="Miðja">Bull</span><small>25 / 50</small></button>
+                <button class="k miss"><span data-is="Framhjá">Miss</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Tablet, landscape (primary).</b> Scores are 158&nbsp;px tall. Numbers sit in two rows (1&ndash;10, 11&ndash;20) with the modifiers on the left and Bull, Miss and Undo on the right.</figcaption>
+        </figure>
+        <figure>
+          <div class="dev phone"><div class="screen c2 c2p">
+            <div class="c2-top"><b data-is="501 · tvöfalt út">501 · Double out</b><span class="pill" data-is="Umferð 7">Round 7</span></div>
+            <div class="c2-act" style="--pc:#38bdf8">
+              <div class="c2-ch"><span class="c2-nm"><span class="dot"></span>Guðjón</span><span class="c2-live" data-is="Á LEIK">THROWING</span></div>
+              <div class="big"><div class="c2-sc">104</div><div class="c2-st"><span><span data-is="Meðaltal">Avg</span> <b>62.7</b></span><span><span data-is="Pílur">Darts</span> <b>19</b></span><span><span data-is="Byrjaði í">From</span> <b>124</b></span></div></div>
+              <div class="c2-slots"><div class="slot f">S20</div><div class="slot a"><span data-is="Píla 2">Dart 2</span></div><div class="slot e"><span data-is="Píla 3">Dart 3</span></div></div>
+              <div class="c2-co"><svg class="i"><use href="#tgt"/></svg><span data-is="Klára">Checkout</span><span class="route">T18 D25</span><span class="alt"><span data-is="eða">or</span> T20 D22</span></div>
+            </div>
+            <div class="c2-lbl" data-is="Næst">Up next</div>
+            <div class="c2-row" style="--pc:#f472b6"><div class="bar"></div><div><div class="nm">Anna</div><div class="sub">avg 52.3 · 18 darts</div></div><div class="sc">187</div></div>
+            <div class="c2-row" style="--pc:#a3e635"><div class="bar"></div><div><div class="nm">Óli <span class="hc" data-is="F 301">HC 301</span></div><div class="sub">avg 34.2 · 18 darts</div></div><div class="sc">96</div></div>
+            <div class="c2-pad">
+              <div class="c2-mods">
+                <button class="k mod s on"><span data-is="Einfalt">Single</span></button>
+                <button class="k mod d"><span data-is="Tvöfalt">Double</span></button>
+                <button class="k mod t"><span data-is="Þrefalt">Triple</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Til baka">Undo</span></button>
+              </div>
+              <div class="c2-grid" data-nums="k n">
+                <button class="k bull span2"><span data-is="Miðja">Bull</span></button>
+                <button class="k miss span2"><span data-is="Framhjá">Miss</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Phone, portrait.</b> A large card for the thrower and rows for the others in throwing order. The 6-column pad keeps every key at 56&nbsp;px or more.</figcaption>
+        </figure>
+        <figure>
+          <div class="dev phone mini"><div class="screen c2 c2p">
+            <div class="c2-top"><b>2 v 2 · <span data-is="501 · tvöfalt út">501 · Double out</span></b><span class="pill" data-is="Umferð 5">Round 5</span></div>
+            <div class="c2-act" style="--pc:#f472b6">
+              <div class="c2-ch"><span class="c2-nm"><span class="dot"></span><span data-is="Lið Rautt">Team Red</span></span><span class="c2-live" data-is="Á LEIK">THROWING</span></div>
+              <div class="c2-team"><span><span class="thr">&#9654; Kári</span> &nbsp;<span data-is="kastar núna, Anna næst">throwing now, Anna next</span></span></div>
+              <div class="big"><div class="c2-sc">141</div><div class="c2-st"><span><span data-is="Meðaltal liðs">Team avg</span> <b>49.8</b></span><span><span data-is="Pílur">Darts</span> <b>24</b></span><span><span data-is="Byrjaði í">From</span> <b>141</b></span></div></div>
+              <div class="c2-slots"><div class="slot a"><span data-is="Píla 1">Dart 1</span></div><div class="slot e"><span data-is="Píla 2">Dart 2</span></div><div class="slot e"><span data-is="Píla 3">Dart 3</span></div></div>
+              <div class="c2-co"><svg class="i"><use href="#tgt"/></svg><span data-is="Klára">Checkout</span><span class="route">T20 T19 D12</span></div>
+            </div>
+            <div class="c2-lbl" data-is="Næst">Up next</div>
+            <div class="c2-row" style="--pc:#38bdf8"><div class="bar"></div><div><div class="nm"><span data-is="Lið Blátt">Team Blue</span></div><div class="sub">Guðjón &amp; Óli · <span data-is="Óli kastar næst">Óli throws next</span></div></div><div class="sc">241</div></div>
+            <div class="c2-pad">
+              <div class="c2-mods">
+                <button class="k mod s on"><span data-is="Einfalt">Single</span></button>
+                <button class="k mod d"><span data-is="Tvöfalt">Double</span></button>
+                <button class="k mod t"><span data-is="Þrefalt">Triple</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Til baka">Undo</span></button>
+              </div>
+              <div class="c2-grid" data-nums="k n">
+                <button class="k bull span2"><span data-is="Miðja">Bull</span></button>
+                <button class="k miss span2"><span data-is="Framhjá">Miss</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Variant: a 2-vs-2 team game.</b> Pairs share one score. The card shows who is throwing and which partner throws next.</figcaption>
+        </figure>
+      </div>
+      <aside class="why wide">
+        <h4>Rationale</h4>
+        <ul>
+          <li class="p">Built for a tablet on the wall. The 158&nbsp;px numbers can be read from 3&ndash;4&nbsp;m, and everyone sees every score, like a pub TV board.</li>
+          <li class="p">The two rows of numbers (1&ndash;10, 11&ndash;20) read like a number line, so younger kids find numbers without scanning a grid.</li>
+          <li class="m">The keys are the narrowest of the four: about 76&times;100&nbsp;px on the tablet and exactly 56&times;56&nbsp;px on the phone. That meets the minimum, but this concept has the highest mis-tap risk on a phone.</li>
+          <li class="m">Up to 4 columns fit well. 5&ndash;6 players need a second row of cards or smaller numbers. Teams fit naturally as columns or cards with the members' names.</li>
+          <li class="n">The phone portrait version is a fallback. The concept works best in landscape on a mounted tablet.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================================================== C3 -->
+  <section class="concept" id="c3">
+    <div class="c-head"><span class="c-no">CONCEPT 3</span><h2 class="c-title">Turn Lane</h2><span class="c-tag">The three darts are the hero. The checkout route fills the empty slots, and you choose the number before the ring.</span></div>
+    <div class="c-body">
+      <div class="frames">
+        <figure>
+          <div class="dev phone"><div class="screen c3 c3p">
+            <div class="c3-tabs">
+              <div class="c3-tab on"><div class="nm">Guðjón</div><div class="sc">104</div></div>
+              <div class="c3-tab"><div class="nm">Anna</div><div class="sc">187</div></div>
+              <div class="c3-tab"><div class="nm">Óli <span class="hc" data-is="F 301">HC 301</span></div><div class="sc">96</div></div>
+            </div>
+            <div class="c3-head">
+              <div><div class="who">Guðjón</div><div class="sub"><span data-is="Byrjaði í">Turn from</span> 124<br>avg 62.7 · 19 <span data-is="pílur">darts</span></div></div>
+              <div class="rem">104</div>
+            </div>
+            <div class="c3-lane">
+              <div class="lane done"><span class="lb" data-is="Píla 1">Dart 1</span><span class="v">S20</span><span class="after">&rarr; <b>104</b></span></div>
+              <div class="lane ghost now"><span class="lb" data-is="Píla 2">Dart 2</span><span class="v">T18</span><span class="after">&rarr; <b>50</b></span></div>
+              <div class="lane ghost"><span class="fin" data-is="ÚT">OUT</span><span class="lb" data-is="Píla 3">Dart 3</span><span class="v">D25</span><span class="after">&rarr; <b>0</b></span></div>
+            </div>
+            <div class="c3-route"><span data-is="Leið">Route</span><span class="opt on">T18 · D25</span><span class="opt">T20 · D22</span></div>
+            <div class="c3-pad">
+              <div class="c3-padlbl" data-is="Veldu tölu, svo einfalt / tvöfalt / þrefalt">Tap a number, then pick single / double / triple</div>
+              <div class="c3-grid" data-nums="k n" data-mark="18"></div>
+              <div class="c3-row3">
+                <button class="k bull"><span data-is="Miðja">Bull</span><small>25 / 50</small></button>
+                <button class="k miss"><span data-is="Framhjá">Miss</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Phone, portrait.</b> The empty slots show the suggested route as outlined ghost text, with the score left after each dart. The dot on key 18 marks the next route target.</figcaption>
+        </figure>
+        <figure>
+          <div class="dev phone mini"><div class="screen c3 c3p">
+            <div class="c3-tabs">
+              <div class="c3-tab on"><div class="nm">Guðjón</div><div class="sc">104</div></div>
+              <div class="c3-tab"><div class="nm">Anna</div><div class="sc">187</div></div>
+              <div class="c3-tab"><div class="nm">Óli</div><div class="sc">96</div></div>
+            </div>
+            <div class="c3-head">
+              <div><div class="who">Guðjón</div><div class="sub"><span data-is="Byrjaði í">Turn from</span> 124</div></div>
+              <div class="rem">104</div>
+            </div>
+            <div class="c3-lane">
+              <div class="lane done"><span class="lb" data-is="Píla 1">Dart 1</span><span class="v">S20</span><span class="after">&rarr; <b>104</b></span></div>
+              <div class="lane ghost now"><span class="lb" data-is="Píla 2">Dart 2</span><span class="v">18?</span><span class="after">&rarr; <b>?</b></span></div>
+              <div class="lane ghost"><span class="lb" data-is="Píla 3">Dart 3</span><span class="v">D25</span><span class="after">&rarr; <b>0</b></span></div>
+            </div>
+            <div class="c3-scrim"></div>
+            <div class="c3-sheet">
+              <div class="grab"></div>
+              <div class="ttl"><b>18</b><span data-is="Hvaða hringur? Píla 2">Which ring? Dart 2</span></div>
+              <div class="ring s"><span data-is="Einfalt">Single</span><span class="pts">18</span></div>
+              <div class="ring d"><span data-is="Tvöfalt">Double</span><span class="pts">36</span></div>
+              <div class="ring t"><span><span data-is="Þrefalt">Triple</span><span class="tag" data-is="LEIÐ">ROUTE</span></span><span class="pts">54</span></div>
+              <div class="c3-cancel" data-is="Hætta við">Cancel</div>
+            </div>
+          </div></div>
+          <figcaption><b>Step 2: ring sheet after tapping 18.</b> Each option shows its points. The Bull sheet offers only Single 25 and Double 50.</figcaption>
+        </figure>
+        <figure>
+          <div class="dev phone mini"><div class="screen c3 c3p">
+            <div class="c3-tabs">
+              <div class="c3-tab on"><div class="nm">Guðjón</div><div class="sc">124</div></div>
+              <div class="c3-tab"><div class="nm">Anna</div><div class="sc">187</div></div>
+              <div class="c3-tab"><div class="nm">Óli</div><div class="sc">96</div></div>
+            </div>
+            <div class="c3-head">
+              <div><div class="who">Guðjón</div><div class="sub"><span data-is="Byrjaði í">Turn from</span> 124</div></div>
+              <div class="rem"><span class="strike">44</span>124</div>
+            </div>
+            <div class="c3-lane">
+              <div class="lane done"><span class="lb" data-is="Píla 1">Dart 1</span><span class="v">S20</span><span class="after">&rarr; <b>104</b></span></div>
+              <div class="lane done"><span class="lb" data-is="Píla 2">Dart 2</span><span class="v">T20</span><span class="after">&rarr; <b>44</b></span></div>
+              <div class="lane bust"><span class="lb" data-is="Píla 3">Dart 3</span><span class="v">T20</span><span class="after">&rarr; <b>&minus;16</b></span></div>
+            </div>
+            <div class="c3-bust">
+              <div class="t1" data-is="SPRUNGIÐ!">BUST!</div>
+              <div class="t2" data-is="Of hátt. Staðan fer aftur í 124.">Too much. The score goes back to 124.</div>
+              <div class="acts"><div class="a1"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></div><div class="a2"><span><span data-is="Næst">Next</span>: Anna</span><svg class="i"><use href="#arr"/></svg></div></div>
+            </div>
+            <div class="c3-pad c3-lock">
+              <div class="c3-grid" data-nums="k n"></div>
+            </div>
+          </div></div>
+          <figcaption><b>Variant: bust.</b> From 124: S20, T20, T20 leaves &minus;16. The busting dart turns red, the score visibly reverts to 124, and the pad locks until Next or Undo.</figcaption>
+        </figure>
+      </div>
+      <aside class="why">
+        <h4>Rationale</h4>
+        <ul>
+          <li class="p">The turn is the story. Each slot shows the score left after that dart, and the empty slots preview the checkout, so kids "fill in" T18 then D25 instead of doing the maths.</li>
+          <li class="p">Number first, then ring, with a big sheet that spells out the points (Triple = 54). Nothing has to be armed in advance, so a forgotten Double or Triple can't cause a wrong entry.</li>
+          <li class="p">Bust is unmistakable: a red dart, the struck-through 44 next to 124, and a locked pad until someone confirms.</li>
+          <li class="m">A scoring dart takes two taps, which is slower for quick adult players. Possible fix: a long press enters a single, or an option skips the sheet for single-only numbers.</li>
+          <li class="m">The light theme suits a bright room. The lane is tall, so landscape would put the lane and pad side by side. With 6 players the tab row scrolls. Team tabs would show the team score with the thrower's name.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================================================== C4 -->
+  <section class="concept" id="c4">
+    <div class="c-head"><span class="c-no">CONCEPT 4</span><h2 class="c-title">Thumb Rail</h2><span class="c-tag">One-handed compact phone with the ring rail on the side. On a tablet the pad splits to both edges.</span></div>
+    <div class="c-body">
+      <div class="frames">
+        <figure>
+          <div class="dev phone"><div class="screen c4 c4p">
+            <div class="c4-tick">
+              <div class="pl on"><span class="av" style="background:#111;color:#c6f135">G</span><span class="nm">Guðjón</span><span class="sc">104</span></div>
+              <div class="pl"><span class="av" style="background:#f472b6">A</span><span class="sc">187</span></div>
+              <div class="pl"><span class="av" style="background:#a3e635">Ó</span><span class="sc">96</span></div>
+            </div>
+            <div class="c4-g"><span data-is="501 · tvöfalt út">501 · Double out</span> · <span data-is="Umferð 7">Round 7</span></div>
+            <div class="c4-hero">
+              <div>
+                <div class="who">Guðjón · <span data-is="píla 2">dart 2</span></div>
+                <div class="rem">104</div>
+                <div class="meta"><span data-is="Meðaltal">Avg</span> <b>62.7</b> · <b>19</b> <span data-is="pílur">darts</span><br><span data-is="Byrjaði í">Turn from</span> <b>124</b></div>
+              </div>
+              <div class="c4-vs">
+                <div class="vs f"><i>1</i>S20<small>20</small></div>
+                <div class="vs a"><i>2</i><span data-is="núna">now</span></div>
+                <div class="vs e"><i>3</i></div>
+              </div>
+            </div>
+            <div class="c4-co"><svg class="i"><use href="#tgt"/></svg><span data-is="Klára">Finish</span><span class="route">T18 D25</span><span class="alt"><span data-is="eða">or</span> T20 D22</span></div>
+            <div class="c4-zone">
+              <div class="c4-zl"><span data-is="Hringur hægra megin">Ring rail on the right</span><span class="sw" data-is="Skipta um hlið">Swap side</span></div>
+              <div class="c4-pad">
+                <div class="c4-nums" data-nums="k n"></div>
+                <div class="c4-rail">
+                  <button class="k rm s"><b>S</b><span data-is="Einf.">Single</span></button>
+                  <button class="k rm d"><b>D</b><span data-is="Tvöf.">Double</span></button>
+                  <button class="k rm t"><b>T</b><span data-is="Þref.">Triple</span></button>
+                </div>
+              </div>
+              <div class="c4-row3">
+                <button class="k bull"><span data-is="Miðja">Bull</span><small>25 / 50</small></button>
+                <button class="k miss"><span data-is="Framhjá">Miss</span></button>
+                <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Phone, portrait.</b> Information sits at the top and every control is in the bottom half. One thumb reaches the S/D/T rail and the numbers without changing grip.</figcaption>
+        </figure>
+        <figure>
+          <div class="dev tablet"><div class="screen c4 c4t">
+            <div class="rail">
+              <div class="lbl" data-is="Hringur">Ring</div>
+              <button class="k rm s"><b>S</b><span data-is="Einfalt">Single</span></button>
+              <button class="k rm d"><b>D</b><span data-is="Tvöfalt">Double</span></button>
+              <button class="k rm t"><b>T</b><span data-is="Þrefalt">Triple</span></button>
+              <button class="k undo"><svg class="i"><use href="#undo"/></svg><span data-is="Afturkalla">Undo</span></button>
+            </div>
+            <div class="mid">
+              <div class="mtop"><span data-is="501 · tvöfalt út">501 · Double out</span><span data-is="Umferð 7">Round 7</span></div>
+              <div class="hero">
+                <div class="row">
+                  <div><div class="who">Guðjón · <span data-is="píla 2 af 3">dart 2 of 3</span></div><div class="rem">104</div></div>
+                  <div class="meta"><span data-is="Meðaltal">Avg</span> <b>62.7</b><br><span data-is="Pílur">Darts</span> <b>19</b><br><span data-is="Byrjaði í">Turn from</span> <b>124</b></div>
+                </div>
+                <div class="hs">
+                  <div class="vs f">S20</div>
+                  <div class="vs a"><span data-is="Píla 2">Dart 2</span></div>
+                  <div class="vs e"><span data-is="Píla 3">Dart 3</span></div>
+                </div>
+              </div>
+              <div class="c4-co"><svg class="i"><use href="#tgt"/></svg><span data-is="Klára">Finish</span><span class="route">T18 D25</span><span class="alt"><span data-is="eða">or</span> T20 D22</span></div>
+              <div class="lad">
+                <div class="r on"><span class="av" style="background:#38bdf8">G</span><div><div class="nm">Guðjón</div><div class="sub">avg 62.7 · 19 darts</div></div><span class="sc">104</span></div>
+                <div class="r"><span class="av" style="background:#f472b6">A</span><div><div class="nm">Anna</div><div class="sub">avg 52.3 · 18 darts</div></div><span class="sc">187</span></div>
+                <div class="r"><span class="av" style="background:#a3e635">Ó</span><div><div class="nm">Óli <span class="hc" data-is="F 301">HC 301</span></div><div class="sub">avg 34.2 · 18 darts</div></div><span class="sc">96</span></div>
+              </div>
+            </div>
+            <div class="right">
+              <div class="lbl" data-is="Tala">Number</div>
+              <div class="c4-nums" data-nums="k n"></div>
+              <div class="r2">
+                <button class="k bull"><span data-is="Miðja">Bull</span><small>25 / 50</small></button>
+                <button class="k miss"><span data-is="Framhjá">Miss</span></button>
+              </div>
+            </div>
+          </div></div>
+          <figcaption><b>Tablet, landscape.</b> The split pad holds rings and Undo on the left edge and numbers on the right edge. The middle stays a clean scoreboard.</figcaption>
+        </figure>
+      </div>
+      <aside class="why">
+        <h4>Rationale</h4>
+        <ul>
+          <li class="p">Every input is within thumb reach in the bottom half of the phone. The S/D/T rail can be moved to either side for left-handers, and its tall keys (about 104&nbsp;px) are easy to hit.</li>
+          <li class="p">On the tablet the controls hug both edges, leaving a large central board. This suits two hands, a mounted tablet, or two kids helping each other.</li>
+          <li class="m">The 4-column grid (1&ndash;4, 5&ndash;8&hellip;) is less familiar than 5 columns, and the rail costs width, so the phone number keys are about 65&times;60&nbsp;px.</li>
+          <li class="m">Other players appear in the smallest form of the four (ticker pills). The pills scroll, so 6 players or teams fit, but they can't be read at a distance on a phone.</li>
+          <li class="n">Teams: a pill shows the team score with the thrower's initials. The ladder on the tablet lists both members under each team.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="concept" id="cmp">
+    <div class="c-head"><span class="c-no">AT A GLANCE</span><h2 class="c-title">How they compare</h2></div>
+    <div class="tblwrap">
+    <table class="cmp">
+      <thead><tr><th>Concept</th><th>Best on</th><th>Read from 2&ndash;3&nbsp;m</th><th>Mis-tap safety</th><th>6 players / teams</th><th>Taps per scoring dart</th></tr></thead>
+      <tbody>
+        <tr><td>1 Big Keys</td><td>Phone or tablet</td><td>Thrower's score: good. Others: weak</td><td>Best (largest keys)</td><td>Chips wrap or scroll</td><td>1&ndash;2 (sticky modifier)</td></tr>
+        <tr><td>2 Living Room</td><td>Mounted tablet</td><td>Best: everyone's score</td><td>OK (narrowest keys)</td><td>Columns, then 2 rows</td><td>1&ndash;2</td></tr>
+        <tr><td>3 Turn Lane</td><td>Phone</td><td>Good: score and darts</td><td>Very good (no hidden mode)</td><td>Tabs scroll</td><td>2 (number, then ring)</td></tr>
+        <tr><td>4 Thumb Rail</td><td>Hand-held phone, tablet split</td><td>Thrower's score: good. Others: weak on phone</td><td>Good</td><td>Pills scroll, tablet ladder</td><td>1&ndash;2</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+</div>
+
+<script>
+document.querySelectorAll('[data-nums]').forEach(function(g){
+  var cls=g.dataset.nums, mult=+(g.dataset.mult||0), mark=(g.dataset.mark||'').split(',').map(Number), h='';
+  for(var i=1;i<=20;i++){h+='<button class="'+cls+(mark.indexOf(i)>-1?' mark':'')+'">'+i+(mult?'<sup>'+(i*mult)+'</sup>':'')+'</button>';}
+  g.insertAdjacentHTML('afterbegin',h);
+});
+(function(){
+  var btns=document.querySelectorAll('.lang button');
+  function setLang(l){
+    document.querySelectorAll('[data-is]').forEach(function(e){
+      if(e.dataset.en===undefined) e.dataset.en=e.textContent;
+      e.textContent = l==='is' ? e.dataset.is : e.dataset.en;
+    });
+    btns.forEach(function(b){b.setAttribute('aria-pressed', String(b.dataset.l===l));});
+    document.documentElement.lang = l;
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.dataset.l);});});
+})();
+</script>
+</body>
+</html>
