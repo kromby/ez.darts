@@ -7,14 +7,21 @@ import GameSetup, {
 } from './components/GameSetup/GameSetup'
 import type { StartedGame } from './components/GameShell/startGame'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import ManagePlayers from './components/ManagePlayers/ManagePlayers'
 import PlayerSelection from './components/PlayerSelection/PlayerSelection'
 import type { PlayerSlot } from './engine/game'
 import { findGame, findGameConfig, gameConfigs } from './games'
-import { createPlayer, type Player } from './players/player'
+import {
+  colorValue,
+  createPlayer,
+  isActive,
+  withColors,
+  type Player,
+} from './players/player'
 import type { DataStore } from './storage/store'
 import styles from './App.module.css'
 
-type Step = 'loading' | 'players' | 'setup' | 'game'
+type Step = 'loading' | 'players' | 'manage' | 'setup' | 'game'
 
 /** Saving happens in the background; a failed save never stops play. */
 function save(write: Promise<void>) {
@@ -61,8 +68,11 @@ function App({ store }: Props) {
           store.games.unfinished(),
         ])
       if (cancelled) return
-      const ids = new Set(known.map((player) => player.id))
-      setPlayers(known)
+      // Removed players are kept for past games but not picked again.
+      const ids = new Set(known.filter(isActive).map((player) => player.id))
+      const colored = withColors(known)
+      for (const player of colored) save(store.players.put(player))
+      setPlayers(known.map((p) => colored.find((c) => c.id === p.id) ?? p))
       setSlots((savedSlots ?? []).filter((slot) => ids.has(slot.playerId)))
       if (savedGameId && findGameConfig(savedGameId)) setGameId(savedGameId)
       setSetups(savedSetups ?? {})
@@ -90,12 +100,32 @@ function App({ store }: Props) {
   const inGame = slots.flatMap(
     (slot) => players.find((player) => player.id === slot.playerId) ?? [],
   )
-  const playerName = (id: string) =>
-    players.find((player) => player.id === id)?.name ?? id
+  const findPlayer = (id: string) => players.find((player) => player.id === id)
+  const playerName = (id: string) => findPlayer(id)?.name ?? id
+  const playerColor = (id: string) => {
+    const player = findPlayer(id)
+    return player?.color && colorValue(player)
+  }
+
+  /** Keeps a new or changed player; a removed one leaves the line-up. */
+  function savePlayer(player: Player) {
+    setPlayers((current) =>
+      current.some((p) => p.id === player.id)
+        ? current.map((p) => (p.id === player.id ? player : p))
+        : [...current, player],
+    )
+    save(store.players.put(player))
+    if (!isActive(player) && slots.some((s) => s.playerId === player.id)) {
+      const next = slots.filter((slot) => slot.playerId !== player.id)
+      setSlots(next)
+      save(store.settings.put('slots', next))
+    }
+  }
 
   if (step === 'game' && game) {
     return game.render({
       playerName,
+      playerColor,
       onPlayAgain: () => setGame(game.again()),
       onExit: (record) => {
         // A game quit before the end is not kept; a finished one is.
@@ -119,16 +149,27 @@ function App({ store }: Props) {
             teamsSupported={config.teams}
             initial={slots}
             onAddPlayer={(name) => {
-              const player = createPlayer(name)
-              setPlayers((current) => [...current, player])
-              save(store.players.put(player))
+              const player = createPlayer(name, players)
+              savePlayer(player)
               return player
+            }}
+            onManage={(chosen) => {
+              setSlots(chosen)
+              save(store.settings.put('slots', chosen))
+              setStep('manage')
             }}
             onContinue={(chosen) => {
               setSlots(chosen)
               save(store.settings.put('slots', chosen))
               setStep('setup')
             }}
+          />
+        )}
+        {step === 'manage' && (
+          <ManagePlayers
+            players={players}
+            onSave={savePlayer}
+            onDone={() => setStep('players')}
           />
         )}
         {step === 'setup' && (

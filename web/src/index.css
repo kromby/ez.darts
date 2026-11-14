@@ -16,6 +16,15 @@
   --team-a: #38bdf8;
   --team-b: #f472b6;
   --team-c: #a3e635;
+  /* Player avatar colours; the first three match the teams. */
+  --player-sky: #38bdf8;
+  --player-pink: #f472b6;
+  --player-lime: #a3e635;
+  --player-amber: #fbbf24;
+  --player-violet: #a78bfa;
+  --player-teal: #2dd4bf;
+  --player-red: #f87171;
+  --player-orange: #fb923c;
 
   --radius: 14px;
   --key-height: 56px;

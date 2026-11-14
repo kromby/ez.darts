@@ -15,9 +15,14 @@ export function isTeam(side: Side): boolean {
   return side.id !== side.members[0]
 }
 
-/** A team's own colour, or one by position for a player. */
-export function sideColor(side: Side, index: number): string {
-  return (isTeam(side) && teamColors[side.id]) || avatarColors[index % 3]
+/** A team's own colour, a player's own, or one by position. */
+export function sideColor(
+  side: Side,
+  index: number,
+  playerColor?: (id: string) => string | undefined,
+): string {
+  if (isTeam(side)) return teamColors[side.id] ?? avatarColors[index % 3]
+  return playerColor?.(side.members[0]) ?? avatarColors[index % 3]
 }
 
 /** The team letter, or the player's initial. */

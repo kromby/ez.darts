@@ -40,7 +40,11 @@ function sideTotals(state: AtwState, side: Side) {
  * screen, the turn's darts with how far each moved on, and every side's
  * target.
  */
-function Scoreboard({ state, playerName }: ScoreboardProps<AtwState>) {
+function Scoreboard({
+  state,
+  playerName,
+  playerColor,
+}: ScoreboardProps<AtwState>) {
   const { t } = useTranslation()
   const dartName = useDartName()
   const { turns, turnDarts, turnSteps, lastTurn, options } = state
@@ -91,7 +95,7 @@ function Scoreboard({ state, playerName }: ScoreboardProps<AtwState>) {
       id: s.id,
       name: sideName(s, playerName),
       avatar: sideAvatar(s, playerName),
-      color: sideColor(s, index),
+      color: sideColor(s, index, playerColor),
       tags: !sideProgress.opened && <Tag text={t('game.notIn')} />,
       line: t('atw.playerLine', {
         rate: percent(hitRate(totals)),

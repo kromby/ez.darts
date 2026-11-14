@@ -294,3 +294,80 @@ describe('App storage', () => {
     ).toBeInTheDocument()
   })
 })
+
+describe('App players', () => {
+  it('adds, edits and removes players, and remembers it all', async () => {
+    mockHealth('ok')
+    const user = userEvent.setup()
+    const store = createMemoryStore()
+
+    const first = await renderApp(store)
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Anna{Enter}')
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Óli{Enter}')
+    await user.click(screen.getByRole('button', { name: 'Breyta leikmönnum' }))
+
+    await user.click(screen.getByRole('button', { name: '+ Nýr leikmaður' }))
+    await user.type(screen.getByLabelText('Nafn'), 'Dagný')
+    await user.click(screen.getByRole('button', { name: 'Vista' }))
+    await user.click(screen.getByRole('button', { name: 'Breyta Anna' }))
+    await user.clear(screen.getByLabelText('Nafn'))
+    await user.type(screen.getByLabelText('Nafn'), 'Anna Jóns')
+    await user.click(screen.getByRole('radio', { name: 'Rauður' }))
+    await user.click(screen.getByRole('button', { name: 'Vista' }))
+    await user.click(screen.getByRole('button', { name: 'Fjarlægja Óli' }))
+    await user.click(screen.getByRole('button', { name: 'Já, fjarlægja' }))
+    await user.click(screen.getByRole('button', { name: 'Lokið' }))
+
+    // Óli leaves the line-up and is no longer offered.
+    expect(screen.getByRole('list', { name: 'Kaströð' })).toHaveTextContent(
+      'Anna Jóns',
+    )
+    expect(screen.getByRole('list', { name: 'Kaströð' })).not.toHaveTextContent(
+      'Óli',
+    )
+    expect(
+      screen.queryByRole('button', { name: 'Bæta Óli í leikinn' }),
+    ).not.toBeInTheDocument()
+    first.unmount()
+
+    await renderApp(store)
+    expect(
+      screen.getByRole('button', { name: 'Bæta Dagný í leikinn' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Breyta leikmönnum' }))
+    expect(
+      screen.getByRole('region', { name: 'Fjarlægðir leikmenn' }),
+    ).toHaveTextContent('Óli')
+    const stored = await store.players.list()
+    expect(stored.find((p) => p.name === 'Óli')?.archivedAt).toEqual(
+      expect.any(String),
+    )
+    expect(stored.find((p) => p.name === 'Anna Jóns')?.color).toBe('red')
+  })
+
+  it("still names a removed player in a game they're in", async () => {
+    mockHealth('ok')
+    const user = userEvent.setup()
+    const store = createMemoryStore()
+
+    const first = await renderApp(store)
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Anna{Enter}')
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Óli{Enter}')
+    await user.click(screen.getByRole('button', { name: 'Áfram' }))
+    await user.click(screen.getByRole('button', { name: 'Byrja leik' }))
+    first.unmount()
+
+    const players = await store.players.list()
+    const oli = players.find((p) => p.name === 'Óli')
+    if (!oli) throw new Error('Óli was saved')
+    await store.players.put({ ...oli, archivedAt: '2026-11-14T20:00:00Z' })
+
+    render(<App store={store} />)
+
+    const sides = within(
+      await screen.findByRole('list', { name: 'Staðan' }),
+    ).getAllByRole('listitem')
+    expect(sides[1]).toHaveTextContent('Óli')
+    await user.click(screen.getByRole('button', { name: 'Valmynd' }))
+  })
+})

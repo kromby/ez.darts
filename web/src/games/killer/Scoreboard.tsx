@@ -39,7 +39,12 @@ const effectLabel = (effect: number) => {
  * the game, the same card asks each player in turn to pick or throw for a
  * number.
  */
-function Scoreboard({ state, playerName, hint }: ScoreboardProps<KillerState>) {
+function Scoreboard({
+  state,
+  playerName,
+  playerColor,
+  hint,
+}: ScoreboardProps<KillerState>) {
   const { t } = useTranslation()
   const dartName = useDartName()
   const { turns, options, stats } = state
@@ -105,7 +110,7 @@ function Scoreboard({ state, playerName, hint }: ScoreboardProps<KillerState>) {
       id: side.id,
       name: sideName(side, playerName),
       avatar: sideAvatar(side, playerName),
-      color: sideColor(side, index),
+      color: sideColor(side, index, playerColor),
       // One tag that never comes or goes, so the chips keep their height.
       tags:
         active &&

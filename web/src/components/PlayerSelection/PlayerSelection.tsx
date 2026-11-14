@@ -17,7 +17,13 @@ import {
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { PlayerId, PlayerSlot, TeamId } from '../../engine/game'
-import { isNameTaken, normalizeName, type Player } from '../../players/player'
+import {
+  isActive,
+  normalizeName,
+  playerNamed,
+  type Player,
+} from '../../players/player'
+import PlayerAvatar from '../PlayerAvatar/PlayerAvatar'
 import SelectedPlayer from './SelectedPlayer'
 import styles from './PlayerSelection.module.css'
 import {
@@ -30,8 +36,16 @@ import {
 } from './selection'
 
 type Props = {
-  /** Everyone who can play: the household's or the guest's players. */
+  /**
+   * The household's or the guest's players. Removed ones are not offered,
+   * but their names stay taken.
+   */
   players: Player[]
+  /**
+   * Opens the screen to add, edit and remove players, with the line-up so
+   * far so it is there on the way back.
+   */
+  onManage?(slots: PlayerSlot[]): void
   onAddPlayer(name: string): Player | Promise<Player>
   /** Whether the game can be played in teams. */
   teamsSupported: boolean
@@ -48,6 +62,7 @@ function PlayerSelection({
   teamsSupported,
   initial = [],
   onContinue,
+  onManage,
   random,
 }: Props) {
   const { t } = useTranslation()
@@ -75,7 +90,9 @@ function PlayerSelection({
 
   const byId = new Map(players.map((player) => [player.id, player]))
   const chosen = selected.flatMap((playerId) => byId.get(playerId) ?? [])
-  const available = players.filter((player) => !selected.includes(player.id))
+  const available = players.filter(
+    (player) => isActive(player) && !selected.includes(player.id),
+  )
   const teams = teamsOn ? teamIds.slice(0, teamCount(chosen.length)) : null
   // A team dropped when players leave (e.g. C with two players) falls back to A.
   const assigned: Record<PlayerId, TeamId> = Object.fromEntries(
@@ -84,7 +101,8 @@ function PlayerSelection({
       teams?.includes(teamOf[playerId]) ? teamOf[playerId] : teamIds[0],
     ]),
   )
-  const nameTaken = isNameTaken(players, newName)
+  const namesake = playerNamed(players, newName)
+  const nameTaken = namesake !== undefined
   const canAdd = normalizeName(newName) !== '' && !nameTaken
   const teamsValid = !teamsOn || hasTwoTeams(selected, assigned)
   const valid = chosen.length > 0 && teamsValid
@@ -240,7 +258,8 @@ function PlayerSelection({
                   aria-label={t('players.add', { name: player.name })}
                   onClick={() => select(player.id)}
                 >
-                  + {player.name}
+                  <PlayerAvatar player={player} size={28} />
+                  {player.name}
                 </button>
               </li>
             ))}
@@ -273,8 +292,21 @@ function PlayerSelection({
         </form>
         {nameTaken && (
           <p id={`${id}-taken`} className={styles.error}>
-            {t('players.nameTaken')}
+            {namesake?.archivedAt
+              ? t('players.nameArchived')
+              : t('players.nameTaken')}
           </p>
+        )}
+        {onManage && (
+          <button
+            type="button"
+            className={styles.manage}
+            onClick={() =>
+              onManage(toSlots(selected, teamsOn ? assigned : null))
+            }
+          >
+            {t('players.manage')}
+          </button>
         )}
       </section>
 
