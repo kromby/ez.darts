@@ -111,6 +111,26 @@ Preview environments include the API and share production's app settings, so the
 
 To check that the deployed API can reach Table Storage, call `GET /api/health/storage`. It writes one fixed row to the `HealthCheck` table and reads it back.
 
+### Household API
+
+Signed-in households keep their players, games and stats in Table Storage, in the `Players`, `Games` and `PlayerStats` tables. Each table uses the household id as its PartitionKey. The server stores what the app sends and never runs game rules.
+
+| Endpoint                 | What                                                                   |
+| ------------------------ | ---------------------------------------------------------------------- |
+| `GET /api/players`       | The household's players, removed ones included                         |
+| `PUT /api/players/{id}`  | Create or update a player (`201` new, `200` updated, `409` name taken) |
+| `GET /api/games`         | Every game, newest first                                               |
+| `GET /api/games/{id}`    | One game                                                               |
+| `PUT /api/games/{id}`    | Save a game, as often as after every dart; the same save twice is safe |
+| `DELETE /api/games/{id}` | Remove a game (one quit before the end)                                |
+| `GET /api/stats`         | Stats rows per player, game and ISO week, for the app to add up        |
+
+Every one of them needs a signed-in household and answers `401` without one. Sign-in comes with #19. Until then, no request has a household, except under `func start` locally, where an `X-Household-Id` header stands in for one:
+
+```bash
+curl -H 'X-Household-Id: test' http://localhost:7071/api/players
+```
+
 ### Provisioning (one time, or after changing `infra/`)
 
 ```bash

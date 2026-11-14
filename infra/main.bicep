@@ -48,6 +48,18 @@ resource healthCheckTable 'Microsoft.Storage/storageAccounts/tableServices/table
   name: 'HealthCheck'
 }
 
+// Household data (PartitionKey = household id). The API also creates these on first use.
+resource dataTables 'Microsoft.Storage/storageAccounts/tableServices/tables@2023-05-01' = [
+  for name in [
+    'Players'
+    'Games'
+    'PlayerStats'
+  ]: {
+    parent: tableService
+    name: name
+  }
+]
+
 resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   name: staticWebAppName
   location: location
