@@ -1,5 +1,6 @@
 import { isValidDart, type Dart } from './dart'
 import type { GameModule, GameRecord, GameResult, PlayerSlot } from './game'
+import { summarize } from './summary'
 
 export type NewGame<TOptions> = {
   options: TOptions
@@ -25,6 +26,22 @@ export function createGameRecord<TOptions, TState>(
     startedAt: (game.startedAt ?? new Date()).toISOString(),
     result: null,
   }
+}
+
+/**
+ * The summary for a finished game in `state`, with the module's points
+ * when it scores them.
+ */
+export function summaryOf<TOptions, TState>(
+  module: GameModule<TOptions, TState>,
+  record: GameRecord<TOptions> & { result: GameResult },
+  state: TState,
+) {
+  const { points } = module
+  return summarize(
+    record,
+    points ? (playerId) => points(state, playerId) : undefined,
+  )
 }
 
 /** Rebuilds game state by replaying the dart log from the start. */
@@ -109,19 +126,28 @@ export function createGameRunner<TOptions, TState>(
           }
         : null
 
+      const darts = [...record.darts, { playerId, dart }]
+      // Finished games carry their summary, for stats.
       commit({
-        record: {
-          ...record,
-          darts: [...record.darts, { playerId, dart }],
-          result,
-        },
+        record: result
+          ? {
+              ...record,
+              darts,
+              result,
+              summary: summaryOf(
+                module,
+                { ...record, darts, result },
+                nextState,
+              ),
+            }
+          : { ...record, darts, result },
         state: nextState,
       })
       if (result) onFinish?.(result)
     },
 
     undo() {
-      const { record } = snapshot
+      const { summary: _finished, ...record } = snapshot.record
       if (record.darts.length === 0) return false
 
       const nextRecord: GameRecord<TOptions> = {

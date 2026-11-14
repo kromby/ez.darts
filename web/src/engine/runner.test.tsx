@@ -142,6 +142,60 @@ describe('createGameRunner', () => {
     expect(() => runner.throwDart(t20)).toThrow('already over')
   })
 
+  it("keeps the finished game's summary with its result", () => {
+    const { runner } = newRunner()
+    expect(runner.getSnapshot().record.summary).toBeUndefined()
+
+    throwAll(runner, 3)
+    runner.throwDart(MISS)
+    runner.throwDart(dart(BULL, 2))
+    runner.throwDart(dart(BULL, 1))
+    runner.throwDart(t20)
+
+    // The race module scores no points, so the summary has none.
+    expect(runner.getSnapshot().record.summary).toEqual([
+      {
+        playerId: 'anna',
+        darts: 4,
+        singles: 0,
+        doubles: 0,
+        triples: 4,
+        misses: 0,
+        place: 1,
+      },
+      {
+        playerId: 'bjarni',
+        darts: 3,
+        singles: 1,
+        doubles: 1,
+        triples: 0,
+        misses: 1,
+        place: 2,
+      },
+    ])
+  })
+
+  it("adds the module's points to the summary", () => {
+    const scoring = {
+      ...race,
+      points: (state: RaceState, id: PlayerId) => state.scores[id],
+    }
+    const runner = createGameRunner(
+      scoring,
+      createGameRecord(scoring, {
+        options: { target: 60 },
+        slots,
+        configVersion: 1,
+      }),
+    )
+
+    runner.throwDart(t20)
+
+    expect(
+      runner.getSnapshot().record.summary?.map(({ points }) => points),
+    ).toEqual([60, 0])
+  })
+
   it('undoes the last dart by replaying the log', () => {
     const { runner } = newRunner()
     throwAll(runner, 4)
@@ -169,6 +223,7 @@ describe('createGameRunner', () => {
     runner.undo()
 
     expect(runner.getSnapshot().record.result).toBeNull()
+    expect(runner.getSnapshot().record).not.toHaveProperty('summary')
     expect(race.isOver(runner.getSnapshot().state)).toBe(false)
 
     runner.throwDart(t20)

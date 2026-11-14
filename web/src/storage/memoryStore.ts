@@ -1,4 +1,5 @@
 import type { Player } from '../players/player'
+import { rowsFromGames } from '../stats/rows'
 import {
   byName,
   newestFirst,
@@ -59,6 +60,9 @@ export function createMemoryStore(): DataStore {
         settings.set(key, copy(value))
         return done
       },
+    },
+    stats: {
+      rows: () => Promise.resolve(rowsFromGames([...games.values()])),
     },
   }
 }

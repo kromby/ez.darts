@@ -1,4 +1,4 @@
-import type { PlayerId, PlayerSlot } from '../../engine/game'
+import type { PlayerId, PlayerSlot } from './game'
 
 /**
  * Groups standings into places: team members that follow each other share

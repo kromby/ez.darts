@@ -67,6 +67,11 @@ export interface GameModule<TOptions, TState> {
   /** A player's key numbers on the results screen. */
   PlayerSummary?: ComponentType<PlayerSummaryProps<TState>>
   hint?(state: TState): string | null
+  /**
+   * Points a player scored, for games where points add up to a 3-dart
+   * average (x01). Left out by games without one.
+   */
+  points?(state: TState, playerId: PlayerId): number
 }
 
 export type ThrownDart = {
@@ -78,6 +83,23 @@ export type GameResult = {
   standings: PlayerId[]
   /** ISO 8601 timestamp. */
   finishedAt: string
+}
+
+/**
+ * One player's numbers from a finished game, kept with it for stats: where
+ * the darts landed (a bull is a single, the bullseye a double), the place
+ * (1 is first; team mates share one) and, for x01, the points scored.
+ * Stats only add these up, so the API needs no game rules.
+ */
+export type PlayerSummary = {
+  playerId: PlayerId
+  darts: number
+  singles: number
+  doubles: number
+  triples: number
+  misses: number
+  place: number
+  points?: number
 }
 
 /** Everything needed to save, resume and replay a game. */
@@ -93,4 +115,6 @@ export type GameRecord<TOptions> = {
   /** ISO 8601 timestamp. */
   startedAt: string
   result: GameResult | null
+  /** Set with the result: one entry per player, in throwing order. */
+  summary?: PlayerSummary[]
 }

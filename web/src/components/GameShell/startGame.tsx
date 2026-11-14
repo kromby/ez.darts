@@ -5,8 +5,9 @@ import type {
   GameRecord,
   PlayerId,
   PlayerSlot,
+  PlayerSummary,
 } from '../../engine/game'
-import { createGameRecord, replay } from '../../engine/runner'
+import { createGameRecord, replay, summaryOf } from '../../engine/runner'
 import GameShell from './GameShell'
 
 export type ShellCallbacks = {
@@ -48,6 +49,11 @@ export type GameStarter = {
    * another game's or can't be replayed.
    */
   resume(record: GameRecord<unknown>): StartedGame
+  /**
+   * The summary of a finished game of this module, by replaying it: for
+   * games saved before summaries were kept. `null` while unfinished.
+   */
+  summarize(record: GameRecord<unknown>): PlayerSummary[] | null
 }
 
 /** A new record, with chance settled by the module's `prepare`. */
@@ -107,6 +113,12 @@ export function gameStarter<TOptions, TState>(
       const saved = record as GameRecord<TOptions>
       replay(module, saved)
       return play(module, saved)
+    },
+    summarize: (record) => {
+      const { result } = record
+      if (record.game !== module.id || !result) return null
+      const saved = record as GameRecord<TOptions>
+      return summaryOf(module, { ...saved, result }, replay(module, saved))
     },
   }
 }

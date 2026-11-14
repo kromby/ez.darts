@@ -35,6 +35,12 @@ function remap(game: StoredGame, map: Map<PlayerId, PlayerId>): StoredGame {
       ...game.result,
       standings: game.result.standings.map(id),
     },
+    ...(game.summary && {
+      summary: game.summary.map((player) => ({
+        ...player,
+        playerId: id(player.playerId),
+      })),
+    }),
   }
 }
 

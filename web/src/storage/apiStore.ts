@@ -1,4 +1,5 @@
 import type { Player } from '../players/player'
+import type { StatsRow } from '../stats/rows'
 import { byName, newestFirst, type DataStore, type StoredGame } from './store'
 
 export class ApiError extends Error {
@@ -32,6 +33,8 @@ export type ApiStoreOptions = {
 /**
  * The signed-in household's store: players and games through the API (#17),
  * so they follow the household to any device. Settings stay on the device.
+ * Stats rows come from the API, which adds each finished game's summary as
+ * it is saved.
  */
 export function createApiStore({
   baseUrl = '/api',
@@ -106,6 +109,9 @@ export function createApiStore({
       },
     },
     settings,
+    stats: {
+      rows: async () => (await json<StatsRow[]>('/stats')) ?? [],
+    },
   }
 }
 

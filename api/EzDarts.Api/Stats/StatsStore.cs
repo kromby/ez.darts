@@ -25,7 +25,7 @@ public class TableStatsStore(TableProvider tables) : IStatsStore
     public const int MaxAttempts = 5;
 
     private static readonly string[] Columns =
-        ["Games", "Wins", "Darts", "Singles", "Doubles", "Triples", "Misses", "Points"];
+        ["Games", "Matches", "Wins", "Darts", "Singles", "Doubles", "Triples", "Misses", "Points"];
 
     public async Task<IReadOnlyList<PlayerStatsDto>> ListAsync(
         string householdId, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ public class TableStatsStore(TableProvider tables) : IStatsStore
             }
 
             rows.Add(new PlayerStatsDto(
-                key.PlayerId, key.Game, key.Week, counts.Games, counts.Wins, counts.Darts,
+                key.PlayerId, key.Game, key.Week, counts.Games, counts.Matches, counts.Wins, counts.Darts,
                 counts.Singles, counts.Doubles, counts.Triples, counts.Misses, counts.Points));
         }
 
@@ -114,7 +114,7 @@ public class TableStatsStore(TableProvider tables) : IStatsStore
     {
         int Get(string column) => entity.GetInt32(column) ?? 0;
         return new StatsCounts(
-            Get("Games"), Get("Wins"), Get("Darts"), Get("Singles"),
+            Get("Games"), Get("Matches"), Get("Wins"), Get("Darts"), Get("Singles"),
             Get("Doubles"), Get("Triples"), Get("Misses"), Get("Points"));
     }
 
@@ -122,7 +122,7 @@ public class TableStatsStore(TableProvider tables) : IStatsStore
     {
         int[] values =
         [
-            counts.Games, counts.Wins, counts.Darts, counts.Singles,
+            counts.Games, counts.Matches, counts.Wins, counts.Darts, counts.Singles,
             counts.Doubles, counts.Triples, counts.Misses, counts.Points,
         ];
         var entity = new TableEntity(householdId, key.RowKey);

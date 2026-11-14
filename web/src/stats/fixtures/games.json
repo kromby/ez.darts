@@ -1,0 +1,511 @@
+[
+  {
+    "id": "fixture-1",
+    "game": "x01",
+    "configVersion": 1,
+    "options": {
+      "startScore": 101,
+      "in": "single",
+      "out": "single",
+      "playOn": false
+    },
+    "slots": [
+      {
+        "playerId": "anna"
+      },
+      {
+        "playerId": "oli"
+      }
+    ],
+    "darts": [
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 10,
+          "multiplier": 2
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 5,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 19,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 1,
+          "multiplier": 1
+        }
+      }
+    ],
+    "startedAt": "2026-11-03T19:50:00.000Z",
+    "result": {
+      "standings": ["anna", "oli"],
+      "finishedAt": "2026-11-03T20:00:00.000Z"
+    },
+    "summary": [
+      {
+        "playerId": "anna",
+        "darts": 4,
+        "singles": 2,
+        "doubles": 1,
+        "triples": 1,
+        "misses": 0,
+        "place": 1,
+        "points": 101
+      },
+      {
+        "playerId": "oli",
+        "darts": 3,
+        "singles": 1,
+        "doubles": 0,
+        "triples": 1,
+        "misses": 1,
+        "place": 2,
+        "points": 62
+      }
+    ]
+  },
+  {
+    "id": "fixture-2",
+    "game": "x01",
+    "configVersion": 1,
+    "options": {
+      "startScore": 41,
+      "in": "single",
+      "out": "double",
+      "playOn": true
+    },
+    "slots": [
+      {
+        "playerId": "anna"
+      },
+      {
+        "playerId": "oli"
+      },
+      {
+        "playerId": "bjorn"
+      }
+    ],
+    "darts": [
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 1,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 20,
+          "multiplier": 2
+        }
+      },
+      {
+        "playerId": "bjorn",
+        "dart": {
+          "segment": 13,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "bjorn",
+        "dart": {
+          "segment": 1,
+          "multiplier": 2
+        }
+      }
+    ],
+    "startedAt": "2026-11-12T20:00:00.000Z",
+    "result": {
+      "standings": ["oli", "bjorn", "anna"],
+      "finishedAt": "2026-11-12T20:10:00.000Z"
+    },
+    "summary": [
+      {
+        "playerId": "anna",
+        "darts": 2,
+        "singles": 2,
+        "doubles": 0,
+        "triples": 0,
+        "misses": 0,
+        "place": 3,
+        "points": 0
+      },
+      {
+        "playerId": "oli",
+        "darts": 2,
+        "singles": 1,
+        "doubles": 1,
+        "triples": 0,
+        "misses": 0,
+        "place": 1,
+        "points": 41
+      },
+      {
+        "playerId": "bjorn",
+        "darts": 2,
+        "singles": 0,
+        "doubles": 1,
+        "triples": 1,
+        "misses": 0,
+        "place": 2,
+        "points": 41
+      }
+    ]
+  },
+  {
+    "id": "fixture-3",
+    "game": "x01",
+    "configVersion": 1,
+    "options": {
+      "startScore": 60,
+      "in": "single",
+      "out": "single",
+      "playOn": false
+    },
+    "slots": [
+      {
+        "playerId": "anna"
+      }
+    ],
+    "darts": [
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 3
+        }
+      }
+    ],
+    "startedAt": "2026-11-13T18:00:00.000Z",
+    "result": {
+      "standings": ["anna"],
+      "finishedAt": "2026-11-13T18:01:00.000Z"
+    },
+    "summary": [
+      {
+        "playerId": "anna",
+        "darts": 1,
+        "singles": 0,
+        "doubles": 0,
+        "triples": 1,
+        "misses": 0,
+        "place": 1,
+        "points": 60
+      }
+    ]
+  },
+  {
+    "id": "fixture-4",
+    "game": "x01",
+    "configVersion": 1,
+    "options": {
+      "startScore": 40,
+      "in": "single",
+      "out": "single",
+      "playOn": false
+    },
+    "slots": [
+      {
+        "playerId": "anna",
+        "teamId": "a"
+      },
+      {
+        "playerId": "oli",
+        "teamId": "b"
+      },
+      {
+        "playerId": "bjorn",
+        "teamId": "a"
+      }
+    ],
+    "darts": [
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 10,
+          "multiplier": 1
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 10,
+          "multiplier": 1
+        }
+      }
+    ],
+    "startedAt": "2025-12-30T09:55:00.000Z",
+    "result": {
+      "standings": ["anna", "bjorn", "oli"],
+      "finishedAt": "2025-12-30T10:00:00.000Z"
+    },
+    "summary": [
+      {
+        "playerId": "anna",
+        "darts": 3,
+        "singles": 3,
+        "doubles": 0,
+        "triples": 0,
+        "misses": 0,
+        "place": 1,
+        "points": 40
+      },
+      {
+        "playerId": "oli",
+        "darts": 0,
+        "singles": 0,
+        "doubles": 0,
+        "triples": 0,
+        "misses": 0,
+        "place": 2,
+        "points": 0
+      },
+      {
+        "playerId": "bjorn",
+        "darts": 0,
+        "singles": 0,
+        "doubles": 0,
+        "triples": 0,
+        "misses": 0,
+        "place": 1,
+        "points": 0
+      }
+    ]
+  },
+  {
+    "id": "fixture-5",
+    "game": "around-the-world",
+    "configVersion": 1,
+    "options": {
+      "in": "single",
+      "out": "single",
+      "bull": false,
+      "missEndsTurn": false,
+      "playOn": false
+    },
+    "slots": [
+      {
+        "playerId": "anna"
+      },
+      {
+        "playerId": "oli"
+      }
+    ],
+    "darts": [
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 1,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 4,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 7,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 10,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 13,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 16,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "oli",
+        "dart": {
+          "segment": 0,
+          "multiplier": 0
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 19,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 1
+        }
+      }
+    ],
+    "startedAt": "2026-10-01T18:00:00.000Z",
+    "result": {
+      "standings": ["anna", "oli"],
+      "finishedAt": "2026-10-01T18:15:00.000Z"
+    },
+    "summary": [
+      {
+        "playerId": "anna",
+        "darts": 8,
+        "singles": 1,
+        "doubles": 0,
+        "triples": 7,
+        "misses": 0,
+        "place": 1
+      },
+      {
+        "playerId": "oli",
+        "darts": 6,
+        "singles": 0,
+        "doubles": 0,
+        "triples": 0,
+        "misses": 6,
+        "place": 2
+      }
+    ]
+  },
+  {
+    "id": "fixture-6",
+    "game": "x01",
+    "configVersion": 1,
+    "options": {
+      "startScore": 501,
+      "in": "single",
+      "out": "double",
+      "playOn": false
+    },
+    "slots": [
+      {
+        "playerId": "anna"
+      },
+      {
+        "playerId": "oli"
+      }
+    ],
+    "darts": [
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 3
+        }
+      },
+      {
+        "playerId": "anna",
+        "dart": {
+          "segment": 20,
+          "multiplier": 1
+        }
+      }
+    ],
+    "startedAt": "2026-11-14T12:00:00.000Z",
+    "result": null
+  }
+]

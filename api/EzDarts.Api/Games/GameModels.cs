@@ -14,7 +14,8 @@ public record GameResultDto(IReadOnlyList<string> Standings, string FinishedAt);
 
 /// <summary>
 /// One player's numbers from a finished game, worked out by the web app (the server never runs game
-/// rules). <c>Points</c> is set for x01 only. Shape proposed for stats in #20.
+/// rules): darts thrown, where they landed (a bull is a single, the bullseye a double), the place
+/// (team mates share one, 1 is first) and, for x01 only, the points scored (busts score nothing).
 /// </summary>
 public record PlayerSummaryDto(
     string PlayerId,

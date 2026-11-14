@@ -6,6 +6,8 @@ import AccountMenu from './components/AccountMenu/AccountMenu'
 import ImportOffer, {
   type ImportOfferState,
 } from './components/ImportOffer/ImportOffer'
+import { withSummary } from './games'
+import { backfillSummaries } from './stats/backfill'
 import { createApiStore } from './storage/apiStore'
 import {
   guestData,
@@ -57,6 +59,13 @@ function Root({ local, auth, accountApi, createHouseholdStore }: Props) {
   // Bumped after an import so the app reloads the household's data.
   const [loads, setLoads] = useState(0)
 
+  // Games finished before summaries were kept count in the stats too.
+  useEffect(() => {
+    backfillSummaries(store).catch((error: unknown) =>
+      console.error('Could not add summaries to older games', error),
+    )
+  }, [store])
+
   useEffect(() => {
     if (householdId === null) return undefined
     let cancelled = false
@@ -95,7 +104,11 @@ function Root({ local, auth, accountApi, createHouseholdStore }: Props) {
     const counts = { players: offer.players, games: offer.games }
     setOffer({ step: 'importing', ...counts })
     try {
-      const result = await importGuestData(shown.guest, store)
+      const { guest: data } = shown
+      const result = await importGuestData(
+        { ...data, games: data.games.map(withSummary) },
+        store,
+      )
       await markOffered()
       setOffer({ step: 'done', result })
       setLoads((n) => n + 1)

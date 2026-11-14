@@ -3,6 +3,7 @@ import {
   type GameStarter,
 } from '../components/GameShell/startGame'
 import { parseGameConfig, type GameConfig } from '../engine/config'
+import type { GameRecord } from '../engine/game'
 import { aroundTheWorld } from './aroundTheWorld/aroundTheWorld'
 import aroundTheWorldConfig from './aroundTheWorld/config.json'
 import killerConfig from './killer/config.json'
@@ -32,4 +33,19 @@ const games: GameStarter[] = [
 
 export function findGame(id: string): GameStarter | undefined {
   return games.find((game) => game.id === id)
+}
+
+/**
+ * The record with its summary, worked out by replaying it when a finished
+ * game was saved without one (before stats, #20). Unchanged otherwise, or
+ * when the game is unknown or can't be replayed.
+ */
+export function withSummary<T extends GameRecord<unknown>>(record: T): T {
+  if (!record.result || record.summary) return record
+  try {
+    const summary = findGame(record.game)?.summarize(record)
+    return summary ? { ...record, summary } : record
+  } catch {
+    return record
+  }
 }

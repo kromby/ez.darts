@@ -258,4 +258,6 @@ export const x01: GameModule<X01Options, X01State> = {
   Status,
   PlayerSummary,
   hint,
+  // Busted turns score nothing, as in the game's own average.
+  points: (state, playerId) => state.stats[playerId]?.scored ?? 0,
 }

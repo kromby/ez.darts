@@ -88,6 +88,75 @@ describe.each(implementations)('%s store', (_, open) => {
     expect(await store.games.list()).toHaveLength(2)
   })
 
+  it("adds up stats rows from the finished games' summaries", async () => {
+    const store = await open()
+    const summary = [
+      {
+        playerId: 'anna',
+        darts: 2,
+        singles: 0,
+        doubles: 0,
+        triples: 1,
+        misses: 1,
+        place: 1,
+        points: 60,
+      },
+      {
+        playerId: 'oli',
+        darts: 0,
+        singles: 0,
+        doubles: 0,
+        triples: 0,
+        misses: 0,
+        place: 2,
+        points: 0,
+      },
+    ]
+
+    await store.games.put({
+      ...game('one', '2026-11-14T20:00:00.000Z', true),
+      summary,
+    })
+    await store.games.put({
+      ...game('two', '2026-11-14T20:30:00.000Z', true),
+      summary,
+    })
+    // In play, or finished before summaries: nothing yet.
+    await store.games.put(game('three', '2026-11-14T21:00:00.000Z', false))
+    await store.games.put(game('four', '2026-11-14T21:30:00.000Z', true))
+
+    expect(await store.stats.rows()).toEqual([
+      {
+        playerId: 'anna',
+        game: 'x01',
+        week: '2026-W46',
+        games: 2,
+        matches: 2,
+        wins: 2,
+        darts: 4,
+        singles: 0,
+        doubles: 0,
+        triples: 2,
+        misses: 2,
+        points: 120,
+      },
+      {
+        playerId: 'oli',
+        game: 'x01',
+        week: '2026-W46',
+        games: 2,
+        matches: 2,
+        wins: 0,
+        darts: 0,
+        singles: 0,
+        doubles: 0,
+        triples: 0,
+        misses: 0,
+        points: 0,
+      },
+    ])
+  })
+
   it('keeps settings', async () => {
     const store = await open()
     const slots: PlayerSlot[] = [
