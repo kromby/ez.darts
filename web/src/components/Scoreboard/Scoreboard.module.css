@@ -1,5 +1,5 @@
-/* Big Keys game state (docs/design, concept 1). Phone first; the wide
-   layout matches GameShell's side-by-side breakpoint. */
+/* Big Keys game state shared by every game (docs/design, concept 1). Phone
+   first; the wide layout matches GameShell's side-by-side breakpoint. */
 .board {
   display: flex;
   flex-direction: column;
@@ -67,6 +67,11 @@
   letter-spacing: -0.03em;
 }
 
+/* A word such as "Bull" instead of a number. */
+.remaining[data-long] {
+  font-size: clamp(40px, 13vw, 64px);
+}
+
 .stats {
   display: flex;
   flex-direction: column;
@@ -94,7 +99,7 @@
   font-weight: 800;
 }
 
-.notIn {
+.notice {
   align-self: flex-start;
   margin: 0;
   padding: 2px 8px;

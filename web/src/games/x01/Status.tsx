@@ -10,7 +10,7 @@ function Status({ state }: ScoreboardProps<X01State>) {
     String(options.startScore),
     options.in !== 'single' && t(`x01.inRules.${options.in}`),
     t(`x01.outRules.${options.out}`),
-    t('x01.round', { round: turns.turnsTaken[turns.current] + 1 }),
+    t('game.round', { round: turns.turnsTaken[turns.current] + 1 }),
   ]
   return <>{parts.filter(Boolean).join(' · ')}</>
 }

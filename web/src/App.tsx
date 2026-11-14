@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchHealth, type HealthStatus } from './api/health'
+import GamePicker from './components/GameSetup/GamePicker'
 import GameSetup, {
   type GameSetupResult,
 } from './components/GameSetup/GameSetup'
@@ -8,7 +9,7 @@ import type { StartedGame } from './components/GameShell/startGame'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import PlayerSelection from './components/PlayerSelection/PlayerSelection'
 import type { PlayerSlot } from './engine/game'
-import { findGame, gameConfigs } from './games'
+import { findGame, findGameConfig, gameConfigs } from './games'
 import { createPlayer, type Player } from './players/player'
 import styles from './App.module.css'
 
@@ -21,9 +22,11 @@ function App() {
   // Kept in memory until player storage (#15, #16).
   const [players, setPlayers] = useState<Player[]>([])
   const [slots, setSlots] = useState<PlayerSlot[]>([])
-  const [setup, setSetup] = useState<GameSetupResult>()
+  const [gameId, setGameId] = useState(gameConfigs[0].id)
+  // The last values used for each game, so going back keeps them.
+  const [setups, setSetups] = useState<Record<string, GameSetupResult>>({})
   const [game, setGame] = useState<StartedGame>()
-  const config = gameConfigs[0]
+  const config = findGameConfig(gameId) ?? gameConfigs[0]
   const starter = findGame(config.id)
 
   useEffect(() => {
@@ -71,19 +74,28 @@ function App() {
             }}
           />
         )}
+        {step === 'setup' && (
+          <GamePicker
+            configs={gameConfigs}
+            value={config.id}
+            onChange={setGameId}
+          />
+        )}
         {step === 'setup' && starter && (
           <GameSetup
+            key={config.id}
             config={config}
             players={inGame}
-            initial={setup}
+            initial={setups[config.id]}
             onBack={() => setStep('players')}
             onStart={(result) => {
-              setSetup(result)
+              setSetups((current) => ({ ...current, [config.id]: result }))
               setGame(
                 starter.start({
                   options: result.options,
                   slots: slots.map((slot) => ({
-                    ...slot,
+                    // Teams only for games that have them.
+                    ...(config.teams ? slot : { playerId: slot.playerId }),
                     options: result.playerOptions[slot.playerId],
                   })),
                   configVersion: config.version,

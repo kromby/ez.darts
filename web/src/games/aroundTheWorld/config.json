@@ -1,0 +1,67 @@
+{
+  "id": "around-the-world",
+  "version": 1,
+  "name": { "is": "Hringinn í kring", "en": "Around the World" },
+  "teams": true,
+  "options": [
+    {
+      "key": "in",
+      "type": "choice",
+      "label": { "is": "Inn (fyrsta tala)", "en": "In (first target)" },
+      "values": [
+        { "value": "single", "label": { "is": "Einfalt", "en": "Single" } },
+        { "value": "double", "label": { "is": "Tvöfalt", "en": "Double" } }
+      ],
+      "default": "single"
+    },
+    {
+      "key": "out",
+      "type": "choice",
+      "label": { "is": "Út (síðasta tala)", "en": "Out (last target)" },
+      "values": [
+        { "value": "single", "label": { "is": "Einfalt", "en": "Single" } },
+        { "value": "double", "label": { "is": "Tvöfalt", "en": "Double" } }
+      ],
+      "default": "single"
+    },
+    {
+      "key": "bull",
+      "type": "bool",
+      "label": { "is": "Enda á miðju", "en": "Finish on the bull" },
+      "default": false
+    },
+    {
+      "key": "missEndsTurn",
+      "type": "bool",
+      "label": {
+        "is": "Umferð lýkur ef hittir ekki",
+        "en": "A miss ends the turn"
+      },
+      "default": false
+    },
+    {
+      "key": "playOn",
+      "type": "bool",
+      "label": {
+        "is": "Spila áfram um sæti",
+        "en": "Play on for places"
+      },
+      "default": false
+    }
+  ],
+  "playerOptions": [],
+  "presets": [
+    {
+      "name": { "is": "1–20", "en": "1–20" },
+      "options": { "in": "single", "out": "single", "bull": false }
+    },
+    {
+      "name": { "is": "1–20 og miðja", "en": "1–20 and bull" },
+      "options": { "in": "single", "out": "single", "bull": true }
+    },
+    {
+      "name": { "is": "Tvöfalt inn og út", "en": "Double in and out" },
+      "options": { "in": "double", "out": "double", "bull": false }
+    }
+  ]
+}
