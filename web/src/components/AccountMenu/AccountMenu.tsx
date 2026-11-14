@@ -171,7 +171,9 @@ function AccountPanel({
           type="button"
           className={styles.secondary}
           disabled={busy}
-          onClick={() => void signOut(false)}
+          onClick={() => {
+            signOut(false).catch(() => setBusy(false))
+          }}
         >
           {t('account.signOut')}
         </button>
@@ -179,7 +181,9 @@ function AccountPanel({
           type="button"
           className={styles.secondary}
           disabled={busy}
-          onClick={() => void signOut(true)}
+          onClick={() => {
+            signOut(true).catch(() => setBusy(false))
+          }}
         >
           {t('account.signOutEverywhere')}
         </button>

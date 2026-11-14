@@ -53,7 +53,7 @@ export function createAccountApi({
   baseUrl = '/api/account',
   fetch: send = (...args) => fetch(...args),
 }: { baseUrl?: string; fetch?: typeof fetch } = {}): AccountApi {
-  async function post(path: string, body?: unknown) {
+  function post(path: string, body?: unknown): Promise<Response> {
     return send(`${baseUrl}${path}`, {
       method: 'POST',
       credentials: 'same-origin',

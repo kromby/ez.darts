@@ -124,7 +124,7 @@ public class AccountFunctionsTests
 
     [Theory]
     [InlineData("https://evil.example")]
-    [InlineData("http://darts.example.evil.example")]
+    [InlineData("https://darts.example.evil.example")]
     [InlineData("null")]
     public async Task StateChangingCalls_RefuseOtherOriginsAsync(string origin)
     {
