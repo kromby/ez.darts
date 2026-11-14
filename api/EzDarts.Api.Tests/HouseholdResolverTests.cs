@@ -6,7 +6,7 @@ namespace EzDarts.Api.Tests;
 public class HouseholdResolverTests
 {
     [Fact]
-    public async Task NoSession_NeverFindsAHousehold()
+    public async Task NoSession_NeverFindsAHouseholdAsync()
     {
         var request = new DefaultHttpContext().Request;
         request.Headers[DevHeaderHouseholdResolver.HeaderName] = "household-1";
@@ -19,7 +19,7 @@ public class HouseholdResolverTests
     [InlineData("", null)]
     [InlineData("a/b", null)]
     [InlineData("has space", null)]
-    public async Task DevHeader_TrustsOnlyASafeId(string header, string? expected)
+    public async Task DevHeader_TrustsOnlyASafeIdAsync(string header, string? expected)
     {
         var request = new DefaultHttpContext().Request;
         request.Headers[DevHeaderHouseholdResolver.HeaderName] = header;
@@ -28,7 +28,7 @@ public class HouseholdResolverTests
     }
 
     [Fact]
-    public async Task DevHeader_FindsNothingWithoutTheHeader()
+    public async Task DevHeader_FindsNothingWithoutTheHeaderAsync()
     {
         Assert.Null(await new DevHeaderHouseholdResolver()
             .ResolveAsync(new DefaultHttpContext().Request, CancellationToken.None));

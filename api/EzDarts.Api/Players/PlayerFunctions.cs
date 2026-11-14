@@ -17,7 +17,7 @@ public partial class PlayerFunctions(IHouseholdResolver households, IPlayerStore
         ["sky", "pink", "lime", "amber", "violet", "teal", "red", "orange"];
 
     [Function("ListPlayers")]
-    public async Task<IActionResult> List(
+    public async Task<IActionResult> ListAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "players")] HttpRequest req,
         CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ public partial class PlayerFunctions(IHouseholdResolver households, IPlayerStore
 
     /// <summary>Creates or replaces a player; ids come from the web app, so retries are safe.</summary>
     [Function("PutPlayer")]
-    public async Task<IActionResult> Put(
+    public async Task<IActionResult> PutAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "players/{id}")] HttpRequest req,
         string id,
         CancellationToken cancellationToken)

@@ -34,7 +34,7 @@ public class TableStoreTests
         Response.FromValue(entity, Substitute.For<Response>());
 
     [Fact]
-    public async Task TableProvider_CreatesEachTableOnce()
+    public async Task TableProvider_CreatesEachTableOnceAsync()
     {
         await _tables.GetAsync(TableProvider.Games, CancellationToken.None);
         await _tables.GetAsync(TableProvider.Games, CancellationToken.None);
@@ -43,7 +43,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task TableProvider_TriesAgainAfterAFailedCreate()
+    public async Task TableProvider_TriesAgainAfterAFailedCreateAsync()
     {
         _table.CreateIfNotExistsAsync(Arg.Any<CancellationToken>())
             .Returns(_ => throw new RequestFailedException(503, "Busy"), _ => Substitute.For<Response<TableItem>>());
@@ -92,7 +92,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task PlayerStore_AddsANewPlayer()
+    public async Task PlayerStore_AddsANewPlayerAsync()
     {
         var created = await new TablePlayerStore(_tables)
             .UpsertAsync(Household, new PlayerDto("anna", "Anna", "sky"), CancellationToken.None);
@@ -104,7 +104,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task PlayerStore_ReplacesAnExistingPlayer()
+    public async Task PlayerStore_ReplacesAnExistingPlayerAsync()
     {
         _table.AddEntityAsync(Arg.Any<TableEntity>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new RequestFailedException(409, "Exists"));
@@ -121,7 +121,7 @@ public class TableStoreTests
     private static readonly StatsCounts OneWin = new(1, 1, 2, 0, 0, 1, 1, 60);
 
     [Fact]
-    public async Task StatsStore_AddsANewRow()
+    public async Task StatsStore_AddsANewRowAsync()
     {
         var missing = Missing();
         _table.GetEntityIfExistsAsync<TableEntity>(Household, AnnaX01.RowKey, null, Arg.Any<CancellationToken>())
@@ -136,7 +136,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task StatsStore_AddsToAnExistingRowWithItsETag()
+    public async Task StatsStore_AddsToAnExistingRowWithItsETagAsync()
     {
         var row = new TableEntity(Household, AnnaX01.RowKey) { ["Games"] = 4, ["Wins"] = 2, ETag = new ETag("v1") };
         _table.GetEntityIfExistsAsync<TableEntity>(Household, AnnaX01.RowKey, null, Arg.Any<CancellationToken>())
@@ -153,7 +153,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task StatsStore_ReadsAgainWhenAnotherSaveGotThereFirst()
+    public async Task StatsStore_ReadsAgainWhenAnotherSaveGotThereFirstAsync()
     {
         var first = new TableEntity(Household, AnnaX01.RowKey) { ["Games"] = 1, ETag = new ETag("v1") };
         var second = new TableEntity(Household, AnnaX01.RowKey) { ["Games"] = 2, ETag = new ETag("v2") };
@@ -172,7 +172,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task StatsStore_GivesUpAfterTooManyClashes()
+    public async Task StatsStore_GivesUpAfterTooManyClashesAsync()
     {
         var missing = Missing();
         _table.GetEntityIfExistsAsync<TableEntity>(Household, AnnaX01.RowKey, null, Arg.Any<CancellationToken>())
@@ -187,7 +187,7 @@ public class TableStoreTests
     }
 
     [Fact]
-    public async Task StatsStore_WritesNothingForNoChange()
+    public async Task StatsStore_WritesNothingForNoChangeAsync()
     {
         await new TableStatsStore(_tables).ApplyAsync(
             Household, new Dictionary<StatsKey, StatsCounts>(), CancellationToken.None);

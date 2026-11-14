@@ -16,42 +16,42 @@ public class PlayerFunctionsTests
         _store.ListAsync(Household, Arg.Any<CancellationToken>()).Returns(players);
 
     [Fact]
-    public async Task List_NeedsAHousehold()
+    public async Task List_NeedsAHouseholdAsync()
     {
-        var result = await Functions(signedIn: false).List(Empty(), CancellationToken.None);
+        var result = await Functions(signedIn: false).ListAsync(Empty(), CancellationToken.None);
 
         Assert.Equal(StatusCodes.Status401Unauthorized, Status(result));
         await _store.DidNotReceiveWithAnyArgs().ListAsync(default!, default);
     }
 
     [Fact]
-    public async Task List_ReturnsTheHouseholdsPlayersByName()
+    public async Task List_ReturnsTheHouseholdsPlayersByNameAsync()
     {
         Existing(new PlayerDto("2", "Óli"), new PlayerDto("1", "anna", "sky"), new PlayerDto("3", "Bjarni"));
 
-        var (status, body) = Json<List<PlayerDto>>(await Functions().List(Empty(), CancellationToken.None));
+        var (status, body) = Json<List<PlayerDto>>(await Functions().ListAsync(Empty(), CancellationToken.None));
 
         Assert.Equal(StatusCodes.Status200OK, status);
         Assert.Equal(["anna", "Bjarni", "Óli"], body.Select(p => p.Name));
     }
 
     [Fact]
-    public async Task Put_NeedsAHousehold()
+    public async Task Put_NeedsAHouseholdAsync()
     {
         var result = await Functions(signedIn: false)
-            .Put(WithJson(new PlayerDto("anna", "Anna")), "anna", CancellationToken.None);
+.PutAsync(WithJson(new PlayerDto("anna", "Anna")), "anna", CancellationToken.None);
 
         Assert.Equal(StatusCodes.Status401Unauthorized, Status(result));
         await _store.DidNotReceiveWithAnyArgs().UpsertAsync(default!, default!, default);
     }
 
     [Fact]
-    public async Task Put_CreatesAPlayerWithATidyName()
+    public async Task Put_CreatesAPlayerWithATidyNameAsync()
     {
         Existing();
         _store.UpsertAsync(Household, Arg.Any<PlayerDto>(), Arg.Any<CancellationToken>()).Returns(true);
 
-        var result = await Functions().Put(
+        var result = await Functions().PutAsync(
             WithJson(new PlayerDto("anna", "  Anna   Jóns ", "red")), "anna", CancellationToken.None);
 
         var (status, body) = Json<PlayerDto>(result);
@@ -61,13 +61,13 @@ public class PlayerFunctionsTests
     }
 
     [Fact]
-    public async Task Put_UpdatesAndArchives()
+    public async Task Put_UpdatesAndArchivesAsync()
     {
         Existing(new PlayerDto("anna", "Anna"));
         _store.UpsertAsync(Household, Arg.Any<PlayerDto>(), Arg.Any<CancellationToken>()).Returns(false);
         var archived = new PlayerDto("anna", "Anna", "sky", "2026-11-14T20:00:00.000Z");
 
-        var result = await Functions().Put(WithJson(archived), "anna", CancellationToken.None);
+        var result = await Functions().PutAsync(WithJson(archived), "anna", CancellationToken.None);
 
         Assert.Equal(StatusCodes.Status200OK, Status(result));
         await _store.Received(1).UpsertAsync(Household, archived, Arg.Any<CancellationToken>());
@@ -77,22 +77,22 @@ public class PlayerFunctionsTests
     [InlineData("óli")]
     [InlineData(" ÓLI ")]
     [InlineData("gunna")]
-    public async Task Put_KeepsNamesUnique_RemovedPlayersIncluded(string name)
+    public async Task Put_KeepsNamesUnique_RemovedPlayersIncludedAsync(string name)
     {
         Existing(new PlayerDto("oli", "Óli"), new PlayerDto("gunna", "Gunna", ArchivedAt: "2026-11-01T20:00:00Z"));
 
-        var result = await Functions().Put(WithJson(new PlayerDto("new", name)), "new", CancellationToken.None);
+        var result = await Functions().PutAsync(WithJson(new PlayerDto("new", name)), "new", CancellationToken.None);
 
         Assert.Equal(StatusCodes.Status409Conflict, Status(result));
         await _store.DidNotReceiveWithAnyArgs().UpsertAsync(default!, default!, default);
     }
 
     [Fact]
-    public async Task Put_LetsAPlayerKeepTheirOwnName()
+    public async Task Put_LetsAPlayerKeepTheirOwnNameAsync()
     {
         Existing(new PlayerDto("oli", "Óli"));
 
-        var result = await Functions().Put(
+        var result = await Functions().PutAsync(
             WithJson(new PlayerDto("oli", "óli", "teal")), "oli", CancellationToken.None);
 
         Assert.NotEqual(StatusCodes.Status409Conflict, Status(result));
@@ -112,11 +112,11 @@ public class PlayerFunctionsTests
 
     [Theory]
     [MemberData(nameof(BadPlayers))]
-    public async Task Put_RejectsBadPlayers(string body, string id)
+    public async Task Put_RejectsBadPlayersAsync(string body, string id)
     {
         Existing();
 
-        var result = await Functions().Put(WithText(body), id, CancellationToken.None);
+        var result = await Functions().PutAsync(WithText(body), id, CancellationToken.None);
 
         var (status, error) = Json<ErrorResponse>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, status);

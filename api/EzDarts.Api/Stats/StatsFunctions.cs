@@ -13,7 +13,7 @@ public class StatsFunctions(IHouseholdResolver households, IStatsStore stats)
     /// whatever period and game it shows.
     /// </summary>
     [Function("GetStats")]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "stats")] HttpRequest req,
         CancellationToken cancellationToken)
     {

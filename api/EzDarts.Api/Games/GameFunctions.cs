@@ -14,7 +14,7 @@ namespace EzDarts.Api.Games;
 public class GameFunctions(IHouseholdResolver households, IGameStore games, IStatsStore stats)
 {
     [Function("ListGames")]
-    public async Task<IActionResult> List(
+    public async Task<IActionResult> ListAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games")] HttpRequest req,
         CancellationToken cancellationToken)
     {
@@ -25,7 +25,7 @@ public class GameFunctions(IHouseholdResolver households, IGameStore games, ISta
     }
 
     [Function("GetGame")]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{id}")] HttpRequest req,
         string id,
         CancellationToken cancellationToken)
@@ -45,7 +45,7 @@ public class GameFunctions(IHouseholdResolver households, IGameStore games, ISta
     /// stores the same game and counts its stats once.
     /// </summary>
     [Function("PutGame")]
-    public async Task<IActionResult> Put(
+    public async Task<IActionResult> PutAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games/{id}")] HttpRequest req,
         string id,
         CancellationToken cancellationToken)
@@ -87,7 +87,7 @@ public class GameFunctions(IHouseholdResolver households, IGameStore games, ISta
 
     /// <summary>For a game quit before the end; a finished one's stats are taken back out.</summary>
     [Function("DeleteGame")]
-    public async Task<IActionResult> Delete(
+    public async Task<IActionResult> DeleteAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "games/{id}")] HttpRequest req,
         string id,
         CancellationToken cancellationToken)
