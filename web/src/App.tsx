@@ -1,15 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchHealth, type HealthStatus } from './api/health'
+import type { PlayerSlot } from './engine/game'
 import GameSetup from './components/GameSetup/GameSetup'
 import LanguageSwitcher from './components/LanguageSwitcher'
+import PlayerSelection from './components/PlayerSelection/PlayerSelection'
 import { gameConfigs } from './games'
+import { createPlayer, type Player } from './players/player'
 import styles from './App.module.css'
+
+type Step = 'players' | 'setup' | 'started'
 
 function App() {
   const { t } = useTranslation()
   const [health, setHealth] = useState<HealthStatus | 'checking'>('checking')
-  const [started, setStarted] = useState(false)
+  const [step, setStep] = useState<Step>('players')
+  // Kept in memory until player storage (#15, #16).
+  const [players, setPlayers] = useState<Player[]>([])
+  const [slots, setSlots] = useState<PlayerSlot[]>([])
+  const config = gameConfigs[0]
 
   useEffect(() => {
     const controller = new AbortController()
@@ -19,11 +28,9 @@ function App() {
     return () => controller.abort()
   }, [])
 
-  // Placeholder players until player selection (#8).
-  const players = [1, 2].map((number) => ({
-    id: `player-${number}`,
-    name: t('setup.demoPlayer', { number }),
-  }))
+  const inGame = slots.flatMap(
+    (slot) => players.find((player) => player.id === slot.playerId) ?? [],
+  )
 
   return (
     <div className={styles.app}>
@@ -32,19 +39,37 @@ function App() {
         <LanguageSwitcher />
       </header>
       <main className={styles.main}>
-        {started ? (
+        {step === 'players' && (
+          <PlayerSelection
+            players={players}
+            teamsSupported={config.teams}
+            initial={slots}
+            onAddPlayer={(name) => {
+              const player = createPlayer(name)
+              setPlayers((current) => [...current, player])
+              return player
+            }}
+            onContinue={(chosen) => {
+              setSlots(chosen)
+              setStep('setup')
+            }}
+          />
+        )}
+        {step === 'setup' && (
+          <GameSetup
+            config={config}
+            players={inGame}
+            onBack={() => setStep('players')}
+            onStart={() => setStep('started')}
+          />
+        )}
+        {step === 'started' && (
           <div className={styles.placeholder}>
             <p role="status">{t('setup.comingSoon')}</p>
-            <button type="button" onClick={() => setStarted(false)}>
+            <button type="button" onClick={() => setStep('setup')}>
               {t('setup.back')}
             </button>
           </div>
-        ) : (
-          <GameSetup
-            config={gameConfigs[0]}
-            players={players}
-            onStart={() => setStarted(true)}
-          />
         )}
       </main>
       <footer className={styles.footer}>

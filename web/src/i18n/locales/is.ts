@@ -17,6 +17,33 @@ const is = {
   settings: {
     language: 'Tungumál',
   },
+  players: {
+    title: 'Leikmenn',
+    inGame: 'Í leiknum',
+    order: 'Kaströð',
+    none: 'Engir leikmenn valdir enn.',
+    available: 'Bæta í leikinn',
+    add: 'Bæta {{name}} í leikinn',
+    newPlayer: 'Nýr leikmaður',
+    create: 'Bæta við',
+    nameTaken: 'Þetta nafn er þegar til',
+    remove: 'Taka {{name}} úr leiknum',
+    move: 'Færa {{name}}',
+    random: 'Handahófsröð',
+    teams: 'Spila í liðum',
+    team: 'Lið {{team}}',
+    teamOf: 'Lið fyrir {{name}}',
+    needTwoTeams: 'Settu leikmenn í að minnsta kosti tvö lið',
+    continue: 'Áfram',
+    dnd: {
+      instructions:
+        'Ýttu á bil eða Enter til að taka leikmann upp. Færðu hann með örvatökkunum og ýttu aftur á bil eða Enter til að sleppa, eða Escape til að hætta við.',
+      picked: '{{name}} tekinn upp',
+      over: '{{name}} yfir sæti {{position}}',
+      dropped: '{{name}} settur í sæti {{position}}',
+      cancelled: 'Hætt við að færa {{name}}',
+    },
+  },
   setup: {
     presets: 'Forstillingar',
     options: 'Stillingar',
@@ -25,8 +52,7 @@ const is = {
     start: 'Byrja leik',
     wholeNumber: 'Sláðu inn heila tölu',
     wholeNumberRange: 'Heil tala frá {{min}} til {{max}}',
-    // Placeholders until player selection (#8) and the game screen (#10).
-    demoPlayer: 'Leikmaður {{number}}',
+    // Placeholder until the game screen (#10).
     comingSoon: 'Leikskjárinn kemur fljótlega.',
     back: 'Til baka',
   },
