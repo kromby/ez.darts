@@ -231,3 +231,21 @@ describe('latestOnly', () => {
     await expect(save.settled('other')).resolves.toBeUndefined()
   })
 })
+
+describe('API store sign-out', () => {
+  it('reports a 401, as when the session ended elsewhere', async () => {
+    const onUnauthorized = vi.fn<() => void>()
+    const api = fakeApi({
+      'GET /api/players': json({ error: 'Signed out' }, 401),
+    })
+    const signedIn = createApiStore({
+      settings: createMemoryStore().settings,
+      fetch: api.fetch,
+      onUnauthorized,
+    })
+
+    await expect(signedIn.players.list()).rejects.toThrow(ApiError)
+
+    expect(onUnauthorized).toHaveBeenCalledOnce()
+  })
+})

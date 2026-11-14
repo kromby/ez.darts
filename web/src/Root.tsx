@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import App from './App'
-import type { AuthSource } from './auth/auth'
+import type { AccountApi } from './auth/accountApi'
+import { guest, type AuthSource } from './auth/auth'
+import AccountMenu from './components/AccountMenu/AccountMenu'
 import ImportOffer, {
   type ImportOfferState,
 } from './components/ImportOffer/ImportOffer'
@@ -16,6 +18,7 @@ type Props = {
   /** The guest's store on this device. */
   local: DataStore
   auth: AuthSource
+  accountApi: AccountApi
   /** For tests: the API store to use when signed in. */
   createHouseholdStore?: (householdId: string, devHeader: boolean) => DataStore
 }
@@ -26,7 +29,7 @@ type Props = {
  * app afresh on the other store. The first time a household signs in on a
  * device with guest data, it offers to import it.
  */
-function Root({ local, auth, createHouseholdStore }: Props) {
+function Root({ local, auth, accountApi, createHouseholdStore }: Props) {
   const state = useSyncExternalStore(auth.subscribe, auth.get)
   const householdId = state.status === 'signedIn' ? state.householdId : null
   const devHeader = state.status === 'signedIn' && state.devHeader === true
@@ -37,8 +40,10 @@ function Root({ local, auth, createHouseholdStore }: Props) {
       : createApiStore({
           settings: local.settings,
           devHousehold: devHeader ? householdId : undefined,
+          // The session ended elsewhere (signed out everywhere, expired).
+          onUnauthorized: () => auth.set(guest),
         })
-  }, [local, householdId, devHeader, createHouseholdStore])
+  }, [local, auth, householdId, devHeader, createHouseholdStore])
 
   // Kept with its household, so signing in as another hides it.
   const [shown, setShown] = useState<{
@@ -104,6 +109,7 @@ function Root({ local, auth, createHouseholdStore }: Props) {
     <App
       key={`${householdId ?? 'guest'}:${loads}`}
       store={store}
+      account={<AccountMenu auth={auth} api={accountApi} />}
       notice={
         offer && (
           <ImportOffer

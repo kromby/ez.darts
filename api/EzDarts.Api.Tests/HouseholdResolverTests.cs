@@ -5,15 +5,6 @@ namespace EzDarts.Api.Tests;
 
 public class HouseholdResolverTests
 {
-    [Fact]
-    public async Task NoSession_NeverFindsAHouseholdAsync()
-    {
-        var request = new DefaultHttpContext().Request;
-        request.Headers[DevHeaderHouseholdResolver.HeaderName] = "household-1";
-
-        Assert.Null(await new NoSessionHouseholdResolver().ResolveAsync(request, CancellationToken.None));
-    }
-
     [Theory]
     [InlineData("household-1", "household-1")]
     [InlineData("", null)]

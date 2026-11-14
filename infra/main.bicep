@@ -48,12 +48,16 @@ resource healthCheckTable 'Microsoft.Storage/storageAccounts/tableServices/table
   name: 'HealthCheck'
 }
 
-// Household data (PartitionKey = household id). The API also creates these on first use.
+// Household data (PartitionKey = household id) and sign-in. The API also creates these on first use.
 resource dataTables 'Microsoft.Storage/storageAccounts/tableServices/tables@2023-05-01' = [
   for name in [
     'Players'
     'Games'
     'PlayerStats'
+    // Sign-in (#19): accounts, sessions (token hashes only) and failed sign-in counts.
+    'Users'
+    'Sessions'
+    'LoginAttempts'
   ]: {
     parent: tableService
     name: name

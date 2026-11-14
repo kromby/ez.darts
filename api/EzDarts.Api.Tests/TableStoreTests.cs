@@ -195,3 +195,35 @@ public class TableStoreTests
         Assert.Empty(_table.ReceivedCalls());
     }
 }
+
+public class AccountTableTests
+{
+    [Fact]
+    public void UserEntity_RoundTripsWithoutTheEmailAsAKey()
+    {
+        var user = new EzDarts.Api.Accounts.UserRecord(
+            EzDarts.Api.Accounts.Tokens.EmailKey("a/b#c?@example.com"), "a/b#c?@example.com", "hash", "home",
+            new DateTimeOffset(2026, 11, 14, 20, 0, 0, TimeSpan.Zero));
+
+        var entity = EzDarts.Api.Accounts.TableUserStore.Write(user);
+
+        Assert.Equal(EzDarts.Api.Accounts.TableUserStore.Partition, entity.PartitionKey);
+        Assert.Matches("^[0-9a-f]{64}$", entity.RowKey);
+        Assert.Equal(user, EzDarts.Api.Accounts.TableUserStore.Read(entity));
+    }
+
+    [Fact]
+    public void SessionEntity_RoundTripsKeyedByTheTokenHash()
+    {
+        var session = new EzDarts.Api.Accounts.SessionRecord(
+            EzDarts.Api.Accounts.Tokens.Hash("token"), "user-key", "home",
+            new DateTimeOffset(2026, 11, 14, 20, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 12, 14, 20, 0, 0, TimeSpan.Zero));
+
+        var entity = EzDarts.Api.Accounts.TableSessionStore.Write(session);
+
+        Assert.Equal(EzDarts.Api.Accounts.Tokens.Hash("token"), entity.RowKey);
+        Assert.DoesNotContain(entity, pair => Equals(pair.Value, "token"));
+        Assert.Equal(session, EzDarts.Api.Accounts.TableSessionStore.Read(entity));
+    }
+}

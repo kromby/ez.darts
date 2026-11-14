@@ -24,6 +24,8 @@ export type ApiStoreOptions = {
    * last players picked: the guest's local store.
    */
   settings: DataStore['settings']
+  /** Called when the API says nobody is signed in, e.g. a session ended elsewhere. */
+  onUnauthorized?(): void
   fetch?: typeof fetch
 }
 
@@ -35,6 +37,7 @@ export function createApiStore({
   baseUrl = '/api',
   devHousehold,
   settings,
+  onUnauthorized,
   fetch: send = (...args) => fetch(...args),
 }: ApiStoreOptions): DataStore {
   async function request(
@@ -51,6 +54,7 @@ export function createApiStore({
       credentials: 'same-origin',
       body: body === undefined ? undefined : JSON.stringify(body),
     })
+    if (response.status === 401) onUnauthorized?.()
     if (!response.ok && response.status !== 404) {
       const text = await response.text().catch(() => '')
       throw new ApiError(

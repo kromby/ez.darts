@@ -125,7 +125,28 @@ Signed-in households keep their players, games and stats in Table Storage, in th
 | `DELETE /api/games/{id}` | Remove a game (one quit before the end)                                |
 | `GET /api/stats`         | Stats rows per player, game and ISO week, for the app to add up        |
 
-Every one of them needs a signed-in household and answers `401` without one. Sign-in comes with #19. Until then, no request has a household, except under `func start` locally, where an `X-Household-Id` header stands in for one:
+Every one of them needs a signed-in household and answers `401` without one.
+
+### Sign-in
+
+One email-and-password account per household. Accounts live in the `Users` table, sessions in `Sessions` and failed sign-ins in `LoginAttempts`.
+
+| Endpoint                              | What                                                  |
+| ------------------------------------- | ----------------------------------------------------- |
+| `POST /api/account/register`          | Create the household's account and sign in            |
+| `POST /api/account/login`             | Sign in (`401` for a wrong email or password alike)   |
+| `GET /api/account/me`                 | Who is signed in on this device, or `401`             |
+| `POST /api/account/logout`            | Sign out this device                                  |
+| `POST /api/account/logout-everywhere` | Sign out every device                                 |
+| `POST /api/account/password`          | Change the password; every other device is signed out |
+
+- **Passwords** are hashed with ASP.NET Core Identity's `PasswordHasher`.
+- **Sessions:** a random 32-byte token goes in the `ezd_session` cookie: `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/api`, lasting 30 days and renewed when used. Only the token's SHA-256 is stored.
+- **Lockout:** five failed sign-ins within 15 minutes lock that email out for 15 minutes, whether or not it has an account.
+- **Same-site check:** requests that change something must come from the app's own pages, judged by the browser's `Sec-Fetch-Site` header, or `Origin` in older browsers.
+- **No clash with Static Web Apps:** the routes and cookie stay clear of its own `/.auth/*` routes and cookies.
+
+Under `func start` locally, an `X-Household-Id` header also stands in for a session, to try the household API without an account:
 
 ```bash
 curl -H 'X-Household-Id: test' http://localhost:7071/api/players
