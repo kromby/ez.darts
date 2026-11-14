@@ -55,6 +55,10 @@ const is = {
     miss: 'Framhjá',
     undo: 'Afturkalla',
   },
+  x01: {
+    scores: 'Staðan',
+    notIn: 'ekki inni',
+  },
   setup: {
     presets: 'Forstillingar',
     options: 'Stillingar',

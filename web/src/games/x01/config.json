@@ -35,6 +35,15 @@
         { "value": "master", "label": { "is": "Meistara", "en": "Master" } }
       ],
       "default": "double"
+    },
+    {
+      "key": "playOn",
+      "type": "bool",
+      "label": {
+        "is": "Spila áfram um sæti",
+        "en": "Play on for places"
+      },
+      "default": false
     }
   ],
   "playerOptions": [

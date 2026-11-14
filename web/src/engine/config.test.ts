@@ -32,6 +32,7 @@ describe('game configs', () => {
       'startScore',
       'in',
       'out',
+      'playOn',
     ])
     expect(x01.playerOptions.map((option) => option.key)).toEqual([
       'startScore',
@@ -165,23 +166,41 @@ describe('isValidValue', () => {
 })
 
 describe('defaults and presets', () => {
-  it('starts from the defaults', () => {
-    const values = defaultValues(x01.options)
+  const defaults = defaultValues(x01.options)
 
-    expect(values).toEqual({ startScore: 501, in: 'single', out: 'double' })
-    expect(areValidValues(x01.options, values)).toBe(true)
+  it('starts from the defaults', () => {
+    expect(defaults).toEqual({
+      startScore: 501,
+      in: 'single',
+      out: 'double',
+      playOn: false,
+    })
+    expect(areValidValues(x01.options, defaults)).toBe(true)
     expect(defaultValues(x01.playerOptions)).toEqual({ startScore: null })
+    expect(matchingPreset(x01, defaults)).toBe(x01.presets[1])
   })
 
   it('applies a preset and recognises it', () => {
-    const values = presetValues(x01, x01.presets[0])
+    const values = presetValues(x01.presets[0], defaults)
 
-    expect(values).toEqual({ startScore: 301, in: 'single', out: 'single' })
+    expect(values).toEqual({
+      startScore: 301,
+      in: 'single',
+      out: 'single',
+      playOn: false,
+    })
     expect(matchingPreset(x01, values)).toBe(x01.presets[0])
   })
 
-  it('matches no preset once an option differs', () => {
-    const values = { ...presetValues(x01, x01.presets[1]), in: 'double' }
+  it('keeps options the preset does not list', () => {
+    const values = presetValues(x01.presets[2], { ...defaults, playOn: true })
+
+    expect(values).toMatchObject({ startScore: 701, playOn: true })
+    expect(matchingPreset(x01, values)).toBe(x01.presets[2])
+  })
+
+  it('matches no preset once a listed option differs', () => {
+    const values = { ...presetValues(x01.presets[1], defaults), in: 'double' }
 
     expect(matchingPreset(x01, values)).toBeUndefined()
   })

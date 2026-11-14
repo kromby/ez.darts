@@ -13,6 +13,12 @@ export type PlayerSlot = {
   options?: Record<string, unknown>
 }
 
+export type ScoreboardProps<TState> = {
+  state: TState
+  /** Display name for a player id. */
+  playerName(id: PlayerId): string
+}
+
 /**
  * Every game is a module with this shape, run by the shared game runner.
  * All functions must be pure: the runner rebuilds state by replaying the
@@ -28,7 +34,7 @@ export interface GameModule<TOptions, TState> {
   currentThrower(state: TState): PlayerId
   /** Players from first place to last. */
   standings(state: TState): PlayerId[]
-  Scoreboard: ComponentType<{ state: TState }>
+  Scoreboard: ComponentType<ScoreboardProps<TState>>
   hint?(state: TState): string | null
 }
 

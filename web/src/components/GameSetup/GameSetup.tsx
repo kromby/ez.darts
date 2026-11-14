@@ -73,7 +73,9 @@ function GameSetup({ config, players, onStart, onBack }: Props) {
                 type="button"
                 className={styles.preset}
                 aria-pressed={preset === activePreset}
-                onClick={() => setOptions(presetValues(config, preset))}
+                onClick={() =>
+                  setOptions((current) => presetValues(preset, current))
+                }
               >
                 {localize(preset.name, language)}
               </button>
