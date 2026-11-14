@@ -40,6 +40,22 @@ export type GameStarter = {
   start(setup: NewGameSetup): StartedGame
 }
 
+/** A new record, with chance settled by the module's `prepare`. */
+function newRecord<TOptions, TState>(
+  module: GameModule<TOptions, TState>,
+  options: TOptions,
+  slots: PlayerSlot[],
+  configVersion: number,
+): GameRecord<TOptions> {
+  return createGameRecord(module, {
+    options: module.prepare
+      ? module.prepare(options, slots, Math.random)
+      : options,
+    slots,
+    configVersion,
+  })
+}
+
 function play<TOptions, TState>(
   module: GameModule<TOptions, TState>,
   record: GameRecord<TOptions>,
@@ -57,11 +73,7 @@ function play<TOptions, TState>(
     again: () =>
       play(
         module,
-        createGameRecord(module, {
-          options: record.options,
-          slots: record.slots,
-          configVersion: record.configVersion,
-        }),
+        newRecord(module, record.options, record.slots, record.configVersion),
       ),
   }
 }
@@ -74,11 +86,7 @@ export function gameStarter<TOptions, TState>(
     start: ({ options, slots, configVersion }) =>
       play(
         module,
-        createGameRecord(module, {
-          options: module.toOptions(options),
-          slots,
-          configVersion,
-        }),
+        newRecord(module, module.toOptions(options), slots, configVersion),
       ),
   }
 }
