@@ -55,7 +55,7 @@ describe('periods', () => {
 
 describe('totals', () => {
   it("adds up each player's rows", () => {
-    const anna = totalsByPlayer(fixtureRows).get('anna')
+    const anna = totalsByPlayer(fixtureRows).get('anna') ?? noCounts
 
     expect(anna).toEqual({
       games: 5,
@@ -68,8 +68,8 @@ describe('totals', () => {
       misses: 0,
       points: 201,
     })
-    expect(winRatio(anna!)).toBe(0.75)
-    expect(shares(anna!)).toEqual({
+    expect(winRatio(anna)).toBe(0.75)
+    expect(shares(anna)).toEqual({
       singles: 8 / 18,
       doubles: 1 / 18,
       triples: 9 / 18,
