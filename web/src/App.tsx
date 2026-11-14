@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchHealth, type HealthStatus } from './api/health'
-import DartPad from './components/DartPad/DartPad'
-import { notation, type Dart } from './engine/dart'
-import type { PlayerSlot } from './engine/game'
-import GameSetup from './components/GameSetup/GameSetup'
+import GameSetup, {
+  type GameSetupResult,
+} from './components/GameSetup/GameSetup'
+import type { StartedGame } from './components/GameShell/startGame'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import PlayerSelection from './components/PlayerSelection/PlayerSelection'
-import { gameConfigs } from './games'
+import type { PlayerSlot } from './engine/game'
+import { findGame, gameConfigs } from './games'
 import { createPlayer, type Player } from './players/player'
 import styles from './App.module.css'
 
-type Step = 'players' | 'setup' | 'started'
+type Step = 'players' | 'setup' | 'game'
 
 function App() {
   const { t } = useTranslation()
@@ -20,9 +21,10 @@ function App() {
   // Kept in memory until player storage (#15, #16).
   const [players, setPlayers] = useState<Player[]>([])
   const [slots, setSlots] = useState<PlayerSlot[]>([])
-  // Darts from the pad preview until the game screen (#10).
-  const [darts, setDarts] = useState<Dart[]>([])
+  const [setup, setSetup] = useState<GameSetupResult>()
+  const [game, setGame] = useState<StartedGame>()
   const config = gameConfigs[0]
+  const starter = findGame(config.id)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -35,6 +37,16 @@ function App() {
   const inGame = slots.flatMap(
     (slot) => players.find((player) => player.id === slot.playerId) ?? [],
   )
+  const playerName = (id: string) =>
+    players.find((player) => player.id === id)?.name ?? id
+
+  if (step === 'game' && game) {
+    return game.render({
+      playerName,
+      onPlayAgain: () => setGame(game.again()),
+      onExit: () => setStep('setup'),
+    })
+  }
 
   return (
     <div className={styles.app}>
@@ -59,36 +71,27 @@ function App() {
             }}
           />
         )}
-        {step === 'setup' && (
+        {step === 'setup' && starter && (
           <GameSetup
             config={config}
             players={inGame}
+            initial={setup}
             onBack={() => setStep('players')}
-            onStart={() => setStep('started')}
+            onStart={(result) => {
+              setSetup(result)
+              setGame(
+                starter.start({
+                  options: result.options,
+                  slots: slots.map((slot) => ({
+                    ...slot,
+                    options: result.playerOptions[slot.playerId],
+                  })),
+                  configVersion: config.version,
+                }),
+              )
+              setStep('game')
+            }}
           />
-        )}
-        {step === 'started' && (
-          <div className={styles.placeholder}>
-            <p role="status">{t('setup.comingSoon')}</p>
-            <p>{t('setup.padPreview')}</p>
-            <ol className={styles.darts} aria-label={t('setup.padDarts')}>
-              {darts.slice(-3).map((thrown, index) => (
-                <li key={darts.length - 3 + index}>
-                  {notation(thrown) ?? t('pad.miss')}
-                </li>
-              ))}
-            </ol>
-            <div className={styles.pad}>
-              <DartPad
-                canUndo={darts.length > 0}
-                onDart={(thrown) => setDarts((current) => [...current, thrown])}
-                onUndo={() => setDarts((current) => current.slice(0, -1))}
-              />
-            </div>
-            <button type="button" onClick={() => setStep('setup')}>
-              {t('setup.back')}
-            </button>
-          </div>
         )}
       </main>
       <footer className={styles.footer}>

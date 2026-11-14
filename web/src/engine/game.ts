@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import type { OptionValues } from './config'
 import type { Dart } from './dart'
 
 export type PlayerId = string
@@ -17,6 +18,16 @@ export type ScoreboardProps<TState> = {
   state: TState
   /** Display name for a player id. */
   playerName(id: PlayerId): string
+  /**
+   * The module's hint for the thrower, such as a checkout. `null` when there
+   * is none right now; left out when the module gives no hints at all.
+   */
+  hint?: string | null
+}
+
+export type PlayerSummaryProps<TState> = {
+  state: TState
+  playerId: PlayerId
 }
 
 /**
@@ -27,6 +38,8 @@ export type ScoreboardProps<TState> = {
 export interface GameModule<TOptions, TState> {
   /** Matches the game config's `id`, e.g. `x01`. */
   id: string
+  /** Reads the module's options from the setup screen's values. */
+  toOptions(values: OptionValues): TOptions
   init(options: TOptions, slots: readonly PlayerSlot[]): TState
   applyDart(state: TState, dart: Dart): TState
   isOver(state: TState): boolean
@@ -34,7 +47,12 @@ export interface GameModule<TOptions, TState> {
   currentThrower(state: TState): PlayerId
   /** Players from first place to last. */
   standings(state: TState): PlayerId[]
+  /** The game state above (phone) or beside (tablet) the dart pad. */
   Scoreboard: ComponentType<ScoreboardProps<TState>>
+  /** One line about the game, e.g. "501 · Double out · Round 7". */
+  Status?: ComponentType<ScoreboardProps<TState>>
+  /** A player's key numbers on the results screen. */
+  PlayerSummary?: ComponentType<PlayerSummaryProps<TState>>
   hint?(state: TState): string | null
 }
 

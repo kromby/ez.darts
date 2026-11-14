@@ -25,22 +25,30 @@ type Props = {
   onStart(setup: GameSetupResult): void
   /** Shows a back button, e.g. to return to player selection. */
   onBack?(): void
+  /** Values to start from, e.g. the last game's; defaults otherwise. */
+  initial?: GameSetupResult
 }
 
 /**
  * Setup screen generated from a game config: presets, game options and
  * per-player options. Games add no setup-screen code of their own.
  */
-function GameSetup({ config, players, onStart, onBack }: Props) {
+function GameSetup({ config, players, onStart, onBack, initial }: Props) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? ''
   const id = useId()
-  const [options, setOptions] = useState(() => defaultValues(config.options))
+  const [options, setOptions] = useState(
+    () => initial?.options ?? defaultValues(config.options),
+  )
   const [playerOptions, setPlayerOptions] = useState<
     Record<PlayerId, OptionValues>
   >(() =>
     Object.fromEntries(
-      players.map((player) => [player.id, defaultValues(config.playerOptions)]),
+      players.map((player) => [
+        player.id,
+        initial?.playerOptions[player.id] ??
+          defaultValues(config.playerOptions),
+      ]),
     ),
   )
 

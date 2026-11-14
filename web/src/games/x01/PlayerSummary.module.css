@@ -1,0 +1,23 @@
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.item dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.item dd {
+  margin: 0;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
