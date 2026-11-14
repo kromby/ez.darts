@@ -12,6 +12,7 @@ A darts scoring app. React + TypeScript frontend, .NET Azure Functions API, host
 | `api/EzDarts.slnx`       | .NET solution                                                         |
 | `swa-cli.config.json`    | SWA CLI config for running frontend + API together                    |
 | `infra/`                 | Bicep for the Azure resources                                         |
+| `docs/design/`           | v1 design mockups and visual tokens (Big Keys game pad, stats)        |
 | `.github/workflows/`     | CI/CD: test on PR, deploy on merge to main, PR preview environments   |
 
 ## Prerequisites
