@@ -292,20 +292,25 @@ export function areValidValues(
   return options.every((option) => isValidValue(option, values[option.key]))
 }
 
-/** Applies a preset over the defaults. */
-export function presetValues(config: GameConfig, preset: Preset): OptionValues {
-  return { ...defaultValues(config.options), ...preset.options }
+/**
+ * Applies a preset to the current values. Options the preset does not list
+ * (e.g. x01's play-on) keep their current value.
+ */
+export function presetValues(
+  preset: Preset,
+  current: OptionValues,
+): OptionValues {
+  return { ...current, ...preset.options }
 }
 
-/** The preset that `values` match exactly, if any. */
+/** The preset whose listed options all match `values`, if any. */
 export function matchingPreset(
   config: GameConfig,
   values: OptionValues,
 ): Preset | undefined {
-  return config.presets.find((preset) => {
-    const expected = presetValues(config, preset)
-    return config.options.every(
-      (option) => expected[option.key] === values[option.key],
-    )
-  })
+  return config.presets.find((preset) =>
+    Object.entries(preset.options).every(
+      ([key, value]) => values[key] === value,
+    ),
+  )
 }

@@ -21,7 +21,13 @@ function play(
   slots: PlayerSlot[] = solo,
 ) {
   const record = createGameRecord(x01, {
-    options: { startScore: 501, in: 'single', out: 'double', ...options },
+    options: {
+      startScore: 501,
+      in: 'single',
+      out: 'double',
+      playOn: false,
+      ...options,
+    },
     slots,
     configVersion: 1,
   })
@@ -300,15 +306,77 @@ describe('x01 standings', () => {
   })
 })
 
+describe('x01 play-on', () => {
+  const three: PlayerSlot[] = [
+    { playerId: 'anna' },
+    { playerId: 'oli' },
+    { playerId: 'dagny' },
+  ]
+
+  it('keeps playing for places until one side is left', () => {
+    const afterFirst = play(
+      { startScore: 40, playOn: true },
+      ['D20'], // anna checks out
+      three,
+    )
+    expect(x01.isOver(afterFirst.state)).toBe(false)
+    expect(afterFirst.record.result).toBeNull()
+    // Anna is skipped from now on.
+    expect(currentThrower(afterFirst.state.turns)).toBe('oli')
+
+    const { state, record } = play(
+      { startScore: 40, playOn: true },
+      [
+        'D20', // anna 1st
+        'S20',
+        'M',
+        'M', // oli 20
+        'D20', // dagny 2nd: only oli is left, so the game ends
+      ],
+      three,
+    )
+    expect(x01.isOver(state)).toBe(true)
+    expect(record.result?.standings).toEqual(['anna', 'dagny', 'oli'])
+  })
+
+  it('ends a two-player game at the first checkout', () => {
+    const { state } = play({ startScore: 40, playOn: true }, ['D20'])
+
+    expect(x01.isOver(state)).toBe(true)
+  })
+
+  it('ends a solo game when the player checks out', () => {
+    const solo1: PlayerSlot[] = [{ playerId: 'anna' }]
+    const before = play({ startScore: 40, playOn: true }, ['S10'], solo1)
+    expect(x01.isOver(before.state)).toBe(false)
+
+    const { state } = play({ startScore: 40, playOn: true }, ['D20'], solo1)
+    expect(x01.isOver(state)).toBe(true)
+  })
+
+  it('without play-on, ends at the first checkout', () => {
+    const { state } = play({ startScore: 40 }, ['D20'], three)
+
+    expect(x01.isOver(state)).toBe(true)
+  })
+})
+
 describe('toX01Options', () => {
   it('reads options from the setup screen', () => {
     expect(
-      toX01Options({ startScore: 501, in: 'single', out: 'double' }),
-    ).toEqual({
-      startScore: 501,
-      in: 'single',
-      out: 'double',
-    })
+      toX01Options({
+        startScore: 501,
+        in: 'single',
+        out: 'double',
+        playOn: true,
+      }),
+    ).toEqual({ startScore: 501, in: 'single', out: 'double', playOn: true })
+  })
+
+  it('ends at the first checkout for games saved without play-on', () => {
+    expect(
+      toX01Options({ startScore: 501, in: 'single', out: 'double' }).playOn,
+    ).toBe(false)
   })
 
   it('rejects invalid options', () => {

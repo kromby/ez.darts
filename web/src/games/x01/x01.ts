@@ -25,6 +25,8 @@ export type X01Options = {
   startScore: number
   in: FitRule
   out: FitRule
+  /** Keep playing after the first checkout until only one side is left. */
+  playOn: boolean
 }
 
 export type SideScore = {
@@ -73,7 +75,13 @@ export function toX01Options(values: OptionValues): X01Options {
   if (!isRule(values.in) || !isRule(values.out)) {
     throw new RangeError('Invalid x01 in/out rule')
   }
-  return { startScore, in: values.in, out: values.out }
+  // Missing in games saved before the option existed: end at the first checkout.
+  return {
+    startScore,
+    in: values.in,
+    out: values.out,
+    playOn: values.playOn === true,
+  }
 }
 
 function handicap(slot: PlayerSlot): number | null {
@@ -167,9 +175,14 @@ function applyDart(state: X01State, dart: Dart): X01State {
   }
 }
 
-/** The game ends when the first side checks out. */
+/**
+ * Ends at the first checkout, or with play-on once every side but one has
+ * checked out (a solo game ends when the player checks out).
+ */
 function isOver(state: X01State): boolean {
-  return state.turns.finished.length > 0
+  const { finished, sides } = state.turns
+  const needed = state.options.playOn ? Math.max(1, sides.length - 1) : 1
+  return finished.length >= needed
 }
 
 /** Finished sides first, then the rest by fewest points left. */
