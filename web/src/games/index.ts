@@ -1,5 +1,8 @@
+import {
+  gameStarter,
+  type GameStarter,
+} from '../components/GameShell/startGame'
 import { parseGameConfig, type GameConfig } from '../engine/config'
-import type { GameModule } from '../engine/game'
 import x01Config from './x01/config.json'
 import { x01 } from './x01/x01'
 
@@ -10,15 +13,8 @@ export function findGameConfig(id: string): GameConfig | undefined {
   return gameConfigs.find((config) => config.id === id)
 }
 
-/**
- * A module whose option and state types are only known to itself. The app
- * passes its options and state straight back to it, so this is safe.
- */
-// oxlint-disable-next-line typescript/no-explicit-any
-export type AnyGameModule = GameModule<any, any>
+const games: GameStarter[] = [gameStarter(x01)]
 
-const gameModules: AnyGameModule[] = [x01]
-
-export function findGameModule(id: string): AnyGameModule | undefined {
-  return gameModules.find((module) => module.id === id)
+export function findGame(id: string): GameStarter | undefined {
+  return games.find((game) => game.id === id)
 }

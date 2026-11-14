@@ -21,7 +21,7 @@ function GameMenu({ onQuit }: Props) {
   }
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return undefined
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setOpen(false)

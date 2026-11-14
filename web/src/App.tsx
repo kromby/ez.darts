@@ -4,12 +4,11 @@ import { fetchHealth, type HealthStatus } from './api/health'
 import GameSetup, {
   type GameSetupResult,
 } from './components/GameSetup/GameSetup'
-import GameShell from './components/GameShell/GameShell'
+import type { StartedGame } from './components/GameShell/startGame'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import PlayerSelection from './components/PlayerSelection/PlayerSelection'
-import type { GameRecord, PlayerSlot } from './engine/game'
-import { createGameRecord } from './engine/runner'
-import { findGameModule, gameConfigs } from './games'
+import type { PlayerSlot } from './engine/game'
+import { findGame, gameConfigs } from './games'
 import { createPlayer, type Player } from './players/player'
 import styles from './App.module.css'
 
@@ -23,9 +22,9 @@ function App() {
   const [players, setPlayers] = useState<Player[]>([])
   const [slots, setSlots] = useState<PlayerSlot[]>([])
   const [setup, setSetup] = useState<GameSetupResult>()
-  const [game, setGame] = useState<GameRecord<unknown>>()
+  const [game, setGame] = useState<StartedGame>()
   const config = gameConfigs[0]
-  const module = findGameModule(config.id)
+  const starter = findGame(config.id)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -41,29 +40,12 @@ function App() {
   const playerName = (id: string) =>
     players.find((player) => player.id === id)?.name ?? id
 
-  function startGame(options: unknown, gameSlots: PlayerSlot[]) {
-    if (!module) return
-    setGame(
-      createGameRecord(module, {
-        options,
-        slots: gameSlots,
-        configVersion: config.version,
-      }),
-    )
-    setStep('game')
-  }
-
-  if (step === 'game' && module && game) {
-    return (
-      <GameShell
-        key={game.id}
-        module={module}
-        record={game}
-        playerName={playerName}
-        onPlayAgain={() => startGame(game.options, game.slots)}
-        onExit={() => setStep('setup')}
-      />
-    )
+  if (step === 'game' && game) {
+    return game.render({
+      playerName,
+      onPlayAgain: () => setGame(game.again()),
+      onExit: () => setStep('setup'),
+    })
   }
 
   return (
@@ -89,7 +71,7 @@ function App() {
             }}
           />
         )}
-        {step === 'setup' && module && (
+        {step === 'setup' && starter && (
           <GameSetup
             config={config}
             players={inGame}
@@ -97,13 +79,17 @@ function App() {
             onBack={() => setStep('players')}
             onStart={(result) => {
               setSetup(result)
-              startGame(
-                module.toOptions(result.options),
-                slots.map((slot) => ({
-                  ...slot,
-                  options: result.playerOptions[slot.playerId],
-                })),
+              setGame(
+                starter.start({
+                  options: result.options,
+                  slots: slots.map((slot) => ({
+                    ...slot,
+                    options: result.playerOptions[slot.playerId],
+                  })),
+                  configVersion: config.version,
+                }),
               )
+              setStep('game')
             }}
           />
         )}
