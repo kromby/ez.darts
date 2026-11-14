@@ -106,4 +106,40 @@ describe('App', () => {
       ),
     ).toHaveValue('40')
   })
+
+  it('picks Around the World and plays it', async () => {
+    mockHealth('ok')
+    const user = userEvent.setup()
+
+    render(<App />)
+    await user.type(screen.getByLabelText('Nýr leikmaður'), 'Anna{Enter}')
+    await user.click(screen.getByRole('button', { name: 'Áfram' }))
+
+    const games = within(screen.getByRole('group', { name: 'Leikur' }))
+    expect(games.getByRole('button', { name: 'x01' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await user.click(games.getByRole('button', { name: 'Hringinn í kring' }))
+    expect(
+      screen.getByRole('heading', { name: 'Hringinn í kring' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '1–20 og miðja' }))
+    await user.click(screen.getByRole('button', { name: 'Byrja leik' }))
+
+    expect(
+      screen.getByRole('heading', { name: '1–20 og miðja · Umferð 1' }),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Tvöfalt' }))
+    await user.click(screen.getByRole('button', { name: 'Tvöfalt 1' }))
+    expect(screen.getByTestId('remaining')).toHaveTextContent('3')
+
+    // Back at setup the game and its values are kept.
+    await user.click(screen.getByRole('button', { name: 'Valmynd' }))
+    await user.click(screen.getByRole('button', { name: 'Hætta leik' }))
+    await user.click(screen.getByRole('button', { name: 'Já, hætta' }))
+    expect(
+      screen.getByRole('button', { name: '1–20 og miðja' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+  })
 })
