@@ -91,6 +91,7 @@ const en: typeof is = {
     turnFrom: 'Turn from',
     bestTurn: 'Best turn',
     checkout: 'Checkout',
+    checkoutOr: 'or {{route}}',
     turnDarts: 'Darts this turn',
     dartSlot: 'Dart {{number}}',
     handicapTag: 'HC {{score}}',

@@ -19,6 +19,7 @@ import {
   type SideId,
   type Turns,
 } from '../../engine/turns'
+import { formatRoute, x01Checkout } from './checkout'
 import PlayerSummary from './PlayerSummary'
 import type { X01Stats } from './stats'
 import Scoreboard from './Scoreboard'
@@ -238,6 +239,13 @@ function standings(state: X01State): PlayerId[] {
   return order.flatMap((side) => side.members)
 }
 
+/** A suggested finish with the darts left this turn, e.g. `T18 D25`. */
+function hint(state: X01State): string | null {
+  if (isOver(state)) return null
+  const checkout = x01Checkout(state)
+  return checkout && formatRoute(checkout.best)
+}
+
 export const x01: GameModule<X01Options, X01State> = {
   id: 'x01',
   toOptions: toX01Options,
@@ -249,4 +257,5 @@ export const x01: GameModule<X01Options, X01State> = {
   Scoreboard,
   Status,
   PlayerSummary,
+  hint,
 }

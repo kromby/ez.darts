@@ -235,3 +235,10 @@
     height: 28px;
   }
 }
+
+/* Short phones: keys at the 56 px minimum so the game state fits above. */
+@media (max-height: 780px) and (orientation: portrait) {
+  .key {
+    min-height: var(--key-height);
+  }
+}

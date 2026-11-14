@@ -93,6 +93,7 @@ const is = {
     turnFrom: 'Umferð frá',
     bestTurn: 'Besta umferð',
     checkout: 'Útskot',
+    checkoutOr: 'eða {{route}}',
     turnDarts: 'Pílur í umferðinni',
     dartSlot: 'Píla {{number}}',
     // Short tag on a player chip; the full wording is for screen readers.
