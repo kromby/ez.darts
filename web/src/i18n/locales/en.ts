@@ -53,6 +53,10 @@ const en: typeof is = {
     miss: 'Miss',
     undo: 'Undo',
   },
+  x01: {
+    scores: 'Scores',
+    notIn: 'not in',
+  },
   setup: {
     presets: 'Presets',
     options: 'Options',

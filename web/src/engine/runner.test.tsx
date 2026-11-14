@@ -221,7 +221,9 @@ describe('createGameRunner', () => {
     throwAll(runner, 3)
     const { Scoreboard } = race
 
-    render(<Scoreboard state={runner.getSnapshot().state} />)
+    render(
+      <Scoreboard state={runner.getSnapshot().state} playerName={(id) => id} />,
+    )
 
     expect(screen.getByText('anna: 180')).toBeInTheDocument()
     expect(screen.getByText('bjarni: 0')).toBeInTheDocument()
