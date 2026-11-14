@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import type { GameModule, GameRecord, PlayerId } from '../../engine/game'
 import DartPad from '../DartPad/DartPad'
 import GameMenu from './GameMenu'
@@ -11,8 +12,13 @@ type Props<TOptions, TState> = {
   playerName(id: PlayerId): string
   /** Same players and options, a fresh game. */
   onPlayAgain(): void
-  /** Back to the setup screen, from the menu or the results. */
-  onExit(): void
+  /**
+   * Back to the setup screen, from the menu or the results, with the game's
+   * last record: unfinished when it was quit.
+   */
+  onExit(record: GameRecord<TOptions>): void
+  /** Called with the record at the start and after every change, to save it. */
+  onRecord?(record: GameRecord<TOptions>): void
 }
 
 /**
@@ -26,8 +32,18 @@ function GameShell<TOptions, TState>({
   playerName,
   onPlayAgain,
   onExit,
+  onRecord,
 }: Props<TOptions, TState>) {
   const { runner, record, state } = useGameRunner(module, initial)
+  // The latest callback, so a new function from the parent doesn't save
+  // the same record again.
+  const onRecordRef = useRef(onRecord)
+  useEffect(() => {
+    onRecordRef.current = onRecord
+  })
+  useEffect(() => {
+    onRecordRef.current?.(record)
+  }, [record])
   const { Scoreboard, Status } = module
 
   if (record.result) {
@@ -40,7 +56,7 @@ function GameShell<TOptions, TState>({
         playerName={playerName}
         onPlayAgain={onPlayAgain}
         onUndo={() => runner.undo()}
-        onExit={onExit}
+        onExit={() => onExit(record)}
       />
     )
   }
@@ -56,7 +72,7 @@ function GameShell<TOptions, TState>({
               module.id
             )}
           </h2>
-          <GameMenu onQuit={onExit} />
+          <GameMenu onQuit={() => onExit(record)} />
         </header>
         <Scoreboard
           state={state}

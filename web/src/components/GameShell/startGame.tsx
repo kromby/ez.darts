@@ -6,13 +6,16 @@ import type {
   PlayerId,
   PlayerSlot,
 } from '../../engine/game'
-import { createGameRecord } from '../../engine/runner'
+import { createGameRecord, replay } from '../../engine/runner'
 import GameShell from './GameShell'
 
 export type ShellCallbacks = {
   playerName(id: PlayerId): string
   onPlayAgain(): void
-  onExit(): void
+  /** With the game's last record: unfinished when it was quit. */
+  onExit(record: GameRecord<unknown>): void
+  /** Called with the record at the start and after every dart. */
+  onRecord?(record: GameRecord<unknown>): void
 }
 
 /**
@@ -38,6 +41,11 @@ export type NewGameSetup = {
 export type GameStarter = {
   id: string
   start(setup: NewGameSetup): StartedGame
+  /**
+   * Carries on a saved game, e.g. after a reload. Throws if the record is
+   * another game's or can't be replayed.
+   */
+  resume(record: GameRecord<unknown>): StartedGame
 }
 
 /** A new record, with chance settled by the module's `prepare`. */
@@ -88,5 +96,15 @@ export function gameStarter<TOptions, TState>(
         module,
         newRecord(module, module.toOptions(options), slots, configVersion),
       ),
+    resume: (record) => {
+      if (record.game !== module.id) {
+        throw new Error(`A ${record.game} game is not ${module.id}`)
+      }
+      // Saved by this module, so its options are this module's. Replaying
+      // checks that before the game screen does.
+      const saved = record as GameRecord<TOptions>
+      replay(module, saved)
+      return play(module, saved)
+    },
   }
 }
