@@ -1,0 +1,237 @@
+/*
+ * Big Keys pad (docs/design, concept 1). It fills its container: keys are
+ * at least 56 px tall on a phone and grow with the space on a tablet.
+ */
+.pad {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.modifiers,
+.extras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.numbers {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: minmax(var(--key-height), 1fr);
+  gap: 8px;
+}
+
+.key {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 60px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: var(--radius);
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.key:active:not(:disabled) {
+  transform: translateY(1px);
+  filter: brightness(1.15);
+}
+
+.key:disabled {
+  cursor: not-allowed;
+}
+
+/* Modifiers: S grey, D green, T orange, as in the stats screens. */
+.key[data-kind='single'],
+.key[data-kind='double'],
+.key[data-kind='triple'] {
+  font-size: 18px;
+}
+
+.key[data-kind='single'] {
+  background: #252e3a;
+  color: #c9d3df;
+}
+
+.key[data-kind='single'][aria-pressed='true'] {
+  background: var(--single);
+  color: #fff;
+  box-shadow: 0 0 0 3px #93a0b0;
+}
+
+.key[data-kind='double'] {
+  background: #11301f;
+  color: #4ade80;
+  box-shadow: inset 0 0 0 2px #1f6b3d;
+}
+
+.key[data-kind='double'][aria-pressed='true'] {
+  background: var(--double);
+  color: #04140a;
+  box-shadow:
+    0 0 0 3px #86efac,
+    0 6px 22px rgb(34 165 92 / 0.5);
+}
+
+.key[data-kind='triple'] {
+  background: #3a260b;
+  color: #fbbf24;
+  box-shadow: inset 0 0 0 2px #7a4d0c;
+}
+
+.key[data-kind='triple'][aria-pressed='true'] {
+  background: #f0950f;
+  color: #1a0f00;
+  box-shadow:
+    0 0 0 3px #fcd34d,
+    0 6px 22px rgb(232 137 12 / 0.5);
+}
+
+.key[data-kind='number'] {
+  background: var(--surface-3);
+  border-bottom: 3px solid var(--surface-2);
+  font-size: 27px;
+}
+
+.value {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pad[data-modifier='2'] .value {
+  color: #4ade80;
+}
+
+.pad[data-modifier='3'] .value {
+  color: #fbbf24;
+}
+
+.key small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.key[data-kind='bull'] {
+  background: var(--surface-3);
+}
+
+.key[data-kind='bull']:disabled {
+  opacity: 0.4;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 2px #4b5768;
+}
+
+.key[data-kind='bull']:disabled small {
+  color: #fda4af;
+  opacity: 1;
+}
+
+.key[data-kind='miss'] {
+  background: #3a1d24;
+  color: #fda4af;
+}
+
+/* Icon above the label on phones, so "Afturkalla" fits a third of the pad. */
+.key[data-kind='undo'] {
+  gap: 3px;
+  background: #1b2a3d;
+  color: #93c5fd;
+}
+
+.key[data-kind='undo'] svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.key[data-kind='bull'],
+.key[data-kind='miss'],
+.key[data-kind='undo'] {
+  font-size: clamp(14px, 5cqi, 18px);
+}
+
+.key[data-kind='miss']:disabled,
+.key[data-kind='undo']:disabled,
+.key[data-kind='number']:disabled,
+.key[data-kind='single']:disabled,
+.key[data-kind='double']:disabled,
+.key[data-kind='triple']:disabled {
+  opacity: 0.4;
+}
+
+/* Tablet by the board: keys about 128×110 px. */
+@container (min-width: 560px) {
+  .pad,
+  .modifiers,
+  .extras,
+  .numbers {
+    gap: 12px;
+  }
+
+  .numbers {
+    grid-auto-rows: minmax(96px, 1fr);
+  }
+
+  .key {
+    border-radius: 18px;
+  }
+
+  .key[data-kind='single'],
+  .key[data-kind='double'],
+  .key[data-kind='triple'] {
+    min-height: 88px;
+    font-size: 26px;
+  }
+
+  .key[data-kind='number'] {
+    font-size: 44px;
+  }
+
+  .value {
+    top: 10px;
+    right: 12px;
+    font-size: 16px;
+  }
+
+  .key[data-kind='bull'],
+  .key[data-kind='miss'],
+  .key[data-kind='undo'] {
+    min-height: 110px;
+    font-size: 26px;
+  }
+
+  .key small {
+    font-size: 14px;
+  }
+
+  .key[data-kind='undo'] {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .key[data-kind='undo'] svg {
+    width: 28px;
+    height: 28px;
+  }
+}

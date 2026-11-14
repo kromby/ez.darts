@@ -79,3 +79,11 @@ export function dart(segment: number, multiplier: Multiplier): Dart {
   }
   return result
 }
+
+const prefixes = { 1: 'S', 2: 'D', 3: 'T' } as const
+
+/** Board notation such as `T20`, `D16`, `S5` or `D25` (bullseye); `null` for a miss. */
+export function notation(dart: Dart): string | null {
+  if (isMiss(dart)) return null
+  return `${prefixes[dart.multiplier as 1 | 2 | 3]}${dart.segment}`
+}

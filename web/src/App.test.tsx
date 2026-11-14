@@ -79,5 +79,12 @@ describe('App', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       'Leikskjárinn kemur fljótlega.',
     )
+
+    await user.click(screen.getByRole('button', { name: 'Þrefalt' }))
+    await user.click(screen.getByRole('button', { name: 'Þrefalt 20' }))
+    await user.click(screen.getByRole('button', { name: 'Framhjá' }))
+    expect(
+      screen.getByRole('list', { name: 'Síðustu pílur' }),
+    ).toHaveTextContent('T20Framhjá')
   })
 })
