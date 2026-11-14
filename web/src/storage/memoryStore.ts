@@ -18,40 +18,46 @@ export function createMemoryStore(): DataStore {
   const games = new Map<string, StoredGame>()
   const settings = new Map<SettingKey, unknown>()
   const copy = <T>(value: T): T => structuredClone(value)
+  const done = Promise.resolve()
 
   return {
     players: {
-      list: async () => [...players.values()].map(copy).sort(byName),
-      put: async (player) => {
+      list: () => Promise.resolve([...players.values()].map(copy).sort(byName)),
+      put: (player) => {
         players.set(player.id, copy(player))
+        return done
       },
     },
     games: {
-      list: async () => [...games.values()].map(copy).sort(newestFirst),
-      get: async (id) => {
+      list: () =>
+        Promise.resolve([...games.values()].map(copy).sort(newestFirst)),
+      get: (id) => {
         const game = games.get(id)
-        return game && copy(game)
+        return Promise.resolve(game && copy(game))
       },
-      unfinished: async () => {
+      unfinished: () => {
         const game = [...games.values()]
           .sort(newestFirst)
           .find((stored) => stored.result === null)
-        return game && copy(game)
+        return Promise.resolve(game && copy(game))
       },
-      put: async (game) => {
+      put: (game) => {
         games.set(game.id, copy(game))
+        return done
       },
-      remove: async (id) => {
+      remove: (id) => {
         games.delete(id)
+        return done
       },
     },
     settings: {
-      get: async <K extends SettingKey>(key: K) => {
+      get: <K extends SettingKey>(key: K) => {
         const value = settings.get(key) as Settings[K] | undefined
-        return value === undefined ? undefined : copy(value)
+        return Promise.resolve(value === undefined ? undefined : copy(value))
       },
-      put: async (key, value) => {
+      put: (key, value) => {
         settings.set(key, copy(value))
+        return done
       },
     },
   }

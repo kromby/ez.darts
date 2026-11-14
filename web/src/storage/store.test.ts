@@ -26,7 +26,7 @@ function game(id: string, startedAt: string, finished: boolean): StoredGame {
 }
 
 const implementations: [string, () => Promise<DataStore>][] = [
-  ['memory', async () => createMemoryStore()],
+  ['memory', () => Promise.resolve(createMemoryStore())],
   // A new factory is an empty browser profile.
   ['IndexedDB', () => openIndexedDbStore(new IDBFactory())],
 ]
@@ -148,14 +148,14 @@ describe('openLocalStore', () => {
   })
 
   it('falls back to memory without IndexedDB', async () => {
-    const store = await openLocalStore(undefined)
+    const store = await openLocalStore(null)
     await store.players.put({ id: 'anna', name: 'Anna' })
 
     expect(await store.players.list()).toHaveLength(1)
   })
 
   it('falls back to memory when IndexedDB refuses to open', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const warn = vi.spyOn(console, 'warn').mockReturnValue()
     const factory = new IDBFactory()
     vi.spyOn(factory, 'open').mockImplementation(() => {
       throw new DOMException('Blocked', 'SecurityError')

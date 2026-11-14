@@ -274,7 +274,7 @@ describe('App storage', () => {
 
   it('starts at the players when a saved game cannot be resumed', async () => {
     mockHealth('ok')
-    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockReturnValue()
     const store = createMemoryStore()
     await store.games.put({
       id: 'broken',

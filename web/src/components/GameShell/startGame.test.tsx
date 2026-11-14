@@ -14,8 +14,8 @@ const setup = {
 }
 const callbacks = {
   playerName: (id: string) => id,
-  onPlayAgain: () => {},
-  onExit: () => {},
+  onPlayAgain: vi.fn<() => void>(),
+  onExit: vi.fn<(record: GameRecord<unknown>) => void>(),
 }
 
 describe('gameStarter', () => {

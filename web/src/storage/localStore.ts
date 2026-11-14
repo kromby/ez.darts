@@ -8,7 +8,7 @@ import type { DataStore } from './store'
  * and only forgets on reload.
  */
 export async function openLocalStore(
-  factory: IDBFactory | undefined = globalThis.indexedDB,
+  factory: IDBFactory | null = globalThis.indexedDB ?? null,
 ): Promise<DataStore> {
   if (!factory) return createMemoryStore()
   try {

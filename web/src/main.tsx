@@ -7,8 +7,11 @@ import { openLocalStore } from './storage/localStore'
 
 // Guests keep their data on this device; signing in (#18) will swap in
 // the API's store.
+const root = document.getElementById('root')
+if (!root) throw new Error('index.html has no #root element')
+
 openLocalStore().then((store) => {
-  createRoot(document.getElementById('root')!).render(
+  createRoot(root).render(
     <StrictMode>
       <App store={store} />
     </StrictMode>,
