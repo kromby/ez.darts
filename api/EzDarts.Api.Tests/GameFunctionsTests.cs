@@ -200,7 +200,7 @@ public class GameFunctionsTests
     [Fact]
     public async Task Stats_ReturnsTheHouseholdsRowsAsync()
     {
-        IReadOnlyList<PlayerStatsDto> rows = [new("anna", "x01", "2026-W46", 1, 1, 2, 0, 0, 1, 1, 60)];
+        IReadOnlyList<PlayerStatsDto> rows = [new("anna", "x01", "2026-W46", 1, 1, 1, 2, 0, 0, 1, 1, 60)];
         _stats.ListAsync(Household, Arg.Any<CancellationToken>()).Returns(rows);
 
         var (_, body) = Json<IReadOnlyList<PlayerStatsDto>>(

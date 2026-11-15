@@ -18,9 +18,14 @@ public record StatsKey(string PlayerId, string Game, string Week)
     }
 }
 
-/// <summary>Plain sums, so a period's stats are rows added together, the same in the browser.</summary>
+/// <summary>
+/// Plain sums, so a period's stats are rows added together, the same in the browser. <c>Matches</c>
+/// are games against another side (not solo practice, not one team alone); only those can be won, so
+/// the win ratio is wins over matches.
+/// </summary>
 public record StatsCounts(
     int Games,
+    int Matches,
     int Wins,
     int Darts,
     int Singles,
@@ -29,10 +34,11 @@ public record StatsCounts(
     int Misses,
     int Points)
 {
-    public static readonly StatsCounts Zero = new(0, 0, 0, 0, 0, 0, 0, 0);
+    public static readonly StatsCounts Zero = new(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     public StatsCounts Plus(StatsCounts other) => new(
         Games + other.Games,
+        Matches + other.Matches,
         Wins + other.Wins,
         Darts + other.Darts,
         Singles + other.Singles,
@@ -42,7 +48,7 @@ public record StatsCounts(
         Points + other.Points);
 
     public StatsCounts Negate() =>
-        new(-Games, -Wins, -Darts, -Singles, -Doubles, -Triples, -Misses, -Points);
+        new(-Games, -Matches, -Wins, -Darts, -Singles, -Doubles, -Triples, -Misses, -Points);
 
     public bool IsZero => this == Zero;
 }
@@ -53,6 +59,7 @@ public record PlayerStatsDto(
     string Game,
     string Week,
     int Games,
+    int Matches,
     int Wins,
     int Darts,
     int Singles,
@@ -76,7 +83,11 @@ public record StatsSource(string Game, string FinishedAt, IReadOnlyList<PlayerSu
 
 public static class StatsContribution
 {
-    /// <summary>One game per player in the summary, in the ISO week the game finished.</summary>
+    /// <summary>
+    /// One game per player in the summary, in the ISO week the game finished. It is a match when
+    /// someone finished behind first place, and a win for everyone in first place. The web app's
+    /// <c>contribution</c> does the same.
+    /// </summary>
     public static IReadOnlyDictionary<StatsKey, StatsCounts> Of(StatsSource? source)
     {
         if (source is null)
@@ -85,11 +96,13 @@ public static class StatsContribution
         }
 
         var week = Week(source.FinishedAt);
+        var match = source.Summary.Any(s => s.Place > 1) ? 1 : 0;
         return source.Summary.ToDictionary(
             s => new StatsKey(s.PlayerId, source.Game, week),
             s => new StatsCounts(
                 1,
-                s.Place == 1 ? 1 : 0,
+                match,
+                s.Place == 1 ? match : 0,
                 s.Darts,
                 s.Singles,
                 s.Doubles,

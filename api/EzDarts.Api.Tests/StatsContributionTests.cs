@@ -1,3 +1,4 @@
+using EzDarts.Api.Games;
 using EzDarts.Api.Stats;
 using static EzDarts.Api.Tests.TestRequests;
 
@@ -20,8 +21,34 @@ public class StatsContributionTests
     {
         var counts = StatsContribution.Of(Finished());
 
-        Assert.Equal(new StatsCounts(1, 1, 2, 0, 0, 1, 1, 60), counts[new StatsKey("anna", "x01", "2026-W46")]);
-        Assert.Equal(new StatsCounts(1, 0, 0, 0, 0, 0, 0, 0), counts[new StatsKey("oli", "x01", "2026-W46")]);
+        Assert.Equal(new StatsCounts(1, 1, 1, 2, 0, 0, 1, 1, 60), counts[new StatsKey("anna", "x01", "2026-W46")]);
+        Assert.Equal(new StatsCounts(1, 1, 0, 0, 0, 0, 0, 0, 0), counts[new StatsKey("oli", "x01", "2026-W46")]);
+    }
+
+    [Fact]
+    public void SoloPracticeIsAGameButNotAMatchOrAWin()
+    {
+        var solo = new StatsSource("x01", "2026-11-14T21:00:00Z", [new PlayerSummaryDto("anna", 9, 6, 2, 1, 0, 1, 301)]);
+
+        Assert.Equal(new StatsCounts(1, 0, 0, 9, 6, 2, 1, 0, 301), StatsContribution.Of(solo)[new StatsKey("anna", "x01", "2026-W46")]);
+    }
+
+    [Fact]
+    public void TeamMatesInFirstPlaceBothWin()
+    {
+        var teams = new StatsSource("x01", "2026-11-14T21:00:00Z",
+        [
+            new PlayerSummaryDto("anna", 3, 3, 0, 0, 0, 1, 60),
+            new PlayerSummaryDto("bjorn", 3, 3, 0, 0, 0, 1, 41),
+            new PlayerSummaryDto("oli", 3, 0, 0, 0, 3, 2, 0),
+        ]);
+
+        var counts = StatsContribution.Of(teams);
+
+        Assert.Equal(1, counts[new StatsKey("anna", "x01", "2026-W46")].Wins);
+        Assert.Equal(1, counts[new StatsKey("bjorn", "x01", "2026-W46")].Wins);
+        Assert.Equal(0, counts[new StatsKey("oli", "x01", "2026-W46")].Wins);
+        Assert.All(counts.Values, c => Assert.Equal(1, c.Matches));
     }
 
     [Fact]
@@ -44,7 +71,7 @@ public class StatsContributionTests
     {
         var delta = StatsContribution.Delta(Finished(), null);
 
-        Assert.Equal(new StatsCounts(-1, -1, -2, 0, 0, -1, -1, -60), delta[new StatsKey("anna", "x01", "2026-W46")]);
+        Assert.Equal(new StatsCounts(-1, -1, -1, -2, 0, 0, -1, -1, -60), delta[new StatsKey("anna", "x01", "2026-W46")]);
     }
 
     [Fact]

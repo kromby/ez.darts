@@ -20,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The games and stats rows the web app's stats tests use too, so both sides agree. -->
+    <None Include="..\..\web\src\stats\fixtures\*.json" LinkBase="fixtures" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EzDarts.Api\EzDarts.Api.csproj" />
   </ItemGroup>
 

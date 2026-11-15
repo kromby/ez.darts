@@ -127,6 +127,10 @@ Signed-in households keep their players, games and stats in Table Storage, in th
 
 Every one of them needs a signed-in household and answers `401` without one.
 
+### Stats
+
+When a game finishes, the app works out a summary for each player and saves it with the game: darts thrown, how many were singles, doubles, triples and misses, the player's place, and, for x01, the points scored. Stats are those summaries added up per player, game and ISO week (UTC). For a household the API keeps the sums in `PlayerStats` as games are saved. For a guest, the app adds up the games on the device the same way. Periods, the game filter, head-to-head (from the games' standings) and the x01 3-dart average are worked out in the app from those rows, so a guest and a household get the same numbers for the same games. `web/src/stats/fixtures/` holds games and their expected rows, and both test suites check against it.
+
 ### Sign-in
 
 One email-and-password account per household. Accounts live in the `Users` table, sessions in `Sessions` and failed sign-ins in `LoginAttempts`.

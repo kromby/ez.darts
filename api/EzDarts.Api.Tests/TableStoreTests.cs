@@ -118,7 +118,7 @@ public class TableStoreTests
     }
 
     private static readonly StatsKey AnnaX01 = new("anna", "x01", "2026-W46");
-    private static readonly StatsCounts OneWin = new(1, 1, 2, 0, 0, 1, 1, 60);
+    private static readonly StatsCounts OneWin = new(1, 1, 1, 2, 0, 0, 1, 1, 60);
 
     [Fact]
     public async Task StatsStore_AddsANewRowAsync()
@@ -146,7 +146,9 @@ public class TableStoreTests
             Household, new Dictionary<StatsKey, StatsCounts> { [AnnaX01] = OneWin }, CancellationToken.None);
 
         await _table.Received(1).UpdateEntityAsync(
-            Arg.Is<TableEntity>(e => (int)e["Games"] == 5 && (int)e["Wins"] == 3 && (int)e["Darts"] == 2),
+            // A row from before Matches existed reads it as 0.
+            Arg.Is<TableEntity>(e =>
+                (int)e["Games"] == 5 && (int)e["Matches"] == 1 && (int)e["Wins"] == 3 && (int)e["Darts"] == 2),
             new ETag("v1"),
             TableUpdateMode.Replace,
             Arg.Any<CancellationToken>());

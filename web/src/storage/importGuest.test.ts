@@ -70,6 +70,41 @@ describe('importGuestData', () => {
     expect((await household.games.unfinished())?.id).toBe('game-2')
   })
 
+  it("puts matched players' ids in the summary, so their stats follow", async () => {
+    const { household } = await setup()
+    const summary = (playerId: string, place: number) => ({
+      playerId,
+      darts: 1,
+      singles: 0,
+      doubles: 0,
+      triples: 0,
+      misses: 1,
+      place,
+      points: 0,
+    })
+
+    await importGuestData(
+      {
+        players: [{ id: 'phone-anna', name: 'anna' }],
+        games: [
+          {
+            ...finished,
+            summary: [summary('phone-anna', 1), summary('phone-dagny', 2)],
+          },
+        ],
+      },
+      household,
+    )
+
+    expect(
+      (await household.games.get('game-1'))?.summary?.map((s) => s.playerId),
+    ).toEqual(['home-anna', 'phone-dagny'])
+    expect((await household.stats.rows()).map((row) => row.playerId)).toEqual([
+      'home-anna',
+      'phone-dagny',
+    ])
+  })
+
   it('changes nothing when run again, and leaves the guest data', async () => {
     const { local, household } = await setup()
     const guest = await guestData(local)

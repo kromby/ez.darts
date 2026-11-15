@@ -1,4 +1,5 @@
 import type { Player } from '../players/player'
+import { rowsFromGames } from '../stats/rows'
 import {
   byName,
   newestFirst,
@@ -108,6 +109,9 @@ export async function openIndexedDbStore(
       put: async (key, value) => {
         await run(SETTINGS, 'readwrite', (settings) => settings.put(value, key))
       },
+    },
+    stats: {
+      rows: async () => rowsFromGames(await allGames()),
     },
   }
 }

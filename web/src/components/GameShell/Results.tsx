@@ -6,7 +6,7 @@ import type {
   GameResult,
   PlayerId,
 } from '../../engine/game'
-import { groupStandings } from './standings'
+import { groupStandings } from '../../engine/standings'
 import styles from './Results.module.css'
 
 type Props<TOptions, TState> = {

@@ -1,6 +1,7 @@
 import type { OptionValues } from '../engine/config'
 import type { GameRecord, PlayerId, PlayerSlot } from '../engine/game'
 import type { Player } from '../players/player'
+import type { StatsRow } from '../stats/rows'
 
 /** A game's setup-screen values, kept so the next game starts from them. */
 export type SetupValues = {
@@ -57,6 +58,14 @@ export interface DataStore {
   settings: {
     get<K extends SettingKey>(key: K): Promise<Settings[K] | undefined>
     put<K extends SettingKey>(key: K, value: Settings[K]): Promise<void>
+  }
+  stats: {
+    /**
+     * Every stats row: per player, game and ISO week, from the finished
+     * games' summaries. The API keeps them as games are saved; a guest's
+     * are added up from the games on the device.
+     */
+    rows(): Promise<StatsRow[]>
   }
 }
 
