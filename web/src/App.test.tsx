@@ -370,4 +370,29 @@ describe('App players', () => {
     expect(sides[1]).toHaveTextContent('Óli')
     await user.click(screen.getByRole('button', { name: 'Valmynd' }))
   })
+
+  it('opens the stats and goes back to where it was', async () => {
+    mockHealth('ok')
+    const store = createMemoryStore()
+    await store.players.put({ id: 'anna', name: 'Anna', color: 'pink' })
+    await renderApp(store)
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('button', { name: 'Tölfræði' }))
+
+    expect(
+      screen.getByRole('heading', { name: 'Tölfræði' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Anna' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(
+      await screen.findByText('Engir kláraðir leikir á þessu tímabili.'),
+    ).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Til baka' }))
+    expect(
+      screen.getByRole('heading', { name: 'Leikmenn' }),
+    ).toBeInTheDocument()
+  })
 })

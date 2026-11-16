@@ -9,6 +9,7 @@ import type { StartedGame } from './components/GameShell/startGame'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import ManagePlayers from './components/ManagePlayers/ManagePlayers'
 import PlayerSelection from './components/PlayerSelection/PlayerSelection'
+import StatsScreen from './components/Stats/StatsScreen'
 import type { PlayerSlot } from './engine/game'
 import { findGame, findGameConfig, gameConfigs } from './games'
 import {
@@ -21,7 +22,7 @@ import {
 import type { DataStore } from './storage/store'
 import styles from './App.module.css'
 
-type Step = 'loading' | 'players' | 'manage' | 'setup' | 'game'
+type Step = 'loading' | 'players' | 'manage' | 'setup' | 'game' | 'stats'
 
 /** Saving happens in the background; a failed save never stops play. */
 function save(write: Promise<void>) {
@@ -47,6 +48,8 @@ function App({ store, notice, account }: Props) {
   // The last values used for each game, so going back keeps them.
   const [setups, setSetups] = useState<Record<string, GameSetupResult>>({})
   const [game, setGame] = useState<StartedGame>()
+  // Where the stats screen goes back to.
+  const [statsFrom, setStatsFrom] = useState<Step>('players')
   const config = findGameConfig(gameId) ?? gameConfigs[0]
   const starter = findGame(config.id)
 
@@ -145,6 +148,18 @@ function App({ store, notice, account }: Props) {
       <header className={styles.header}>
         <h1 className={styles.name}>{t('app.name')}</h1>
         {account}
+        {step !== 'stats' && step !== 'loading' && (
+          <button
+            type="button"
+            className={styles.statsButton}
+            onClick={() => {
+              setStatsFrom(step)
+              setStep('stats')
+            }}
+          >
+            {t('stats.open')}
+          </button>
+        )}
         <LanguageSwitcher />
       </header>
       <main className={styles.main}>
@@ -169,6 +184,13 @@ function App({ store, notice, account }: Props) {
               save(store.settings.put('slots', chosen))
               setStep('setup')
             }}
+          />
+        )}
+        {step === 'stats' && (
+          <StatsScreen
+            store={store}
+            players={players}
+            onBack={() => setStep(statsFrom)}
           />
         )}
         {step === 'manage' && (
