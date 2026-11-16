@@ -37,7 +37,7 @@ function householdStore(): Promise<DataStore> {
   )
 }
 
-async function setup(store: DataStore, list = players) {
+function setup(store: DataStore, list = players) {
   const onBack = vi.fn<() => void>()
   render(<StatsScreen store={store} players={list} onBack={onBack} now={now} />)
   return { onBack, user: userEvent.setup() }
@@ -54,7 +54,7 @@ describe.each([
   ['a household', householdStore],
 ])('StatsScreen for %s', (_, open) => {
   it("shows the first player's last 12 weeks", async () => {
-    await setup(await open())
+    setup(await open())
 
     const hero = await screen.findByRole('region', { name: 'Vinningshlutfall' })
     expect(screen.getByRole('button', { name: 'Anna' })).toHaveAttribute(
@@ -96,7 +96,7 @@ describe.each([
   })
 
   it('follows the player, period and game picked', async () => {
-    const { user } = await setup(await open())
+    const { user } = setup(await open())
     await screen.findByRole('region', { name: 'Vinningshlutfall' })
 
     await user.click(screen.getByRole('button', { name: 'Óli' }))
@@ -117,10 +117,7 @@ describe.each([
 describe('StatsScreen', () => {
   it('says when a player has no games in the period', async () => {
     const store = await guestStore()
-    const { user } = await setup(store, [
-      ...players,
-      { id: 'kari', name: 'Kári' },
-    ])
+    const { user } = setup(store, [...players, { id: 'kari', name: 'Kári' }])
     await screen.findByRole('region', { name: 'Vinningshlutfall' })
 
     await user.click(screen.getByRole('button', { name: 'Kári' }))
@@ -131,7 +128,7 @@ describe('StatsScreen', () => {
   })
 
   it('leaves out removed players without stats', async () => {
-    await setup(await guestStore(), [
+    setup(await guestStore(), [
       ...players,
       { id: 'gone', name: 'Gunna', archivedAt: '2026-11-01T00:00:00.000Z' },
       {
@@ -150,7 +147,7 @@ describe('StatsScreen', () => {
   })
 
   it('asks for players when there are none', async () => {
-    await setup(createMemoryStore(), [])
+    setup(createMemoryStore(), [])
 
     expect(
       await screen.findByText(
@@ -165,7 +162,7 @@ describe('StatsScreen', () => {
     const rowsOnce = vi
       .spyOn(store.stats, 'rows')
       .mockRejectedValueOnce(new Error('offline'))
-    const { user } = await setup(store)
+    const { user } = setup(store)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Ekki tókst að sækja tölfræðina.',
@@ -179,7 +176,7 @@ describe('StatsScreen', () => {
   })
 
   it('reads a week off a trend chart with the arrow keys', async () => {
-    const { user } = await setup(await guestStore())
+    const { user } = setup(await guestStore())
     await screen.findByRole('region', { name: 'Vinningshlutfall' })
     const chart = screen.getByRole('img', { name: /^Tvöföld, % af pílum/ })
 
@@ -191,7 +188,7 @@ describe('StatsScreen', () => {
   })
 
   it('goes back', async () => {
-    const { onBack, user } = await setup(await guestStore())
+    const { onBack, user } = setup(await guestStore())
 
     await user.click(screen.getByRole('button', { name: 'Til baka' }))
 

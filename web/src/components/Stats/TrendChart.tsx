@@ -21,8 +21,8 @@ type Props = {
   fromZero?: boolean
 }
 
-const W = 330
-const H = 118
+const WIDTH = 330
+const HEIGHT = 118
 const LEFT = 34
 const RIGHT = 46
 const TOP = 8
@@ -66,9 +66,11 @@ function TrendChart({
   const ticks = [0, 1, 2, 3].map((i) => low + gap * i)
   const n = points.length
   const x = (i: number) =>
-    n === 1 ? (LEFT + W - RIGHT) / 2 : LEFT + (i * (W - LEFT - RIGHT)) / (n - 1)
+    n === 1
+      ? (LEFT + WIDTH - RIGHT) / 2
+      : LEFT + (i * (WIDTH - LEFT - RIGHT)) / (n - 1)
   const y = (v: number) =>
-    TOP + (1 - (v - low) / (high - low)) * (H - TOP - BOTTOM)
+    TOP + (1 - (v - low) / (high - low)) * (HEIGHT - TOP - BOTTOM)
 
   // Lines between weeks next to each other; a week without darts breaks it.
   const segments: string[] = []
@@ -97,9 +99,9 @@ function TrendChart({
 
   function nearest(event: PointerEvent<SVGSVGElement>) {
     const box = event.currentTarget.getBoundingClientRect()
-    const vx = ((event.clientX - box.left) * W) / (box.width || W)
+    const vx = ((event.clientX - box.left) * WIDTH) / (box.width || WIDTH)
     const i =
-      n === 1 ? 0 : Math.round(((vx - LEFT) * (n - 1)) / (W - LEFT - RIGHT))
+      n === 1 ? 0 : Math.round(((vx - LEFT) * (n - 1)) / (WIDTH - LEFT - RIGHT))
     setActive(Math.max(0, Math.min(n - 1, i)))
   }
 
@@ -121,7 +123,7 @@ function TrendChart({
       </figcaption>
       <div className={styles.chart}>
         <svg
-          viewBox={`0 0 ${W} ${H}`}
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           role="img"
           tabIndex={0}
           aria-describedby={`${id}-read`}
@@ -145,7 +147,7 @@ function TrendChart({
               <line
                 className={styles.grid}
                 x1={LEFT}
-                x2={W - RIGHT}
+                x2={WIDTH - RIGHT}
                 y1={y(tick)}
                 y2={y(tick)}
               />
@@ -164,7 +166,7 @@ function TrendChart({
               key={i}
               className={styles.axis}
               x={x(i)}
-              y={H - 4}
+              y={HEIGHT - 4}
               textAnchor={i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}
             >
               {points[i].label}
@@ -203,7 +205,7 @@ function TrendChart({
               x1={x(active)}
               x2={x(active)}
               y1={TOP}
-              y2={H - BOTTOM}
+              y2={HEIGHT - BOTTOM}
             />
           )}
         </svg>
