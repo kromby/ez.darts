@@ -125,6 +125,17 @@ export function Headline({ view }: { view: PlayerView }) {
     <span className={styles.muted}>{t('stats.previous', { value })}</span>
   )
 
+  const averageChange = average !== null && previousAverage !== null && (
+    <>
+      <Delta
+        change={Math.round(average * 10) - Math.round(previousAverage * 10)}
+        text={format.decimal(Math.abs(average - previousAverage))}
+        better="up"
+      />{' '}
+      {was(format.decimal(previousAverage))}
+    </>
+  )
+
   return (
     <Card title={t('stats.winRatio')}>
       <p className={styles.big}>
@@ -157,18 +168,7 @@ export function Headline({ view }: { view: PlayerView }) {
           label={t('stats.average')}
           value={average === null ? '—' : format.decimal(average)}
         >
-          {average !== null && previousAverage !== null && (
-            <>
-              <Delta
-                change={
-                  Math.round(average * 10) - Math.round(previousAverage * 10)
-                }
-                text={format.decimal(Math.abs(average - previousAverage))}
-                better="up"
-              />{' '}
-              {was(format.decimal(previousAverage))}
-            </>
-          )}
+          {averageChange}
         </Tile>
       </dl>
     </Card>
@@ -248,6 +248,23 @@ export function DartMix({ view }: { view: PlayerView }) {
   )
 }
 
+/** Column headings: a label column, then right-aligned number columns. */
+function TableHead({ first, numbers }: { first: string; numbers: string[] }) {
+  const cells = numbers.map((label) => (
+    <th key={label} scope="col" className={styles.n}>
+      {label}
+    </th>
+  ))
+  return (
+    <thead>
+      <tr>
+        <th scope="col">{first}</th>
+        {cells}
+      </tr>
+    </thead>
+  )
+}
+
 function TrendTable({ view }: { view: PlayerView }) {
   const { t } = useTranslation()
   const format = useFormat()
@@ -265,20 +282,14 @@ function TrendTable({ view }: { view: PlayerView }) {
     ))
   return (
     <table className={styles.table}>
-      <thead>
-        <tr>
-          <th scope="col">{t('stats.trends.week')}</th>
-          <th scope="col" className={styles.n}>
-            {t('stats.average')}
-          </th>
-          <th scope="col" className={styles.n}>
-            {t('stats.mix.double')}
-          </th>
-          <th scope="col" className={styles.n}>
-            {t('stats.mix.triple')}
-          </th>
-        </tr>
-      </thead>
+      <TableHead
+        first={t('stats.trends.week')}
+        numbers={[
+          t('stats.average'),
+          t('stats.mix.double'),
+          t('stats.mix.triple'),
+        ]}
+      />
       <tbody>{rows}</tbody>
     </table>
   )
@@ -429,23 +440,15 @@ export function ByGame({ view }: { view: PlayerView }) {
   return (
     <Card title={t('stats.byGame.title')}>
       <table className={styles.table}>
-        <thead>
-          <tr>
-            <th scope="col">{t('stats.byGame.game')}</th>
-            <th scope="col" className={styles.n}>
-              {t('stats.byGame.played')}
-            </th>
-            <th scope="col" className={styles.n}>
-              {t('stats.byGame.won')}
-            </th>
-            <th scope="col" className={styles.n}>
-              {t('stats.byGame.winRatio')}
-            </th>
-            <th scope="col" className={styles.n}>
-              {t('stats.byGame.keyStat')}
-            </th>
-          </tr>
-        </thead>
+        <TableHead
+          first={t('stats.byGame.game')}
+          numbers={[
+            t('stats.byGame.played'),
+            t('stats.byGame.won'),
+            t('stats.byGame.winRatio'),
+            t('stats.byGame.keyStat'),
+          ]}
+        />
         <tbody>
           {view.byGame.map((line) => (
             <GameRow key={line.game} line={line} />

@@ -105,6 +105,26 @@ function TrendChart({
     setActive(Math.max(0, Math.min(n - 1, i)))
   }
 
+  const grid = ticks.map((tick) => (
+    <g key={tick}>
+      <line
+        className={styles.grid}
+        x1={LEFT}
+        x2={WIDTH - RIGHT}
+        y1={y(tick)}
+        y2={y(tick)}
+      />
+      <text
+        className={styles.axis}
+        x={LEFT - 6}
+        y={y(tick) + 3.5}
+        textAnchor="end"
+      >
+        {formatTick(tick)}
+      </text>
+    </g>
+  ))
+
   function onKeyDown(event: KeyboardEvent<SVGSVGElement>) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
     event.preventDefault()
@@ -142,25 +162,7 @@ function TrendChart({
           onBlur={() => setActive(null)}
           onKeyDown={onKeyDown}
         >
-          {ticks.map((tick) => (
-            <g key={tick}>
-              <line
-                className={styles.grid}
-                x1={LEFT}
-                x2={WIDTH - RIGHT}
-                y1={y(tick)}
-                y2={y(tick)}
-              />
-              <text
-                className={styles.axis}
-                x={LEFT - 6}
-                y={y(tick) + 3.5}
-                textAnchor="end"
-              >
-                {formatTick(tick)}
-              </text>
-            </g>
-          ))}
+          {grid}
           {labelled.map((i) => (
             <text
               key={i}
