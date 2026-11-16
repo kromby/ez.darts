@@ -21,6 +21,16 @@
   color: var(--muted);
 }
 
+.statsButton {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .main {
   flex: 1;
 }

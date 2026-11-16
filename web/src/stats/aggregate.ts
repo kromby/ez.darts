@@ -12,6 +12,8 @@ import {
 /** How far back the stats go: the last 4, 12 or 52 ISO weeks, or all. */
 export type Period = '4w' | '12w' | 'year' | 'all'
 
+const WEEK = 7 * 86_400_000
+
 export const periods: readonly Period[] = ['4w', '12w', 'year', 'all']
 
 const weeksIn: Record<Period, number | null> = {
@@ -37,7 +39,7 @@ export function firstWeek(
 ): string | null {
   const weeks = weeksIn[period]
   if (weeks === null) return null
-  return isoWeek(new Date(now.getTime() - (weeks - 1) * 7 * 86_400_000))
+  return isoWeek(new Date(now.getTime() - (weeks - 1) * WEEK))
 }
 
 function matches(
@@ -52,6 +54,56 @@ function matches(
   )
 }
 
+/** Monday 00:00 UTC of an ISO week such as `2026-W46`. */
+export function weekStart(week: string): Date {
+  const [year, number] = week.split('-W').map(Number)
+  // 4 January is always in week 1.
+  const jan4 = Date.UTC(year, 0, 4)
+  const monday = jan4 - ((new Date(jan4).getUTCDay() || 7) - 1) * 86_400_000
+  return new Date(monday + (number - 1) * WEEK)
+}
+
+/**
+ * Every ISO week in the period, oldest first and this week last, whether
+ * or not anything was played. All time starts at `earliest`, the first
+ * week with data.
+ */
+export function periodWeeks(
+  period: Period,
+  now: Date = new Date(),
+  earliest: string | null = null,
+): string[] {
+  const first = firstWeek(period, now) ?? earliest ?? isoWeek(now)
+  const weeks: string[] = []
+  const last = isoWeek(now)
+  for (let at = weekStart(first).getTime(); ; at += WEEK) {
+    const week = isoWeek(new Date(at))
+    weeks.push(week)
+    if (week >= last) return weeks
+  }
+}
+
+/**
+ * The rows of the same length of time just before the period, for "vs the
+ * previous 12 weeks"; `null` for all time, which has none.
+ */
+export function previousRows(
+  rows: readonly StatsRow[],
+  filter: StatsFilter,
+  now: Date = new Date(),
+): StatsRow[] | null {
+  const weeks = weeksIn[filter.period]
+  if (weeks === null) return null
+  const end = firstWeek(filter.period, now)
+  const first = firstWeek(filter.period, new Date(now.getTime() - weeks * WEEK))
+  return rows.filter(
+    (row) =>
+      matches(row.game, row.week, filter, first) &&
+      end !== null &&
+      row.week < end,
+  )
+}
+
 /** The rows in the filter's period and game. */
 export function filterRows(
   rows: readonly StatsRow[],
@@ -62,18 +114,24 @@ export function filterRows(
   return rows.filter((row) => matches(row.game, row.week, filter, first))
 }
 
+/** Rows added up by a key, such as the player or the game. */
+export function totalsBy<K>(
+  rows: readonly StatsRow[],
+  key: (row: StatsRow) => K,
+): Map<K, StatsCounts> {
+  const totals = new Map<K, StatsCounts>()
+  for (const row of rows) {
+    const k = key(row)
+    totals.set(k, addCounts(totals.get(k) ?? noCounts, row))
+  }
+  return totals
+}
+
 /** Each player's rows added up. */
 export function totalsByPlayer(
   rows: readonly StatsRow[],
 ): Map<PlayerId, StatsCounts> {
-  const totals = new Map<PlayerId, StatsCounts>()
-  for (const row of rows) {
-    totals.set(
-      row.playerId,
-      addCounts(totals.get(row.playerId) ?? noCounts, row),
-    )
-  }
-  return totals
+  return totalsBy(rows, (row) => row.playerId)
 }
 
 /** One player's totals per ISO week, oldest first, for trends. */
