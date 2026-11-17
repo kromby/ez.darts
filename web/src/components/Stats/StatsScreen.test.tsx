@@ -112,6 +112,82 @@ describe.each([
       within(card('Innbyrðis')).getByText('1 af 3 sameiginlegum leikjum'),
     ).toBeVisible()
   })
+
+  it('compares everyone on the household view', async () => {
+    const { user } = setup(await open())
+    await screen.findByRole('region', { name: 'Vinningshlutfall' })
+
+    await user.click(screen.getByRole('button', { name: 'Heimilið' }))
+
+    expect(screen.getByRole('button', { name: 'Heimilið' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(screen.getByRole('button', { name: 'Anna' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+
+    const ratios = within(card('Vinningshlutfall')).getAllByRole('listitem')
+    expect(ratios.map((line) => line.textContent)).toEqual([
+      'AAnna 2 sigrar í 3 leikjum67%',
+      'ÓÓli 1 sigrar í 3 leikjum33%',
+      'BBjörn 0 sigrar í 1 leik0%',
+    ])
+
+    // Row player against column player: Anna, Óli, Björn.
+    const grid = within(card('Innbyrðis'))
+    const anna = grid.getByRole('rowheader', { name: 'Anna' })
+    expect(cells(anna.closest('tr') as HTMLElement)).toEqual([
+      '—',
+      '67%2/3',
+      '0%0/1',
+    ])
+    expect(
+      grid.getByTitle('Anna endaði ofar en Óli í 2 af 3 sameiginlegum leikjum'),
+    ).toHaveTextContent('67%')
+    expect(
+      grid.getByTitle('Björn endaði ofar en Anna í 1 af 1 sameiginlegum leik'),
+    ).toHaveTextContent('100%')
+    expect(
+      grid.getAllByRole('columnheader').map((th) => th.textContent),
+    ).toEqual(['AAnna', 'ÓÓli', 'BBjörn'])
+
+    // 161 points in 7 darts, 103 in 5, 41 in 2.
+    const averages = within(card('x01 meðaltal (3 pílur)')).getAllByRole(
+      'listitem',
+    )
+    expect(averages.map((line) => line.textContent)).toEqual([
+      'AAnna69,0',
+      'ÓÓli61,8',
+      'BBjörn61,5',
+    ])
+
+    const mix = within(card('Tvöföld og þreföld')).getAllByRole('row')
+    expect(mix.slice(1).map((row) => row.textContent)).toEqual([
+      'Björn50,0%50,0%0,0%',
+      'Óli9,1%9,1%63,6%',
+      'Anna6,7%60,0%0,0%',
+    ])
+  })
+
+  it('leaves the x01 average off the household view for other games', async () => {
+    const { user } = setup(await open())
+    await screen.findByRole('region', { name: 'Vinningshlutfall' })
+
+    await user.click(screen.getByRole('button', { name: 'Heimilið' }))
+    await user.selectOptions(
+      screen.getByLabelText('Leikur'),
+      'around-the-world',
+    )
+
+    expect(
+      screen.queryByRole('region', { name: 'x01 meðaltal (3 pílur)' }),
+    ).not.toBeInTheDocument()
+    expect(
+      within(card('Vinningshlutfall')).getAllByRole('listitem'),
+    ).toHaveLength(2)
+  })
 })
 
 describe('StatsScreen', () => {
@@ -185,6 +261,39 @@ describe('StatsScreen', () => {
     await user.keyboard('{ArrowLeft}')
 
     expect(chart).toHaveAccessibleDescription(/^25,0% Vikan frá/)
+  })
+
+  it('goes from the household view back to a player', async () => {
+    const { user } = setup(await guestStore())
+    await screen.findByRole('region', { name: 'Vinningshlutfall' })
+    await user.click(screen.getByRole('button', { name: 'Heimilið' }))
+
+    await user.click(screen.getByRole('button', { name: 'Óli' }))
+
+    expect(screen.getByRole('button', { name: 'Heimilið' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+    expect(
+      within(card('Vinningshlutfall')).getByText('1 sigrar í 3 leikjum'),
+    ).toBeVisible()
+    expect(card('Hvar pílurnar lenda')).toBeVisible()
+  })
+
+  it('says when no one played in the period on the household view', async () => {
+    const { user } = setup(await guestStore(), players)
+    await screen.findByRole('region', { name: 'Vinningshlutfall' })
+    await user.click(screen.getByRole('button', { name: 'Heimilið' }))
+
+    await user.click(screen.getByRole('button', { name: '4 vikur' }))
+    await user.selectOptions(
+      screen.getByLabelText('Leikur'),
+      'around-the-world',
+    )
+
+    expect(
+      screen.getByText('Engir kláraðir leikir á þessu tímabili.'),
+    ).toBeVisible()
   })
 
   it('goes back', async () => {

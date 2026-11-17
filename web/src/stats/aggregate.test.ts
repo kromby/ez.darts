@@ -6,6 +6,7 @@ import {
   filterRows,
   firstWeek,
   headToHead,
+  headToHeadGrid,
   shares,
   threeDartAverage,
   totalsByPlayer,
@@ -141,6 +142,36 @@ describe('headToHead', () => {
         now,
       ).games,
     ).toBe(3)
+  })
+})
+
+describe('headToHeadGrid', () => {
+  const cells = (grid: ReturnType<typeof headToHeadGrid>) =>
+    Object.fromEntries(
+      [...grid].map(([row, line]) => [row, Object.fromEntries(line)]),
+    )
+
+  it('has every pair that met, row player against column player', () => {
+    expect(cells(headToHeadGrid(fixtureGames, all, now))).toEqual({
+      anna: { oli: { games: 4, ahead: 3 }, bjorn: { games: 1, ahead: 0 } },
+      oli: { anna: { games: 4, ahead: 1 }, bjorn: { games: 2, ahead: 1 } },
+      bjorn: { anna: { games: 1, ahead: 1 }, oli: { games: 2, ahead: 1 } },
+    })
+  })
+
+  it('follows the period and game filters', () => {
+    const grid = headToHeadGrid(
+      fixtureGames,
+      { period: '4w', game: 'x01' },
+      now,
+    )
+    // fixture-1 and fixture-2.
+    expect(grid.get('anna')?.get('oli')).toEqual({ games: 2, ahead: 1 })
+    expect(grid.get('bjorn')?.get('oli')).toEqual({ games: 1, ahead: 0 })
+  })
+
+  it('is empty without games against others', () => {
+    expect(headToHeadGrid([], all, now).size).toBe(0)
   })
 })
 

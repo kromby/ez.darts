@@ -334,6 +334,28 @@ const is = {
       players_other: '{{count}} leikmenn',
       solo: 'Æfing',
     },
+    household: {
+      open: 'Heimilið',
+      grid: {
+        aside: 'röð endaði ofar en dálkur',
+        cell_one:
+          '{{row}} endaði ofar en {{column}} í {{ahead}} af {{count}} sameiginlegum leik',
+        cell_other:
+          '{{row}} endaði ofar en {{column}} í {{ahead}} af {{count}} sameiginlegum leikjum',
+        never: '{{row}} og {{column}} hafa ekki mæst',
+        behind: 'Oftar neðar',
+        ahead: 'Oftar ofar',
+        note: '% af sameiginlegum leikjum. Gildir líka um leiki með fleiri en tveimur.',
+        vs: 'ofar en {{name}}',
+      },
+      averages: {
+        none: 'Enginn x01 leikur á tímabilinu.',
+      },
+      mix: {
+        title: 'Tvöföld og þreföld',
+        aside: '% af pílum',
+      },
+    },
   },
   setup: {
     game: 'Leikur',

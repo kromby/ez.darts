@@ -191,6 +191,51 @@ export type HeadToHead = {
   ahead: Record<PlayerId, number>
 }
 
+/** One player against another: shared games, and how many they won ahead. */
+export type Meeting = { games: number; ahead: number }
+
+/** Row player against column player, for everyone who met in the filter. */
+export type HeadToHeadGrid = Map<PlayerId, Map<PlayerId, Meeting>>
+
+/**
+ * Every pair of players' head to head, from the games' standings, in one
+ * pass: the games each pair played on different sides, and how often the
+ * row player finished ahead of the column player.
+ */
+export function headToHeadGrid(
+  games: readonly GameRecord<unknown>[],
+  filter: StatsFilter,
+  now: Date = new Date(),
+): HeadToHeadGrid {
+  const first = firstWeek(filter.period, now)
+  const grid: HeadToHeadGrid = new Map()
+  const meeting = (row: PlayerId, column: PlayerId): Meeting => {
+    const line = grid.get(row) ?? new Map<PlayerId, Meeting>()
+    grid.set(row, line)
+    const cell = line.get(column) ?? { games: 0, ahead: 0 }
+    line.set(column, cell)
+    return cell
+  }
+  for (const game of games) {
+    if (!game.result) continue
+    if (!matches(game.game, isoWeek(game.result.finishedAt), filter, first)) {
+      continue
+    }
+    const place = places({ slots: game.slots, result: game.result })
+    for (const row of game.slots) {
+      for (const column of game.slots) {
+        if (row.playerId === column.playerId) continue
+        if (row.teamId !== undefined && row.teamId === column.teamId) continue
+        const cell = meeting(row.playerId, column.playerId)
+        cell.games++
+        const rowPlace = place.get(row.playerId) ?? 0
+        if (rowPlace < (place.get(column.playerId) ?? 0)) cell.ahead++
+      }
+    }
+  }
+  return grid
+}
+
 /**
  * How two players did against each other, from the games' standings: the
  * games they both played on different sides, and who finished ahead.
@@ -202,24 +247,11 @@ export function headToHead(
   filter: StatsFilter,
   now: Date = new Date(),
 ): HeadToHead {
-  const first = firstWeek(filter.period, now)
-  const result: HeadToHead = { games: 0, ahead: { [a]: 0, [b]: 0 } }
-  for (const game of games) {
-    if (!game.result) continue
-    if (!matches(game.game, isoWeek(game.result.finishedAt), filter, first)) {
-      continue
-    }
-    const slotA = game.slots.find((slot) => slot.playerId === a)
-    const slotB = game.slots.find((slot) => slot.playerId === b)
-    if (!slotA || !slotB) continue
-    if (slotA.teamId !== undefined && slotA.teamId === slotB.teamId) continue
-
-    const place = places({ slots: game.slots, result: game.result })
-    const placeA = place.get(a) ?? 0
-    const placeB = place.get(b) ?? 0
-    result.games++
-    if (placeA < placeB) result.ahead[a]++
-    else if (placeB < placeA) result.ahead[b]++
+  const grid = headToHeadGrid(games, filter, now)
+  const ab = grid.get(a)?.get(b)
+  const ba = grid.get(b)?.get(a)
+  return {
+    games: ab?.games ?? 0,
+    ahead: { [a]: ab?.ahead ?? 0, [b]: ba?.ahead ?? 0 },
   }
-  return result
 }

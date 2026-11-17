@@ -454,3 +454,178 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.house {
+  padding: 0 12px;
+}
+
+.house svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Head to head: row player against column player. */
+.matrix {
+  --h2h-ahead: #3987e5;
+  --h2h-behind: #e66767;
+  --h2h-even: #2a313b;
+
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+
+.matrix thead td {
+  width: 84px;
+}
+
+.matrix[data-many] thead td {
+  width: 30px;
+}
+
+.matrix thead th {
+  height: 30px;
+  text-align: center;
+}
+
+.matrix thead th > span {
+  margin: 0 auto;
+}
+
+.matrix tbody th {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matrix tbody th > span:first-child {
+  display: inline-grid;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.matrix td {
+  height: 52px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.matrix[data-many] td {
+  font-size: 13px;
+}
+
+.matrix[data-many] .rowName {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.matrix td small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.matrix .self {
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--muted);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ramp {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #e66767, #2a313b 50%, #3987e5);
+}
+
+.note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.h2hList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.h2hList .rivalName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meetings {
+  margin: 6px 0 0;
+  padding: 0 0 0 36px;
+  list-style: none;
+}
+
+.meetings li {
+  display: grid;
+  grid-template-columns: 1fr auto 48px;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+.meetings b {
+  text-align: right;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barLine {
+  display: grid;
+  grid-template-columns: 28px minmax(64px, auto) 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar span {
+  height: 14px;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent);
+}

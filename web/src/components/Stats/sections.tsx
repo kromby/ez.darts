@@ -1,11 +1,8 @@
-import { useId, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { GameRecord, PlayerId } from '../../engine/game'
-import { findGameConfig } from '../../games'
-import { formatDecimal, formatNumber, formatPercent } from '../../i18n/format'
-import { localize } from '../../i18n/languages'
 import type { Player } from '../../players/player'
-import { shares, weekStart, winRatio, type Shares } from '../../stats/aggregate'
+import { shares, winRatio, type Shares } from '../../stats/aggregate'
 import type {
   GameLine,
   PlayerView,
@@ -15,60 +12,10 @@ import type {
 import type { StatsCounts } from '../../stats/rows'
 import PlayerAvatar from '../PlayerAvatar/PlayerAvatar'
 import Delta from './Delta'
+import { Card, TableHead } from './parts'
 import TrendChart from './TrendChart'
+import { useFormat, type Format } from './useFormat'
 import styles from './StatsScreen.module.css'
-
-/** Numbers, dates and game names in the current language. */
-function useFormat() {
-  const { t, i18n } = useTranslation()
-  const language = i18n.resolvedLanguage ?? 'is'
-  return {
-    number: (value: number) => formatNumber(value, language),
-    decimal: (value: number) => formatDecimal(value, language),
-    percent: (value: number, digits = 1) =>
-      formatPercent(value, language, digits),
-    points: (value: number) =>
-      t('stats.points', { value: formatDecimal(value, language) }),
-    week: (week: string) =>
-      new Intl.DateTimeFormat(language, {
-        day: 'numeric',
-        month: 'short',
-        timeZone: 'UTC',
-      }).format(weekStart(week)),
-    date: (iso: string) =>
-      new Intl.DateTimeFormat(language, {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-      }).format(new Date(iso)),
-    gameName: (game: string) => {
-      const config = findGameConfig(game)
-      return config ? localize(config.name, language) : game
-    },
-  }
-}
-
-/** A titled card; the title names its region for screen readers. */
-function Card({
-  title,
-  aside,
-  children,
-}: {
-  title: string
-  aside?: string | null
-  children: ReactNode
-}) {
-  const id = useId()
-  return (
-    <section className={styles.card} aria-labelledby={id}>
-      <div className={styles.cardHead}>
-        <h3 id={id}>{title}</h3>
-        {aside && <span>{aside}</span>}
-      </div>
-      {children}
-    </section>
-  )
-}
 
 /** A game's key number: the x01 average, or darts for around the world. */
 function keyStat(
@@ -76,7 +23,7 @@ function keyStat(
   points: number | undefined,
   darts: number,
   games: number,
-  format: ReturnType<typeof useFormat>,
+  format: Format,
   t: ReturnType<typeof useTranslation>['t'],
 ): string {
   if (points !== undefined && darts > 0) {
@@ -245,23 +192,6 @@ export function DartMix({ view }: { view: PlayerView }) {
         ))}
       </ul>
     </Card>
-  )
-}
-
-/** Column headings: a label column, then right-aligned number columns. */
-function TableHead({ first, numbers }: { first: string; numbers: string[] }) {
-  const cells = numbers.map((label) => (
-    <th key={label} scope="col" className={styles.n}>
-      {label}
-    </th>
-  ))
-  return (
-    <thead>
-      <tr>
-        <th scope="col">{first}</th>
-        {cells}
-      </tr>
-    </thead>
   )
 }
 
