@@ -5,10 +5,12 @@ import { gameConfigs } from '../../games'
 import { localize } from '../../i18n/languages'
 import { isActive, type Player } from '../../players/player'
 import { periods, type Period, type StatsFilter } from '../../stats/aggregate'
+import { householdView } from '../../stats/householdView'
 import { playerView } from '../../stats/playerView'
 import type { StatsRow } from '../../stats/rows'
 import type { DataStore } from '../../storage/store'
 import PlayerAvatar from '../PlayerAvatar/PlayerAvatar'
+import { Averages, HeadToHeadCard, MixByPlayer, WinRatios } from './household'
 import {
   ByGame,
   DartMix,
@@ -33,10 +35,30 @@ type Data =
   | { status: 'failed' }
   | { status: 'ready'; rows: StatsRow[]; games: GameRecord<unknown>[] }
 
+/** The house at the end of the player chips. */
+function HouseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 11l9-7 9 7" />
+      <path d="M5 10v10h14V10" />
+      <path d="M10 20v-6h4v6" />
+    </svg>
+  )
+}
+
 /**
  * A player's stats: win ratio, where their darts land, weekly trends, head
- * to head, by game and recent games, for a period and game. Works the same
- * from the API's stats (a household) as from the device's games (a guest).
+ * to head, by game and recent games, for a period and game. The house chip
+ * switches to the household view, comparing everyone. Works the same from
+ * the API's stats (a household) as from the device's games (a guest).
  */
 function StatsScreen({
   store,
@@ -52,6 +74,7 @@ function StatsScreen({
     game: null,
   })
   const [chosen, setChosen] = useState<PlayerId | null>(null)
+  const [everyone, setEveryone] = useState(false)
   const [today] = useState(now)
 
   // Bumped by "Try again".
@@ -83,11 +106,19 @@ function StatsScreen({
 
   const view = useMemo(
     () =>
-      data.status === 'ready' && playerId !== null
+      data.status === 'ready' && playerId !== null && !everyone
         ? playerView(data.rows, data.games, playerId, filter, today)
         : null,
-    [data, playerId, filter, today],
+    [data, playerId, filter, today, everyone],
   )
+  const house = useMemo(
+    () =>
+      data.status === 'ready' && everyone
+        ? householdView(data.rows, data.games, filter, today)
+        : null,
+    [data, filter, today, everyone],
+  )
+  const showAverage = filter.game === null || filter.game === 'x01'
 
   const playerOf = (pid: PlayerId): Player =>
     players.find((p) => p.id === pid) ?? { id: pid, name: pid }
@@ -112,13 +143,26 @@ function StatsScreen({
               key={player.id}
               type="button"
               className={styles.chip}
-              aria-pressed={player.id === playerId}
-              onClick={() => setChosen(player.id)}
+              aria-pressed={!everyone && player.id === playerId}
+              onClick={() => {
+                setChosen(player.id)
+                setEveryone(false)
+              }}
             >
               <PlayerAvatar player={player} size={28} />
               {player.name}
             </button>
           ))}
+          <button
+            type="button"
+            className={`${styles.chip} ${styles.house}`}
+            aria-label={t('stats.household.open')}
+            title={t('stats.household.open')}
+            aria-pressed={everyone}
+            onClick={() => setEveryone(true)}
+          >
+            <HouseIcon />
+          </button>
         </div>
       )}
 
@@ -181,7 +225,7 @@ function StatsScreen({
         <p className={styles.muted}>{t('stats.noPlayers')}</p>
       )}
 
-      {view && view.current.games === 0 && (
+      {((view && view.current.games === 0) || house?.players.length === 0) && (
         <p className={`${styles.card} ${styles.muted}`}>{t('stats.noGames')}</p>
       )}
 
@@ -189,13 +233,19 @@ function StatsScreen({
         <>
           <Headline view={view} />
           <DartMix view={view} />
-          <Trends
-            view={view}
-            showAverage={filter.game === null || filter.game === 'x01'}
-          />
+          <Trends view={view} showAverage={showAverage} />
           <Rivals view={view} playerOf={playerOf} />
           <ByGame view={view} />
           <RecentGames view={view} nameOf={(pid) => playerOf(pid).name} />
+        </>
+      )}
+
+      {house && house.players.length > 0 && (
+        <>
+          <WinRatios view={house} period={filter.period} playerOf={playerOf} />
+          <HeadToHeadCard view={house} playerOf={playerOf} />
+          {showAverage && <Averages view={house} playerOf={playerOf} />}
+          <MixByPlayer view={house} playerOf={playerOf} />
         </>
       )}
     </div>

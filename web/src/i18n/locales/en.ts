@@ -329,6 +329,28 @@ const en: typeof is = {
       players_other: '{{count}} players',
       solo: 'Practice',
     },
+    household: {
+      open: 'Household',
+      grid: {
+        aside: 'row finished ahead of column',
+        cell_one:
+          '{{row}} finished ahead of {{column}} in {{ahead}} of {{count}} shared game',
+        cell_other:
+          '{{row}} finished ahead of {{column}} in {{ahead}} of {{count}} shared games',
+        never: '{{row}} and {{column}} have not met',
+        behind: 'Behind more',
+        ahead: 'Ahead more',
+        note: '% of shared games. Works for games with more than two players.',
+        vs: 'ahead of {{name}}',
+      },
+      averages: {
+        none: 'No x01 games in this period.',
+      },
+      mix: {
+        title: 'Doubles & triples',
+        aside: '% of darts',
+      },
+    },
   },
   setup: {
     game: 'Game',

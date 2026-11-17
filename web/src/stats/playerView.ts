@@ -3,7 +3,7 @@ import { places } from '../engine/summary'
 import {
   filterRows,
   firstWeek,
-  headToHead,
+  headToHeadGrid,
   periodWeeks,
   previousRows,
   threeDartAverage,
@@ -153,20 +153,8 @@ export function playerView(
     .filter((game) => inFilter(game, filter, first))
     .filter((game) => game.slots.some((slot) => slot.playerId === playerId))
 
-  const others = new Set(
-    played.flatMap((game) => game.slots.map((slot) => slot.playerId)),
-  )
-  others.delete(playerId)
-  const rivals = [...others]
-    .map((other) => {
-      const result = headToHead(played, playerId, other, filter, now)
-      return {
-        playerId: other,
-        games: result.games,
-        ahead: result.ahead[playerId],
-      }
-    })
-    .filter((rival) => rival.games > 0)
+  const rivals = [...(headToHeadGrid(played, filter, now).get(playerId) ?? [])]
+    .map(([other, meeting]) => ({ playerId: other, ...meeting }))
     .sort((a, b) => b.games - a.games)
 
   const recent = played
