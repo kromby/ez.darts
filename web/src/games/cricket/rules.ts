@@ -88,17 +88,13 @@ export function wins(
 ): boolean {
   const side = board[sideId]
   if (!closedAll(side)) return false
-  const others = Object.entries(board)
+  if (options.variant === 'noScore') return true
+  const lowestWins = options.variant === 'cutThroat'
+  return Object.entries(board)
     .filter(([id]) => id !== sideId)
-    .map(([, other]) => other.score)
-  switch (options.variant) {
-    case 'standard':
-      return others.every((score) => side.score >= score)
-    case 'cutThroat':
-      return others.every((score) => side.score <= score)
-    case 'noScore':
-      return true
-  }
+    .every(([, other]) =>
+      lowestWins ? side.score <= other.score : side.score >= other.score,
+    )
 }
 
 /** The most notable thing that happened in a turn. */
