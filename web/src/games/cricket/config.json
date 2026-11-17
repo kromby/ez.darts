@@ -1,0 +1,43 @@
+{
+  "id": "cricket",
+  "version": 1,
+  "name": { "is": "Krikket", "en": "Cricket" },
+  "teams": true,
+  "options": [
+    {
+      "key": "variant",
+      "type": "choice",
+      "label": { "is": "Afbrigði", "en": "Variant" },
+      "values": [
+        {
+          "value": "standard",
+          "label": { "is": "Venjulegt", "en": "Standard" }
+        },
+        {
+          "value": "cutThroat",
+          "label": { "is": "Miskunnarlaust", "en": "Cut-throat" }
+        },
+        {
+          "value": "noScore",
+          "label": { "is": "Án stiga", "en": "No score" }
+        }
+      ],
+      "default": "standard"
+    }
+  ],
+  "playerOptions": [],
+  "presets": [
+    {
+      "name": { "is": "Venjulegt", "en": "Standard" },
+      "options": { "variant": "standard" }
+    },
+    {
+      "name": { "is": "Miskunnarlaust", "en": "Cut-throat" },
+      "options": { "variant": "cutThroat" }
+    },
+    {
+      "name": { "is": "Án stiga", "en": "No score" },
+      "options": { "variant": "noScore" }
+    }
+  ]
+}

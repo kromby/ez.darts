@@ -18,7 +18,7 @@ describe('withSummary', () => {
   })
 
   it('leaves games in play, with a summary, unknown or broken alone', () => {
-    const unknown = { ...older(fixtureGames[0]), game: 'cricket' }
+    const unknown = { ...older(fixtureGames[0]), game: 'shanghai' }
     const broken: StoredGame = {
       ...older(fixtureGames[0]),
       darts: [{ playerId: 'anna', dart: { segment: 30, multiplier: 3 } }],

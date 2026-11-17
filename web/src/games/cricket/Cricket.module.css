@@ -1,0 +1,112 @@
+/* The marks grid: a row per side, a column per number, then the score. */
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  table-layout: fixed;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid th,
+.grid td {
+  height: 38px;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.grid tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.grid thead th {
+  height: 28px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.grid thead th[data-dead] {
+  text-decoration: line-through;
+}
+
+.who {
+  width: 40px;
+}
+
+.score {
+  width: 52px;
+}
+
+.grid tbody th {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin: 0 6px 0 4px;
+  border-radius: 50%;
+  background: var(--avatar);
+  color: #0b0f14;
+  font-size: 12px;
+  font-weight: 850;
+  vertical-align: middle;
+}
+
+/* On a phone only the avatar names a row; the name fits beside the pad
+   (GameShell's side-by-side breakpoint). */
+.name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+  .who {
+    width: 30%;
+  }
+
+  .name {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    vertical-align: middle;
+  }
+}
+
+.grid td {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.grid td[data-closed] {
+  color: var(--double);
+}
+
+.grid td[data-dead] {
+  color: var(--muted);
+  opacity: 0.45;
+}
+
+.grid tr[data-current] > * {
+  background: var(--accent-bg);
+}
+
+.grid td.score {
+  font-size: 20px;
+}
