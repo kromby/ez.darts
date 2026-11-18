@@ -47,6 +47,18 @@ const is = {
       cancelled: 'Hætt við að færa {{name}}',
     },
   },
+  computer: {
+    name: 'Tölva ({{level}})',
+    numbered: 'Tölva {{number}} ({{level}})',
+    add: 'Bæta við tölvu',
+    addLevel: 'Bæta við tölvu: {{level}}',
+    levels: {
+      easy: 'létt',
+      medium: 'miðlungs',
+      hard: 'erfið',
+    },
+    throwing: '{{name}} kastar…',
+  },
   manage: {
     title: 'Breyta leikmönnum',
     none: 'Engir leikmenn enn.',

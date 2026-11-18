@@ -66,8 +66,11 @@ export type GameRunner<TOptions, TState> = {
   subscribe(listener: () => void): () => void
   /** Logs a dart for whoever is up. Throws if the dart or move is invalid. */
   throwDart(dart: Dart): void
-  /** Drops the last dart and replays. Returns false when there is none. */
-  undo(): boolean
+  /**
+   * Drops the last `count` darts (default 1) and replays. Returns false
+   * when there are none.
+   */
+  undo(count?: number): boolean
 }
 
 export type RunnerOptions = {
@@ -146,13 +149,13 @@ export function createGameRunner<TOptions, TState>(
       if (result) onFinish?.(result)
     },
 
-    undo() {
+    undo(count = 1) {
       const { summary: _finished, ...record } = snapshot.record
-      if (record.darts.length === 0) return false
+      if (record.darts.length === 0 || count < 1) return false
 
       const nextRecord: GameRecord<TOptions> = {
         ...record,
-        darts: record.darts.slice(0, -1),
+        darts: record.darts.slice(0, -count),
         result: null,
       }
       commit({ record: nextRecord, state: replay(module, nextRecord) })

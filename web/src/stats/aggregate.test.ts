@@ -173,6 +173,18 @@ describe('headToHeadGrid', () => {
   it('is empty without games against others', () => {
     expect(headToHeadGrid([], all, now).size).toBe(0)
   })
+
+  it('leaves computers out', () => {
+    const game = fixtureGames.find((g) => g.result)
+    if (!game?.result) throw new Error('The fixture needs a finished game')
+    const withComputer = {
+      ...game,
+      slots: [{ playerId: 'anna' }, { playerId: 'computer-hard-1' }],
+      result: { ...game.result, standings: ['computer-hard-1', 'anna'] },
+    }
+
+    expect(headToHeadGrid([withComputer], all, now).size).toBe(0)
+  })
 })
 
 describe('a guest and a household', () => {

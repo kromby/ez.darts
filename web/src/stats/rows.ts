@@ -1,3 +1,4 @@
+import { isComputer } from '../engine/computer'
 import type { GameRecord, PlayerId } from '../engine/game'
 
 /** The numbers a stats row adds up; the API's `StatsCounts`. */
@@ -76,14 +77,17 @@ export function isoWeek(at: string | Date): string {
  * What a finished game adds to the stats: one game per player in its
  * summary, in the week it finished. It is a match when someone finished
  * behind first place, and a win for everyone in first. Nothing for a game
- * in play or one without a summary. The API's `StatsContribution.Of`.
+ * in play or one without a summary, and nothing for computer players (a
+ * game against one still counts for the people). The API's
+ * `StatsContribution.Of`.
  */
 export function contribution(game: GameRecord<unknown>): StatsRow[] {
   const { result, summary } = game
   if (!result || !summary) return []
   const week = isoWeek(result.finishedAt)
   const match = summary.some((player) => player.place > 1) ? 1 : 0
-  return summary.map((player) => ({
+  const people = summary.filter((player) => !isComputer(player.playerId))
+  return people.map((player) => ({
     playerId: player.playerId,
     game: game.game,
     week,

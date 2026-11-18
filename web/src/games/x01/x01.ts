@@ -19,6 +19,7 @@ import {
   type SideId,
   type Turns,
 } from '../../engine/turns'
+import { x01Aim } from './aim'
 import { formatRoute, x01Checkout } from './checkout'
 import PlayerSummary from './PlayerSummary'
 import type { X01Stats } from './stats'
@@ -260,4 +261,5 @@ export const x01: GameModule<X01Options, X01State> = {
   hint,
   // Busted turns score nothing, as in the game's own average.
   points: (state, playerId) => state.stats[playerId]?.scored ?? 0,
+  aim: x01Aim,
 }

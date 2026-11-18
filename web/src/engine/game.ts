@@ -68,6 +68,12 @@ export interface GameModule<TOptions, TState> {
   PlayerSummary?: ComponentType<PlayerSummaryProps<TState>>
   hint?(state: TState): string | null
   /**
+   * Where a computer player should aim its next dart, e.g. T20 or the
+   * double to finish on. The shared thrower scatters the dart around it.
+   * Games without it are thrown at T20.
+   */
+  aim?(state: TState, options: TOptions): Dart
+  /**
    * Points a player scored, for games that keep score: x01 (where they add
    * up to a 3-dart average) and Cricket. Left out by games without points.
    */

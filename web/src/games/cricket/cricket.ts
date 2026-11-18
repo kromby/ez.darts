@@ -11,6 +11,7 @@ import {
   type SideId,
   type Turns,
 } from '../../engine/turns'
+import { cricketAim } from './aim'
 import PlayerSummary from './PlayerSummary'
 import {
   CLOSED,
@@ -247,4 +248,5 @@ export const cricket: GameModule<CricketOptions, CricketState> = {
   Status,
   PlayerSummary,
   points: (state, playerId) => state.stats[playerId]?.points ?? 0,
+  aim: cricketAim,
 }

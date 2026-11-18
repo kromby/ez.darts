@@ -1,3 +1,4 @@
+import { isComputer } from '../engine/computer'
 import type { GameRecord, PlayerId } from '../engine/game'
 import { places } from '../engine/summary'
 import {
@@ -222,8 +223,10 @@ export function headToHeadGrid(
       continue
     }
     const place = places({ slots: game.slots, result: game.result })
-    for (const row of game.slots) {
-      for (const column of game.slots) {
+    // Head to head is between people; computers are left out.
+    const people = game.slots.filter((slot) => !isComputer(slot.playerId))
+    for (const row of people) {
+      for (const column of people) {
         if (row.playerId === column.playerId) continue
         if (row.teamId !== undefined && row.teamId === column.teamId) continue
         const cell = meeting(row.playerId, column.playerId)

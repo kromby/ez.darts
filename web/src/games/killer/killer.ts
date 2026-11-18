@@ -12,6 +12,7 @@ import {
   startTurns,
   type Turns,
 } from '../../engine/turns'
+import { killerAim } from './aim'
 import PlayerSummary from './PlayerSummary'
 import {
   damage,
@@ -321,4 +322,5 @@ export const killer: GameModule<KillerOptions, KillerState> = {
   Status,
   PlayerSummary,
   hint,
+  aim: killerAim,
 }

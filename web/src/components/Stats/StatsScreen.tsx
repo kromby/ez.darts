@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { GameRecord, PlayerId } from '../../engine/game'
 import { gameConfigs } from '../../games'
 import { localize } from '../../i18n/languages'
+import { computerPlayer } from '../../players/computer'
 import { isActive, type Player } from '../../players/player'
 import { periods, type Period, type StatsFilter } from '../../stats/aggregate'
 import { householdView } from '../../stats/householdView'
@@ -121,7 +122,8 @@ function StatsScreen({
   const showAverage = filter.game === null || filter.game === 'x01'
 
   const playerOf = (pid: PlayerId): Player =>
-    players.find((p) => p.id === pid) ?? { id: pid, name: pid }
+    players.find((p) => p.id === pid) ??
+    computerPlayer(pid, t) ?? { id: pid, name: pid }
 
   return (
     <div className={styles.stats}>
