@@ -14,9 +14,11 @@ export const computerLevels: readonly ComputerLevel[] = [
  * A computer is a game slot, not a saved player, so everything about it is
  * in its id: `computer-hard-2` is the second hard computer in a game. The
  * id is all the API keeps of a slot, and all the stats see of a player.
+ * Head to head counts each level as one opponent, `computer-hard`, so
+ * games against it add up however many were in a game.
  */
 const prefix = 'computer-'
-const idPattern = /^computer-(easy|medium|hard)-([1-9]\d*)$/
+const idPattern = /^computer-(easy|medium|hard)(?:-([1-9]\d*))?$/
 
 export function computerId(level: ComputerLevel, number: number): PlayerId {
   return `${prefix}${level}-${number}`
@@ -28,8 +30,22 @@ export function parseComputer(
 ): { level: ComputerLevel; number: number } | null {
   const match = idPattern.exec(playerId)
   return match
-    ? { level: match[1] as ComputerLevel, number: Number(match[2]) }
+    ? { level: match[1] as ComputerLevel, number: Number(match[2] ?? 1) }
     : null
+}
+
+/** The level's one id across games, for head to head: `computer-hard`. */
+export function computerRivalId(level: ComputerLevel): PlayerId {
+  return `${prefix}${level}`
+}
+
+/**
+ * Who a player is in head to head: a person by their id, a computer by its
+ * level, so "Anna against the hard computer" adds up over games.
+ */
+export function rivalId(playerId: PlayerId): PlayerId {
+  const computer = parseComputer(playerId)
+  return computer ? computerRivalId(computer.level) : playerId
 }
 
 export function isComputer(playerId: PlayerId): boolean {

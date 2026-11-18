@@ -59,6 +59,26 @@ describe('HeadToHeadCard', () => {
     expect(anna).toHaveTextContent('ofar en Björn1/1100%')
   })
 
+  it('puts the computers played after the people', () => {
+    const view = viewOf(2)
+    const hard = 'computer-hard'
+    view.headToHead.get('anna')?.set(hard, { games: 3, ahead: 1 })
+    view.headToHead.set(hard, new Map([['anna', { games: 3, ahead: 2 }]]))
+    const withComputer = (id: string): Player =>
+      id === hard ? { id, name: 'Tölva (erfið)' } : playerOf(id)
+    render(<HeadToHeadCard view={view} playerOf={withComputer} />)
+
+    const card = screen.getByRole('region', { name: 'Innbyrðis' })
+    const rows = within(card).getAllByRole('row')
+    expect(rows).toHaveLength(4)
+    expect(rows[3]).toHaveTextContent('Tölva (erfið)')
+    expect(
+      within(rows[1]).getByTitle(
+        'Anna endaði ofar en Tölva (erfið) í 1 af 3 sameiginlegum leikjum',
+      ),
+    ).toBeInTheDocument()
+  })
+
   it('says when no two players met', () => {
     const view = viewOf(1)
     render(<HeadToHeadCard view={view} playerOf={playerOf} />)

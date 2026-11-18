@@ -9,6 +9,7 @@ import {
   isComputer,
   nextComputerId,
   parseComputer,
+  rivalId,
   spread,
   throwAt,
   undoCount,
@@ -40,6 +41,13 @@ describe('computer ids', () => {
     expect(parseComputer('computer-expert-1')).toBeNull()
     expect(parseComputer('computer-hard-0')).toBeNull()
     expect(isComputer('anna')).toBe(false)
+  })
+
+  it('is one rival per level in head to head', () => {
+    expect(rivalId('computer-hard-1')).toBe('computer-hard')
+    expect(rivalId('computer-hard-2')).toBe('computer-hard')
+    expect(rivalId('anna')).toBe('anna')
+    expect(parseComputer('computer-hard')).toEqual({ level: 'hard', number: 1 })
   })
 
   it('numbers computers of a level from the first free number', () => {

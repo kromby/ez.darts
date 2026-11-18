@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
+import { computerLevels, computerRivalId } from '../../engine/computer'
 import type { PlayerId } from '../../engine/game'
 import type { Player } from '../../players/player'
 import {
@@ -267,9 +268,14 @@ export function HeadToHeadCard({
   playerOf: PlayerOf
 }) {
   const { t } = useTranslation()
-  const players = view.players
-    .filter((line) => view.headToHead.has(line.playerId))
-    .map((line) => playerOf(line.playerId))
+  // The people by win ratio, then the computers they played, easy first.
+  const people = view.players
+    .map((line) => line.playerId)
+    .filter((id) => view.headToHead.has(id))
+  const computers = computerLevels
+    .map(computerRivalId)
+    .filter((id) => view.headToHead.has(id))
+  const players = [...people, ...computers].map(playerOf)
   if (players.length < 2) {
     return (
       <Card title={t('stats.rivals.title')}>
