@@ -32,6 +32,46 @@ describe('contribution', () => {
     ])
   })
 
+  it('leaves computers out, but counts the game for the people', () => {
+    const game = {
+      ...fixtureGames[3],
+      slots: [{ playerId: 'anna' }, { playerId: 'computer-hard-1' }],
+      result: {
+        standings: ['computer-hard-1', 'anna'],
+        finishedAt: '2026-11-14T21:00:00.000Z',
+      },
+      summary: [
+        {
+          playerId: 'anna',
+          darts: 3,
+          singles: 3,
+          doubles: 0,
+          triples: 0,
+          misses: 0,
+          place: 2,
+        },
+        {
+          playerId: 'computer-hard-1',
+          darts: 3,
+          singles: 0,
+          doubles: 0,
+          triples: 3,
+          misses: 0,
+          place: 1,
+        },
+      ],
+    }
+
+    expect(contribution(game)).toEqual([
+      expect.objectContaining({
+        playerId: 'anna',
+        games: 1,
+        matches: 1,
+        wins: 0,
+      }),
+    ])
+  })
+
   it('gives team mates in first place a win each', () => {
     expect(
       contribution(fixtureGames[3]).map(({ playerId, wins }) => [

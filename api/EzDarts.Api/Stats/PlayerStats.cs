@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using EzDarts.Api.Games;
 
 namespace EzDarts.Api.Stats;
@@ -81,11 +82,21 @@ public record StatsSource(string Game, string FinishedAt, IReadOnlyList<PlayerSu
             : new StatsSource(game.Game, game.Result.FinishedAt, game.Summary);
 }
 
-public static class StatsContribution
+public static partial class StatsContribution
 {
     /// <summary>
+    /// Computer players are game slots, not household players, with ids such as
+    /// <c>computer-hard-2</c>. The web app's <c>isComputer</c>.
+    /// </summary>
+    public static bool IsComputer(string playerId) => ComputerId().IsMatch(playerId);
+
+    [GeneratedRegex("^computer-(easy|medium|hard)-[1-9][0-9]*$")]
+    private static partial Regex ComputerId();
+
+    /// <summary>
     /// One game per player in the summary, in the ISO week the game finished. It is a match when
-    /// someone finished behind first place, and a win for everyone in first place. The web app's
+    /// someone finished behind first place, and a win for everyone in first place. Computer players
+    /// get no stats, though a game against one counts for the people in it. The web app's
     /// <c>contribution</c> does the same.
     /// </summary>
     public static IReadOnlyDictionary<StatsKey, StatsCounts> Of(StatsSource? source)
@@ -97,7 +108,7 @@ public static class StatsContribution
 
         var week = Week(source.FinishedAt);
         var match = source.Summary.Any(s => s.Place > 1) ? 1 : 0;
-        return source.Summary.ToDictionary(
+        return source.Summary.Where(s => !IsComputer(s.PlayerId)).ToDictionary(
             s => new StatsKey(s.PlayerId, source.Game, week),
             s => new StatsCounts(
                 1,

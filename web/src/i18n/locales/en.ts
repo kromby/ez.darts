@@ -45,6 +45,18 @@ const en: typeof is = {
       cancelled: 'Stopped moving {{name}}',
     },
   },
+  computer: {
+    name: 'Computer ({{level}})',
+    numbered: 'Computer {{number}} ({{level}})',
+    add: 'Add a computer',
+    addLevel: 'Add a computer: {{level}}',
+    levels: {
+      easy: 'easy',
+      medium: 'medium',
+      hard: 'hard',
+    },
+    throwing: '{{name}} is throwing…',
+  },
   manage: {
     title: 'Manage players',
     none: 'No players yet.',

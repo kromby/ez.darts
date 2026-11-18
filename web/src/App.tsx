@@ -10,8 +10,10 @@ import LanguageSwitcher from './components/LanguageSwitcher'
 import ManagePlayers from './components/ManagePlayers/ManagePlayers'
 import PlayerSelection from './components/PlayerSelection/PlayerSelection'
 import StatsScreen from './components/Stats/StatsScreen'
+import { isComputer } from './engine/computer'
 import type { PlayerSlot } from './engine/game'
 import { findGame, findGameConfig, gameConfigs } from './games'
+import { computerPlayer } from './players/computer'
 import {
   colorValue,
   createPlayer,
@@ -80,7 +82,11 @@ function App({ store, notice, account }: Props) {
       const colored = withColors(known)
       for (const player of colored) save(store.players.put(player))
       setPlayers(known.map((p) => colored.find((c) => c.id === p.id) ?? p))
-      setSlots((savedSlots ?? []).filter((slot) => ids.has(slot.playerId)))
+      setSlots(
+        (savedSlots ?? []).filter(
+          (slot) => ids.has(slot.playerId) || isComputer(slot.playerId),
+        ),
+      )
       if (savedGameId && findGameConfig(savedGameId)) setGameId(savedGameId)
       setSetups(savedSetups ?? {})
 
@@ -104,10 +110,10 @@ function App({ store, notice, account }: Props) {
     }
   }, [store])
 
-  const inGame = slots.flatMap(
-    (slot) => players.find((player) => player.id === slot.playerId) ?? [],
-  )
-  const findPlayer = (id: string) => players.find((player) => player.id === id)
+  // Computers are not saved players; their ids say who they are.
+  const findPlayer = (id: string) =>
+    players.find((player) => player.id === id) ?? computerPlayer(id, t)
+  const inGame = slots.flatMap((slot) => findPlayer(slot.playerId) ?? [])
   const playerName = (id: string) => findPlayer(id)?.name ?? id
   const playerColor = (id: string) => {
     const player = findPlayer(id)

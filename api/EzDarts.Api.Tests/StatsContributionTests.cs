@@ -52,6 +52,34 @@ public class StatsContributionTests
     }
 
     [Fact]
+    public void ComputersGetNoStatsButTheGameCountsForThePeople()
+    {
+        var game = new StatsSource("cricket", "2026-11-14T21:00:00Z",
+        [
+            new PlayerSummaryDto("anna", 3, 3, 0, 0, 0, 1, 40),
+            new PlayerSummaryDto("computer-hard-1", 3, 3, 0, 0, 0, 1, 0),
+            new PlayerSummaryDto("oli", 3, 0, 0, 0, 3, 2, 0),
+            new PlayerSummaryDto("computer-easy-2", 3, 0, 0, 0, 3, 2, 0),
+        ]);
+
+        var counts = StatsContribution.Of(game);
+
+        Assert.Equal(["anna", "oli"], counts.Keys.Select(k => k.PlayerId).Order());
+        Assert.Equal(new StatsCounts(1, 1, 1, 3, 3, 0, 0, 0, 40), counts[new StatsKey("anna", "cricket", "2026-W46")]);
+    }
+
+    [Theory]
+    [InlineData("computer-easy-1", true)]
+    [InlineData("computer-hard-12", true)]
+    [InlineData("computer-hard-0", false)]
+    [InlineData("computer-expert-1", false)]
+    [InlineData("anna", false)]
+    public void IsComputer_ReadsTheId(string playerId, bool expected)
+    {
+        Assert.Equal(expected, StatsContribution.IsComputer(playerId));
+    }
+
+    [Fact]
     public void Delta_AddsAGameWhenItFinishes()
     {
         var delta = StatsContribution.Delta(null, Finished());

@@ -133,6 +133,12 @@ When a game finishes, the app works out a summary for each player and saves it w
 
 The stats screen has a player view and a household view (the house chip after the players), which compares everyone: win ratio, a head-to-head grid (how often the row player finished ahead of the column player in their shared games, as a list above six players), x01 averages and the dart mix. It only ever shows the signed-in household's own players and games, since the API reads every table by the household's PartitionKey; a guest sees the games on their device.
 
+Computer players get no stats rows of their own. A computer is a game slot named by its id (`computer-hard-2` is the second hard computer), not a saved player, so the app and the API both leave such ids out of the stats rows. A game against a computer still counts as a game, a match and possibly a win for the people in it. Head-to-head does include computers, one per level (`computer-hard`), so "Anna against the hard computer" adds up over games. With two of a level in one game it counts once, by the better placed one on the other side.
+
+### Computer players
+
+Player selection always offers a computer at three levels: easy, medium or hard. It works in every game and in teams. Each game module says where the computer should aim (`aim` in `GameModule`: a checkout or T20 in x01, the best open number in Cricket, the next number in Around the World, its own or the weakest player's double in Killer). A shared thrower in `web/src/engine/computer.ts` then scatters the dart around that point on a board model, more widely the easier the level. Its darts go into the dart log like anyone's, so replay, resume and undo need no special case. Undo goes back to the last person's dart, taking the computer's darts after it too.
+
 ### Sign-in
 
 One email-and-password account per household. Accounts live in the `Users` table, sessions in `Sessions` and failed sign-ins in `LoginAttempts`.

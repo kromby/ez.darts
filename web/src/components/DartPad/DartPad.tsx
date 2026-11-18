@@ -20,14 +20,23 @@ type Props = {
   canUndo?: boolean
   /** Disables the whole pad, e.g. once the game is over. */
   disabled?: boolean
+  /** Disables every key but Undo, e.g. while a computer throws. */
+  locked?: boolean
 }
 
 /**
  * The Big Keys input pad: pick Single/Double/Triple, then a number. The
  * modifier drops back to Single after every dart.
  */
-function DartPad({ onDart, onUndo, canUndo = true, disabled = false }: Props) {
+function DartPad({
+  onDart,
+  onUndo,
+  canUndo = true,
+  disabled = false,
+  locked = false,
+}: Props) {
   const { t } = useTranslation()
+  const keysOff = disabled || locked
   const [modifier, setModifier] = useState<Modifier>(1)
   const modifierName = t(`pad.${modifiers[modifier - 1].key}`)
 
@@ -50,7 +59,7 @@ function DartPad({ onDart, onUndo, canUndo = true, disabled = false }: Props) {
             className={styles.key}
             data-kind={key}
             aria-pressed={modifier === value}
-            disabled={disabled}
+            disabled={keysOff}
             // Tapping the selected modifier again goes back to Single.
             onClick={() => setModifier(modifier === value ? 1 : value)}
           >
@@ -67,7 +76,7 @@ function DartPad({ onDart, onUndo, canUndo = true, disabled = false }: Props) {
             className={styles.key}
             data-kind="number"
             aria-label={t('pad.number', { modifier: modifierName, number })}
-            disabled={disabled}
+            disabled={keysOff}
             onClick={() => throwDart(dart(number, modifier))}
           >
             {number}
@@ -93,7 +102,7 @@ function DartPad({ onDart, onUndo, canUndo = true, disabled = false }: Props) {
                   number: t('pad.bull'),
                 })
           }
-          disabled={disabled || modifier === 3}
+          disabled={keysOff || modifier === 3}
           onClick={() => throwDart(dart(BULL, modifier))}
         >
           <span>{t('pad.bull')}</span>
@@ -105,7 +114,7 @@ function DartPad({ onDart, onUndo, canUndo = true, disabled = false }: Props) {
           type="button"
           className={styles.key}
           data-kind="miss"
-          disabled={disabled}
+          disabled={keysOff}
           onClick={() => throwDart(MISS)}
         >
           {t('pad.miss')}

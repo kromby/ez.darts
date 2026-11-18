@@ -16,7 +16,13 @@ import {
 } from '@dnd-kit/sortable'
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  computerLevels,
+  nextComputerId,
+  type ComputerLevel,
+} from '../../engine/computer'
 import type { PlayerId, PlayerSlot, TeamId } from '../../engine/game'
+import { computerPlayer } from '../../players/computer'
 import {
   isActive,
   normalizeName,
@@ -55,6 +61,58 @@ type Props = {
   random?: () => number
 }
 
+/** One chip per level, to add a computer player at that level. */
+function ComputerChips({ onAdd }: { onAdd(level: ComputerLevel): void }) {
+  const { t } = useTranslation()
+  return (
+    <div
+      className={styles.computers}
+      role="group"
+      aria-label={t('computer.add')}
+    >
+      <span className={styles.computersLabel}>{t('computer.add')}</span>
+      <ul className={styles.chips}>
+        {computerLevels.map((level) => {
+          const name = t(`computer.levels.${level}`)
+          return (
+            <li key={level}>
+              <button
+                type="button"
+                className={styles.chip}
+                data-computer={level}
+                aria-label={t('computer.addLevel', { level: name })}
+                onClick={() => onAdd(level)}
+              >
+                <ComputerIcon />
+                {name}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+/** A small screen with a face, for computer players. */
+function ComputerIcon() {
+  return (
+    <svg
+      className={styles.computerIcon}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="4" y="6" width="16" height="12" rx="3" />
+      <path d="M12 6V3M9 11v1M15 11v1M9.5 15h5" />
+    </svg>
+  )
+}
+
 /** Pre-game step shared by every game: who plays, in what order, in which team. */
 function PlayerSelection({
   players,
@@ -89,7 +147,10 @@ function PlayerSelection({
   )
 
   const byId = new Map(players.map((player) => [player.id, player]))
-  const chosen = selected.flatMap((playerId) => byId.get(playerId) ?? [])
+  // Computers are not saved players; their ids say who they are.
+  const chosen = selected.flatMap(
+    (playerId) => byId.get(playerId) ?? computerPlayer(playerId, t) ?? [],
+  )
   const available = players.filter(
     (player) => isActive(player) && !selected.includes(player.id),
   )
@@ -108,7 +169,7 @@ function PlayerSelection({
   const valid = chosen.length > 0 && teamsValid
 
   const nameOf = (playerId: UniqueIdentifier) =>
-    byId.get(String(playerId))?.name ?? ''
+    chosen.find((player) => player.id === String(playerId))?.name ?? ''
   const positionOf = (playerId: UniqueIdentifier | undefined) =>
     selected.indexOf(String(playerId)) + 1
   const announcements: Announcements = {
@@ -142,6 +203,10 @@ function PlayerSelection({
       )
       return { ...current, [playerId]: teamIds[counts[0] <= counts[1] ? 0 : 1] }
     })
+  }
+
+  function addComputer(level: ComputerLevel) {
+    select(nextComputerId(level, selected))
   }
 
   async function addPlayer() {
@@ -265,6 +330,7 @@ function PlayerSelection({
             ))}
           </ul>
         )}
+        <ComputerChips onAdd={addComputer} />
         <form
           className={styles.newPlayer}
           onSubmit={(event) => {

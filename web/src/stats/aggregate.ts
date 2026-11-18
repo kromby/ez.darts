@@ -1,4 +1,5 @@
-import type { GameRecord, PlayerId } from '../engine/game'
+import { rivalId } from '../engine/computer'
+import type { GameRecord, PlayerId, PlayerSlot } from '../engine/game'
 import { places } from '../engine/summary'
 import {
   addCounts,
@@ -197,10 +198,15 @@ export type Meeting = { games: number; ahead: number }
 /** Row player against column player, for everyone who met in the filter. */
 export type HeadToHeadGrid = Map<PlayerId, Map<PlayerId, Meeting>>
 
+const sameTeam = (a: PlayerSlot, b: PlayerSlot) =>
+  a.teamId !== undefined && a.teamId === b.teamId
+
 /**
  * Every pair of players' head to head, from the games' standings, in one
  * pass: the games each pair played on different sides, and how often the
- * row player finished ahead of the column player.
+ * row player finished ahead of the column player. A computer is there by
+ * its level (`computer-hard`), so games against it add up; with two of a
+ * level in a game, the better placed one counts.
  */
 export function headToHeadGrid(
   games: readonly GameRecord<unknown>[],
@@ -222,14 +228,28 @@ export function headToHeadGrid(
       continue
     }
     const place = places({ slots: game.slots, result: game.result })
-    for (const row of game.slots) {
-      for (const column of game.slots) {
-        if (row.playerId === column.playerId) continue
-        if (row.teamId !== undefined && row.teamId === column.teamId) continue
-        const cell = meeting(row.playerId, column.playerId)
+    const best = (slots: readonly PlayerSlot[]) =>
+      Math.min(...slots.map((slot) => place.get(slot.playerId) ?? Infinity))
+    // People by id and computers by level, so two hard computers in one
+    // game are one opponent, there once.
+    const groups = new Map<PlayerId, PlayerSlot[]>()
+    for (const slot of game.slots) {
+      const id = rivalId(slot.playerId)
+      groups.set(id, [...(groups.get(id) ?? []), slot])
+    }
+    for (const [row, rowSlots] of groups) {
+      for (const [column, columnSlots] of groups) {
+        if (row === column) continue
+        // Only those on different sides met; team mates did not.
+        const met = rowSlots.flatMap((a) =>
+          columnSlots.flatMap((b) => (sameTeam(a, b) ? [] : [[a, b]])),
+        )
+        if (met.length === 0) continue
+        const cell = meeting(row, column)
         cell.games++
-        const rowPlace = place.get(row.playerId) ?? 0
-        if (rowPlace < (place.get(column.playerId) ?? 0)) cell.ahead++
+        if (best(met.map(([a]) => a)) < best(met.map(([, b]) => b))) {
+          cell.ahead++
+        }
       }
     }
   }

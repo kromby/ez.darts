@@ -12,6 +12,7 @@ import {
   type SideId,
   type Turns,
 } from '../../engine/turns'
+import { atwAim } from './aim'
 import PlayerSummary from './PlayerSummary'
 import {
   steps,
@@ -192,4 +193,5 @@ export const aroundTheWorld: GameModule<AtwOptions, AtwState> = {
   Scoreboard,
   Status,
   PlayerSummary,
+  aim: atwAim,
 }

@@ -173,6 +173,76 @@ describe('headToHeadGrid', () => {
   it('is empty without games against others', () => {
     expect(headToHeadGrid([], all, now).size).toBe(0)
   })
+
+  describe('with computers', () => {
+    const game = fixtureGames.find((g) => g.result)
+    const result = game?.result
+    if (!game || !result) throw new Error('The fixture needs a finished game')
+    const finished = (
+      slots: { playerId: string; teamId?: string }[],
+      standings: string[],
+    ) => ({ ...game, slots, result: { ...result, standings } })
+
+    it('counts each level as one opponent across games', () => {
+      const grid = headToHeadGrid(
+        [
+          finished(
+            [{ playerId: 'anna' }, { playerId: 'computer-hard-1' }],
+            ['computer-hard-1', 'anna'],
+          ),
+          finished(
+            [{ playerId: 'computer-hard-1' }, { playerId: 'anna' }],
+            ['anna', 'computer-hard-1'],
+          ),
+          finished(
+            [{ playerId: 'anna' }, { playerId: 'computer-easy-1' }],
+            ['anna', 'computer-easy-1'],
+          ),
+        ],
+        all,
+        now,
+      )
+
+      expect(cells(grid)).toEqual({
+        anna: {
+          'computer-hard': { games: 2, ahead: 1 },
+          'computer-easy': { games: 1, ahead: 1 },
+        },
+        'computer-hard': { anna: { games: 2, ahead: 1 } },
+        'computer-easy': { anna: { games: 1, ahead: 0 } },
+      })
+    })
+
+    it('counts a game once with two of a level, by the one on the other side', () => {
+      // 2v2: Anna with one hard computer, Óli with the other.
+      const grid = headToHeadGrid(
+        [
+          finished(
+            [
+              { playerId: 'anna', teamId: 'A' },
+              { playerId: 'oli', teamId: 'B' },
+              { playerId: 'computer-hard-1', teamId: 'A' },
+              { playerId: 'computer-hard-2', teamId: 'B' },
+            ],
+            ['oli', 'computer-hard-2', 'anna', 'computer-hard-1'],
+          ),
+        ],
+        all,
+        now,
+      )
+
+      expect(grid.get('anna')?.get('computer-hard')).toEqual({
+        games: 1,
+        ahead: 0,
+      })
+      // Óli's team beat Anna's computer.
+      expect(grid.get('oli')?.get('computer-hard')).toEqual({
+        games: 1,
+        ahead: 1,
+      })
+      expect(grid.get('anna')?.get('oli')).toEqual({ games: 1, ahead: 0 })
+    })
+  })
 })
 
 describe('a guest and a household', () => {

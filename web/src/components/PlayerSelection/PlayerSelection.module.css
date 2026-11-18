@@ -208,6 +208,36 @@
   cursor: pointer;
 }
 
+.computers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.computersLabel {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.computerIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--computer);
+}
+
+.chip[data-computer='easy'] {
+  --computer: var(--player-lime);
+}
+
+.chip[data-computer='medium'] {
+  --computer: var(--player-amber);
+}
+
+.chip[data-computer='hard'] {
+  --computer: var(--player-red);
+}
+
 .manage {
   align-self: flex-start;
   min-height: 48px;

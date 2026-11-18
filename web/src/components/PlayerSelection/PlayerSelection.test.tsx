@@ -273,4 +273,91 @@ describe('PlayerSelection', () => {
     // With the line-up so far, so it is kept.
     expect(onManage).toHaveBeenCalledWith([{ playerId: 'oli' }])
   })
+
+  describe('computers', () => {
+    const addComputer = (level: string) =>
+      screen.getByRole('button', { name: `Bæta við tölvu: ${level}` })
+
+    it('adds computers at any level, more than one of each', async () => {
+      const { onContinue, user } = setup()
+
+      await user.click(addComputer('erfið'))
+      await user.click(addComputer('erfið'))
+      await user.click(addComputer('létt'))
+
+      expect(order()).toEqual([
+        'Tölva (erfið)',
+        'Tölva 2 (erfið)',
+        'Tölva (létt)',
+      ])
+      await user.click(continueButton())
+      expect(onContinue).toHaveBeenCalledWith([
+        { playerId: 'computer-hard-1' },
+        { playerId: 'computer-hard-2' },
+        { playerId: 'computer-easy-1' },
+      ])
+    })
+
+    it('offers a computer with no saved players', async () => {
+      const { onContinue, user } = setup({ players: [] })
+
+      await user.click(addComputer('miðlungs'))
+      await user.click(continueButton())
+
+      expect(onContinue).toHaveBeenCalledWith([
+        { playerId: 'computer-medium-1' },
+      ])
+    })
+
+    it('takes a computer back out and reuses its number', async () => {
+      const { user } = setup()
+      await user.click(addComputer('erfið'))
+      await user.click(addComputer('erfið'))
+
+      await user.click(
+        screen.getByRole('button', { name: 'Taka Tölva (erfið) úr leiknum' }),
+      )
+      await user.click(addComputer('erfið'))
+
+      expect(order()).toEqual(['Tölva 2 (erfið)', 'Tölva (erfið)'])
+    })
+
+    it('puts a computer in a team with people', async () => {
+      const { onContinue, user } = setup()
+      await user.click(
+        screen.getByRole('button', { name: 'Bæta Anna í leikinn' }),
+      )
+      await user.click(
+        screen.getByRole('button', { name: 'Bæta Óli í leikinn' }),
+      )
+      await user.click(addComputer('létt'))
+      await user.click(addComputer('erfið'))
+      await user.click(screen.getByRole('switch', { name: 'Spila í liðum' }))
+
+      const teamOf = (name: string) =>
+        screen.getByRole('radiogroup', { name: `Lið fyrir ${name}` })
+      await user.click(
+        within(teamOf('Tölva (létt)')).getByRole('radio', { name: 'Lið A' }),
+      )
+      await user.click(
+        within(teamOf('Tölva (erfið)')).getByRole('radio', { name: 'Lið B' }),
+      )
+      await user.click(continueButton())
+
+      expect(onContinue).toHaveBeenCalledWith([
+        { playerId: 'anna', teamId: 'A' },
+        { playerId: 'oli', teamId: 'B' },
+        { playerId: 'computer-easy-1', teamId: 'A' },
+        { playerId: 'computer-hard-1', teamId: 'B' },
+      ])
+    })
+
+    it('keeps computers from an earlier choice', () => {
+      setup({
+        initial: [{ playerId: 'computer-hard-1' }, { playerId: 'anna' }],
+      })
+
+      expect(order()).toEqual(['Tölva (erfið)', 'Anna'])
+    })
+  })
 })
