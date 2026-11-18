@@ -243,6 +243,33 @@ const is = {
       missed: '{{name}} hitti ekki',
     },
   },
+  cricket: {
+    // Draft wording; "Miskunnarlaust" stands for cut-throat.
+    variants: {
+      standard: 'Venjulegt',
+      cutThroat: 'Miskunnarlaust',
+      noScore: 'Án stiga',
+    },
+    side: 'Leikmaður eða lið',
+    bullShort: 'Mið',
+    marks: 'Merki',
+    markCount_one: '{{count}} merki',
+    markCount_other: '{{count}} merki',
+    closed: 'lokað',
+    closedLabel: 'Lokaðar',
+    dead: 'dauð',
+    score: 'Stig',
+    points: 'Stig',
+    // Marks per round of three darts.
+    mpr: 'Merki/umf.',
+    feedback: {
+      won: '{{name}} vann!',
+      scored: '{{name}}: {{marks}}, {{points}} stig',
+      given: '{{name}}: {{marks}}, {{points}} stig á hina',
+      marked: '{{name}}: {{marks}}',
+      missed: '{{name}} hitti ekkert',
+    },
+  },
   stats: {
     open: 'Tölfræði',
     title: 'Tölfræði',

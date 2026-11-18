@@ -17,7 +17,10 @@ import TrendChart from './TrendChart'
 import { useFormat, type Format } from './useFormat'
 import styles from './StatsScreen.module.css'
 
-/** A game's key number: the x01 average, or darts for around the world. */
+/**
+ * A game's key number: the x01 average, or darts for around the world.
+ * Other games' points (Cricket's) are no 3-dart average.
+ */
 function keyStat(
   game: string,
   points: number | undefined,
@@ -26,7 +29,7 @@ function keyStat(
   format: Format,
   t: ReturnType<typeof useTranslation>['t'],
 ): string {
-  if (points !== undefined && darts > 0) {
+  if (game === 'x01' && points !== undefined && darts > 0) {
     return t('stats.byGame.average', {
       value: format.decimal((points / darts) * 3),
     })

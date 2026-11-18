@@ -68,8 +68,8 @@ export interface GameModule<TOptions, TState> {
   PlayerSummary?: ComponentType<PlayerSummaryProps<TState>>
   hint?(state: TState): string | null
   /**
-   * Points a player scored, for games where points add up to a 3-dart
-   * average (x01). Left out by games without one.
+   * Points a player scored, for games that keep score: x01 (where they add
+   * up to a 3-dart average) and Cricket. Left out by games without points.
    */
   points?(state: TState, playerId: PlayerId): number
 }
@@ -88,7 +88,8 @@ export type GameResult = {
 /**
  * One player's numbers from a finished game, kept with it for stats: where
  * the darts landed (a bull is a single, the bullseye a double), the place
- * (1 is first; team mates share one) and, for x01, the points scored.
+ * (1 is first; team mates share one) and, for x01 and Cricket, the points
+ * scored.
  * Stats only add these up, so the API needs no game rules.
  */
 export type PlayerSummary = {

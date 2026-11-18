@@ -39,7 +39,8 @@ function counts(darts: readonly ThrownDart[], playerId: PlayerId) {
 
 /**
  * The finished game's summary, one entry per player in throwing order.
- * `points` comes from the game module, for games that score them (x01).
+ * `points` comes from the game module, for games that score them (x01,
+ * Cricket).
  */
 export function summarize(
   record: Pick<GameRecord<unknown>, 'slots' | 'darts'> & {

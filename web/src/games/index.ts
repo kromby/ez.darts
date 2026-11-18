@@ -6,6 +6,8 @@ import { parseGameConfig, type GameConfig } from '../engine/config'
 import type { GameRecord } from '../engine/game'
 import { aroundTheWorld } from './aroundTheWorld/aroundTheWorld'
 import aroundTheWorldConfig from './aroundTheWorld/config.json'
+import cricketConfig from './cricket/config.json'
+import { cricket } from './cricket/cricket'
 import killerConfig from './killer/config.json'
 import { killer } from './killer/killer'
 import x01Config from './x01/config.json'
@@ -19,6 +21,7 @@ export const gameConfigs: GameConfig[] = [
   x01Config,
   aroundTheWorldConfig,
   killerConfig,
+  cricketConfig,
 ].map(parseGameConfig)
 
 export function findGameConfig(id: string): GameConfig | undefined {
@@ -29,6 +32,7 @@ const games: GameStarter[] = [
   gameStarter(x01),
   gameStarter(aroundTheWorld),
   gameStarter(killer),
+  gameStarter(cricket),
 ]
 
 export function findGame(id: string): GameStarter | undefined {
