@@ -129,9 +129,9 @@ export function dartAt({ x, y }: Point): Dart {
 /** A normally distributed number (Box–Muller), from a uniform `random`. */
 function gaussian(random: () => number): number {
   // 1 - random() is in (0, 1], so the logarithm is finite.
-  const u = 1 - random()
-  const v = random()
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+  const distance = 1 - random()
+  const turn = random()
+  return Math.sqrt(-2 * Math.log(distance)) * Math.cos(2 * Math.PI * turn)
 }
 
 /**

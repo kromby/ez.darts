@@ -35,8 +35,8 @@ function renderGame(
       module={x01}
       record={record}
       playerName={(id) => names[id]}
-      onPlayAgain={() => {}}
-      onExit={() => {}}
+      onPlayAgain={vi.fn<() => void>()}
+      onExit={vi.fn<() => void>()}
       onRecord={(next) => records.push(next)}
       random={seededRandom(51)}
       computerDelay={DELAY}
