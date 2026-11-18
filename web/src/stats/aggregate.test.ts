@@ -176,11 +176,12 @@ describe('headToHeadGrid', () => {
 
   describe('with computers', () => {
     const game = fixtureGames.find((g) => g.result)
-    if (!game?.result) throw new Error('The fixture needs a finished game')
+    const result = game?.result
+    if (!game || !result) throw new Error('The fixture needs a finished game')
     const finished = (
       slots: { playerId: string; teamId?: string }[],
       standings: string[],
-    ) => ({ ...game, slots, result: { ...game.result!, standings } })
+    ) => ({ ...game, slots, result: { ...result, standings } })
 
     it('counts each level as one opponent across games', () => {
       const grid = headToHeadGrid(
